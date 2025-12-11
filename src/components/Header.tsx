@@ -1,21 +1,28 @@
 import { useState } from "react";
-import { Heart, Search, ShoppingCart, Menu, X } from "lucide-react";
+import { Heart, ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
-import { useMenu } from "@/context/MenuContext";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Minus, Plus, Truck } from "lucide-react";
+import { brands } from "@/data/brands";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Header = () => {
   const { wishlist } = useWishlist();
   const { items, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-b from-background/95 via-background/90 to-background/80 backdrop-blur-xl border-b border-border/30 transition-all duration-300 shadow-lg shadow-black/5">
@@ -33,6 +40,27 @@ const Header = () => {
               <p className="text-[10px] text-muted-foreground tracking-widest uppercase">Gorras Premium</p>
             </div>
           </div>
+
+          {/* Navigation - Desktop */}
+          <nav className="hidden md:flex items-center gap-6">
+            <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              Inicio
+            </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+                Marcas <ChevronDown className="h-4 w-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="center" className="w-48">
+                {brands.map((brand) => (
+                  <DropdownMenuItem key={brand.id} asChild>
+                    <Link to={`/marca/${brand.slug}`} className="w-full cursor-pointer">
+                      {brand.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </nav>
 
           {/* Actions */}
           <div className="flex items-center gap-2">
@@ -183,8 +211,44 @@ const Header = () => {
                 )}
               </SheetContent>
             </Sheet>
+
+            {/* Mobile Menu Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-10 w-10 rounded-xl hover:bg-primary/10 md:hidden"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <nav className="md:hidden py-4 border-t border-border/30 mt-4 animate-fade-in">
+            <div className="flex flex-col gap-3">
+              <Link 
+                to="/" 
+                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Inicio
+              </Link>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mt-2">Marcas</p>
+              {brands.map((brand) => (
+                <Link
+                  key={brand.id}
+                  to={`/marca/${brand.slug}`}
+                  className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors py-2 pl-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {brand.name}
+                </Link>
+              ))}
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );

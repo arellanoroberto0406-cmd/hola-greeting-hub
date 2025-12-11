@@ -10,6 +10,7 @@ import { MenuProvider } from "@/context/MenuContext";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import BrandPage from "./pages/BrandPage";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/marca/:slug" element={<BrandPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
