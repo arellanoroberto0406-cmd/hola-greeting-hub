@@ -202,7 +202,10 @@ const Header = () => {
                       <Button
                         className="w-full"
                         size="lg"
-                        onClick={() => setIsCartOpen(false)}
+                        onClick={() => {
+                          setIsCartOpen(false);
+                          navigate("/checkout");
+                        }}
                       >
                         Proceder al Pago
                       </Button>
