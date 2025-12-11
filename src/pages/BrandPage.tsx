@@ -1,15 +1,24 @@
 import { useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
-import { getBrandBySlug, getProductsByBrand } from "@/data/brands";
+import { getBrandBySlug } from "@/data/brands";
+import { useProductsByBrand } from "@/hooks/useProducts";
 import { Button } from "@/components/ui/button";
+
+// Mapeo de slug a nombre de marca en DB
+const brandNameMap: Record<string, string> = {
+  barbahats: "BarbaHats",
+  gallofino: "GalloFino",
+  jchats: "JC Hats",
+};
 
 const BrandPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const brand = getBrandBySlug(slug || "");
-  const products = getProductsByBrand(slug || "");
+  const brandName = brandNameMap[slug || ""] || "";
+  const { data: products = [], isLoading } = useProductsByBrand(brandName);
 
   if (!brand) {
     return (
@@ -72,19 +81,25 @@ const BrandPage = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product, index) => (
-              <div 
-                key={product.id} 
-                className="animate-fade-in"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {products.map((product, index) => (
+                <div 
+                  key={product.id} 
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <ProductCard product={product} />
+                </div>
+              ))}
+            </div>
+          )}
 
-          {products.length === 0 && (
+          {!isLoading && products.length === 0 && (
             <div className="text-center py-20">
               <p className="text-muted-foreground text-lg">
                 No hay productos disponibles en esta colección.

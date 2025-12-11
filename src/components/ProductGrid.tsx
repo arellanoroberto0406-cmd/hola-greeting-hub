@@ -1,22 +1,34 @@
 import { useState, useMemo } from "react";
 import ProductCard from "./ProductCard";
 import { Button } from "@/components/ui/button";
-import { Filter, X } from "lucide-react";
+import { Filter, Loader2 } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { products, collections, allColors } from "@/data/products";
 import { Product } from "@/types/product";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useCart } from "@/context/CartContext";
 import { Rating } from "./Rating";
+import { useProducts } from "@/hooks/useProducts";
 
 const ProductGrid = () => {
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
   const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
   const { addItem } = useCart();
+  const { data: products = [], isLoading } = useProducts();
+
+  // Extraer colecciones y colores únicos de los productos
+  const collections = useMemo(() => 
+    Array.from(new Set(products.map(p => p.collection))), 
+    [products]
+  );
+  
+  const allColors = useMemo(() => 
+    Array.from(new Set(products.flatMap(p => p.colors))), 
+    [products]
+  );
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
@@ -26,7 +38,7 @@ const ProductGrid = () => {
         selectedCollections.includes(product.collection);
       return colorMatch && collectionMatch;
     });
-  }, [selectedColors, selectedCollections]);
+  }, [products, selectedColors, selectedCollections]);
 
   const handleColorChange = (color: string) => {
     setSelectedColors((prev) =>
@@ -145,7 +157,11 @@ const ProductGrid = () => {
               </p>
             </div>
 
-            {filteredProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : filteredProducts.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-lg text-muted-foreground">No se encontraron productos con estos filtros</p>
                 <Button onClick={clearFilters} className="mt-4">
