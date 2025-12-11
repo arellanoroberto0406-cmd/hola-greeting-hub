@@ -11,6 +11,7 @@ import { MenuProvider } from "@/context/MenuContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BrandPage from "./pages/BrandPage";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/marca/:slug" element={<BrandPage />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
