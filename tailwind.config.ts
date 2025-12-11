@@ -13,6 +13,11 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        'display': ['Bebas Neue', 'sans-serif'],
+        'heading': ['Oswald', 'sans-serif'],
+        'body': ['Montserrat', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,6 +52,10 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        gold: {
+          DEFAULT: "hsl(var(--gold))",
+          foreground: "hsl(var(--gold-foreground))",
+        },
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -80,10 +89,133 @@ export default {
             height: "0",
           },
         },
+        "pulse-zoom": {
+          "0%, 100%": {
+            transform: "scale(1)",
+          },
+          "50%": {
+            transform: "scale(1.05)",
+          },
+        },
+        slideIn: {
+          "0%": {
+            width: "0",
+            opacity: "0",
+          },
+          "100%": {
+            width: "100%",
+            opacity: "1",
+          },
+        },
+        pulse: {
+          "0%, 100%": {
+            opacity: "1",
+            transform: "scale(1)",
+          },
+          "50%": {
+            opacity: "0.8",
+            transform: "scale(1.02)",
+          },
+        },
+        rotateText: {
+          "0%": {
+            transform: "rotateY(0deg)",
+          },
+          "100%": {
+            transform: "rotateY(360deg)",
+          },
+        },
+        "slide-in-right": {
+          "0%": {
+            transform: "translateX(100%)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "translateX(0)",
+            opacity: "1",
+          },
+        },
+        "shine-sweep": {
+          "0%": {
+            transform: "translateX(-100%)",
+          },
+          "100%": {
+            transform: "translateX(100%)",
+          },
+        },
+        "logo-shine": {
+          "0%": {
+            transform: "translateX(-100%)",
+          },
+          "16.67%": {
+            transform: "translateX(100%)",
+          },
+          "100%": {
+            transform: "translateX(100%)",
+          },
+        },
+        "scale-in": {
+          "0%": {
+            transform: "scale(0.8)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+        },
+        "fade-in": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "zoom-forward": {
+          "0%": {
+            transform: "scale(0.3) translateZ(-200px)",
+            opacity: "0",
+          },
+          "50%": {
+            transform: "scale(1.15) translateZ(50px)",
+            opacity: "1",
+          },
+          "70%": {
+            transform: "scale(0.95) translateZ(0)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "scale(1) translateZ(0)",
+            opacity: "1",
+          },
+        },
+        "zoom-out-fade": {
+          "0%": {
+            transform: "scale(1)",
+            opacity: "1",
+          },
+          "100%": {
+            transform: "scale(1.5)",
+            opacity: "0",
+          },
+        },
       },
       animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
+        "accordion-down": "accordion-down 0.08s ease-out",
+        "accordion-up": "accordion-up 0.08s ease-out",
+        "pulse-zoom": "pulse-zoom 6s ease-in-out infinite",
+        slideIn: "slideIn 0.3s ease-out forwards",
+        pulse: "pulse 0.5s ease-in-out infinite",
+        "slide-in-right": "slide-in-right 0.3s ease-out",
+        "shine-sweep": "shine-sweep 1s ease-out forwards",
+        "logo-shine": "logo-shine 6s ease-in-out infinite",
+        "scale-in": "scale-in 0.5s ease-out forwards",
+        "fade-in": "fade-in 0.4s ease-out forwards",
+        "zoom-forward": "zoom-forward 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+        "zoom-out-fade": "zoom-out-fade 0.4s ease-in forwards",
       },
     },
   },
