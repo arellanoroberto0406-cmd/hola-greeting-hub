@@ -14,7 +14,183 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      order_items: {
+        Row: {
+          created_at: string
+          id: string
+          order_id: string
+          price: number
+          product_id: string | null
+          product_image: string
+          product_name: string
+          quantity: number
+          selected_color: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          order_id: string
+          price: number
+          product_id?: string | null
+          product_image: string
+          product_name: string
+          quantity: number
+          selected_color?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          order_id?: string
+          price?: number
+          product_id?: string | null
+          product_image?: string
+          product_name?: string
+          quantity?: number
+          selected_color?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          address: string
+          city: string
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          payment_method: string
+          phone: string
+          shipping_cost: number
+          state: string
+          status: string
+          subtotal: number
+          total: number
+          updated_at: string
+          user_id: string | null
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          city: string
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          payment_method: string
+          phone: string
+          shipping_cost?: number
+          state: string
+          status?: string
+          subtotal: number
+          total: number
+          updated_at?: string
+          user_id?: string | null
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          payment_method?: string
+          phone?: string
+          shipping_cost?: number
+          state?: string
+          status?: string
+          subtotal?: number
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+          zip_code?: string
+        }
+        Relationships: []
+      }
+      products: {
+        Row: {
+          brand: string | null
+          collection: string
+          colors: string[] | null
+          created_at: string
+          description: string | null
+          features: string[] | null
+          id: string
+          image: string
+          images: string[] | null
+          is_new: boolean | null
+          is_on_sale: boolean | null
+          materials: string | null
+          name: string
+          original_price: number | null
+          price: number
+          rating: number | null
+          review_count: number | null
+          stock: number
+          updated_at: string
+        }
+        Insert: {
+          brand?: string | null
+          collection: string
+          colors?: string[] | null
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          image: string
+          images?: string[] | null
+          is_new?: boolean | null
+          is_on_sale?: boolean | null
+          materials?: string | null
+          name: string
+          original_price?: number | null
+          price: number
+          rating?: number | null
+          review_count?: number | null
+          stock?: number
+          updated_at?: string
+        }
+        Update: {
+          brand?: string | null
+          collection?: string
+          colors?: string[] | null
+          created_at?: string
+          description?: string | null
+          features?: string[] | null
+          id?: string
+          image?: string
+          images?: string[] | null
+          is_new?: boolean | null
+          is_on_sale?: boolean | null
+          materials?: string | null
+          name?: string
+          original_price?: number | null
+          price?: number
+          rating?: number | null
+          review_count?: number | null
+          stock?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

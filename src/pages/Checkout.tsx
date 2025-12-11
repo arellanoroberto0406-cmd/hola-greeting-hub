@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { useCreateOrder } from "@/hooks/useOrders";
 import {
   Form,
   FormControl,
@@ -55,8 +56,8 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const createOrder = useCreateOrder();
 
   const shippingCost = totalPrice >= 500 ? 0 : 99;
   const finalTotal = totalPrice + shippingCost;
@@ -77,19 +78,37 @@ const Checkout = () => {
   });
 
   const onSubmit = async (data: ShippingForm) => {
-    setIsSubmitting(true);
-    
-    // Simulate order processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setOrderComplete(true);
-    clearCart();
-    
-    toast({
-      title: "¡Pedido realizado!",
-      description: "Recibirás un correo con los detalles de tu pedido.",
-    });
+    try {
+      await createOrder.mutateAsync({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        zipCode: data.zipCode,
+        paymentMethod: data.paymentMethod,
+        items: items,
+        subtotal: totalPrice,
+        shippingCost: shippingCost,
+        total: finalTotal,
+      });
+
+      setOrderComplete(true);
+      clearCart();
+
+      toast({
+        title: "¡Pedido realizado!",
+        description: "Recibirás un correo con los detalles de tu pedido.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error al procesar pedido",
+        description: "Por favor intenta de nuevo.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (items.length === 0 && !orderComplete) {
@@ -341,9 +360,9 @@ const Checkout = () => {
                     type="submit" 
                     size="lg" 
                     className="w-full"
-                    disabled={isSubmitting}
+                    disabled={createOrder.isPending}
                   >
-                    {isSubmitting ? "Procesando..." : `Pagar $${finalTotal.toLocaleString()}`}
+                    {createOrder.isPending ? "Procesando..." : `Pagar $${finalTotal.toLocaleString()}`}
                   </Button>
                 </div>
               </form>
@@ -410,10 +429,10 @@ const Checkout = () => {
                   type="submit" 
                   size="lg" 
                   className="w-full"
-                  disabled={isSubmitting}
+                  disabled={createOrder.isPending}
                   onClick={form.handleSubmit(onSubmit)}
                 >
-                  {isSubmitting ? "Procesando..." : "Confirmar Pedido"}
+                  {createOrder.isPending ? "Procesando..." : "Confirmar Pedido"}
                 </Button>
               </div>
             </div>
