@@ -49,6 +49,7 @@ const Dashboard = () => {
   const [productPrice, setProductPrice] = useState("");
   const [productOriginalPrice, setProductOriginalPrice] = useState("");
   const [productImage, setProductImage] = useState("");
+  const [productImages, setProductImages] = useState<string[]>([]);
   const [productCollection, setProductCollection] = useState("");
   const [productStock, setProductStock] = useState("10");
   const [productDescription, setProductDescription] = useState("");
@@ -171,6 +172,7 @@ const Dashboard = () => {
     setProductPrice("");
     setProductOriginalPrice("");
     setProductImage("");
+    setProductImages([]);
     setProductCollection("");
     setProductStock("10");
     setProductDescription("");
@@ -184,6 +186,7 @@ const Dashboard = () => {
     setProductPrice(String(product.price));
     setProductOriginalPrice(product.original_price ? String(product.original_price) : "");
     setProductImage(product.image);
+    setProductImages(product.images || []);
     setProductCollection(product.collection);
     setProductStock(String(product.stock));
     setProductDescription(product.description || "");
@@ -210,6 +213,7 @@ const Dashboard = () => {
         price: parseFloat(productPrice),
         original_price: productOriginalPrice ? parseFloat(productOriginalPrice) : null,
         image: productImage,
+        images: productImages,
         collection: productCollection || "General",
         stock: parseInt(productStock) || 10,
         description: productDescription,
@@ -470,61 +474,134 @@ const Dashboard = () => {
                           />
                         </div>
                       </div>
-                      <div className="space-y-2">
-                        <Label>Imagen del producto *</Label>
+                      <div className="space-y-3">
+                        <Label>Imágenes del producto *</Label>
                         <input
                           type="file"
                           ref={fileInputRef}
                           accept="image/jpeg,image/png,image/webp,image/gif"
+                          multiple
                           className="hidden"
                           onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (file && user) {
-                              const url = await uploadImage(file, user.id);
-                              if (url) {
-                                setProductImage(url);
+                            const files = e.target.files;
+                            if (files && user) {
+                              for (const file of Array.from(files)) {
+                                const url = await uploadImage(file, user.id);
+                                if (url) {
+                                  if (!productImage) {
+                                    setProductImage(url);
+                                  } else {
+                                    setProductImages(prev => [...prev, url]);
+                                  }
+                                }
                               }
+                            }
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = "";
                             }
                           }}
                         />
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            className="flex-1"
-                            onClick={() => fileInputRef.current?.click()}
-                            disabled={uploading}
-                          >
-                            {uploading ? (
-                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            ) : (
-                              <Upload className="h-4 w-4 mr-2" />
-                            )}
-                            {uploading ? "Subiendo..." : "Subir imagen"}
-                          </Button>
-                        </div>
-                        {productImage ? (
-                          <div className="relative w-32 h-32 group">
-                            <img 
-                              src={productImage} 
-                              alt="Preview" 
-                              className="w-full h-full object-cover rounded-lg border"
-                            />
-                            <Button
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={uploading}
+                          className="w-full"
+                        >
+                          {uploading ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          ) : (
+                            <Upload className="h-4 w-4 mr-2" />
+                          )}
+                          {uploading ? "Subiendo..." : "Subir imágenes"}
+                        </Button>
+                        
+                        {/* Image gallery preview */}
+                        <div className="grid grid-cols-4 gap-2">
+                          {/* Main image */}
+                          {productImage ? (
+                            <div className="relative aspect-square group">
+                              <img 
+                                src={productImage} 
+                                alt="Principal" 
+                                className="w-full h-full object-cover rounded-lg border-2 border-primary"
+                              />
+                              <div className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-[10px] px-1.5 py-0.5 rounded">
+                                Principal
+                              </div>
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => {
+                                  if (productImages.length > 0) {
+                                    setProductImage(productImages[0]);
+                                    setProductImages(prev => prev.slice(1));
+                                  } else {
+                                    setProductImage("");
+                                  }
+                                }}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="aspect-square border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground">
+                              <ImageIcon className="h-6 w-6" />
+                            </div>
+                          )}
+                          
+                          {/* Additional images */}
+                          {productImages.map((img, index) => (
+                            <div key={index} className="relative aspect-square group">
+                              <img 
+                                src={img} 
+                                alt={`Imagen ${index + 2}`} 
+                                className="w-full h-full object-cover rounded-lg border"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                className="absolute top-1 right-1 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                onClick={() => setProductImages(prev => prev.filter((_, i) => i !== index))}
+                              >
+                                <Trash2 className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="icon"
+                                className="absolute bottom-1 right-1 h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+                                title="Hacer principal"
+                                onClick={() => {
+                                  const newMain = productImages[index];
+                                  const newImages = [...productImages];
+                                  newImages[index] = productImage;
+                                  setProductImage(newMain);
+                                  setProductImages(newImages);
+                                }}
+                              >
+                                ★
+                              </Button>
+                            </div>
+                          ))}
+                          
+                          {/* Add more button */}
+                          {(productImage || productImages.length > 0) && productImages.length < 7 && (
+                            <button
                               type="button"
-                              variant="destructive"
-                              size="icon"
-                              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                              onClick={() => setProductImage("")}
+                              onClick={() => fileInputRef.current?.click()}
+                              className="aspect-square border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground hover:border-primary hover:text-primary transition-colors"
                             >
-                              <Trash2 className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ) : (
-                          <div className="w-32 h-32 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground">
-                            <ImageIcon className="h-8 w-8" />
-                          </div>
-                        )}
+                              <Plus className="h-6 w-6" />
+                            </button>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Sube hasta 8 imágenes. La primera será la imagen principal.
+                        </p>
                       </div>
                       <div className="space-y-2">
                         <Label>Descripción</Label>
