@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import StoreFront from "./pages/StoreFront";
 import StoreCheckout from "./pages/StoreCheckout";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,7 @@ const App = () => (
             <WishlistProvider>
               <Toaster />
               <Sonner />
+              <PWAInstallPrompt />
               <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
