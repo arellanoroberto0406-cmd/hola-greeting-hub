@@ -218,6 +218,83 @@ export type Database = {
         }
         Relationships: []
       }
+      stores: {
+        Row: {
+          accent_color: string | null
+          address: string | null
+          banner_url: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          facebook_url: string | null
+          free_shipping_threshold: number | null
+          id: string
+          instagram_url: string | null
+          is_active: boolean | null
+          logo_url: string | null
+          name: string
+          owner_id: string
+          phone: string | null
+          primary_color: string | null
+          secondary_color: string | null
+          shipping_cost: number | null
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string | null
+          address?: string | null
+          banner_url?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          free_shipping_threshold?: number | null
+          id?: string
+          instagram_url?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name: string
+          owner_id: string
+          phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          shipping_cost?: number | null
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string | null
+          address?: string | null
+          banner_url?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          facebook_url?: string | null
+          free_shipping_threshold?: number | null
+          id?: string
+          instagram_url?: string | null
+          is_active?: boolean | null
+          logo_url?: string | null
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          primary_color?: string | null
+          secondary_color?: string | null
+          shipping_cost?: number | null
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stores_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
