@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3 } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -18,6 +18,7 @@ import { useImageUpload } from "@/hooks/useImageUpload";
 import { useStoreAssets } from "@/hooks/useStoreAssets";
 import OrdersPanel from "@/components/dashboard/OrdersPanel";
 import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
+import CouponsPanel from "@/components/dashboard/CouponsPanel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -408,22 +409,26 @@ const Dashboard = () => {
         ) : (
           // Store Dashboard
           <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full max-w-2xl grid-cols-4">
+            <TabsList className="grid w-full max-w-3xl grid-cols-5">
               <TabsTrigger value="orders" className="gap-2">
                 <ShoppingBag className="h-4 w-4" />
-                Pedidos
+                <span className="hidden sm:inline">Pedidos</span>
               </TabsTrigger>
               <TabsTrigger value="analytics" className="gap-2">
                 <BarChart3 className="h-4 w-4" />
-                Analytics
+                <span className="hidden sm:inline">Analytics</span>
+              </TabsTrigger>
+              <TabsTrigger value="coupons" className="gap-2">
+                <Tag className="h-4 w-4" />
+                <span className="hidden sm:inline">Cupones</span>
               </TabsTrigger>
               <TabsTrigger value="products" className="gap-2">
                 <Package className="h-4 w-4" />
-                Productos
+                <span className="hidden sm:inline">Productos</span>
               </TabsTrigger>
               <TabsTrigger value="settings" className="gap-2">
                 <Settings className="h-4 w-4" />
-                Configuración
+                <span className="hidden sm:inline">Config</span>
               </TabsTrigger>
             </TabsList>
 
@@ -433,6 +438,10 @@ const Dashboard = () => {
 
             <TabsContent value="analytics">
               <AnalyticsPanel storeId={store.id} />
+            </TabsContent>
+
+            <TabsContent value="coupons">
+              <CouponsPanel storeId={store.id} />
             </TabsContent>
 
             <TabsContent value="products" className="space-y-4">
