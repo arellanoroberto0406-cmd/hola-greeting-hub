@@ -9,12 +9,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useImageUpload } from "@/hooks/useImageUpload";
+import { useStoreAssets } from "@/hooks/useStoreAssets";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -26,7 +27,10 @@ const Dashboard = () => {
   const createStore = useCreateStore();
   const updateStore = useUpdateStore();
   const { uploadImage, uploading } = useImageUpload();
+  const { uploadStoreAsset, uploading: uploadingAsset } = useStoreAssets();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const bannerInputRef = useRef<HTMLInputElement>(null);
 
   // Store form state
   const [storeName, setStoreName] = useState("");
@@ -40,6 +44,8 @@ const Dashboard = () => {
   const [storeEmail, setStoreEmail] = useState("");
   const [storeInstagram, setStoreInstagram] = useState("");
   const [storeFacebook, setStoreFacebook] = useState("");
+  const [storeLogo, setStoreLogo] = useState("");
+  const [storeBanner, setStoreBanner] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   // Product form state
@@ -76,6 +82,8 @@ const Dashboard = () => {
       setStoreEmail(store.email || "");
       setStoreInstagram(store.instagram_url || "");
       setStoreFacebook(store.facebook_url || "");
+      setStoreLogo(store.logo_url || "");
+      setStoreBanner(store.banner_url || "");
     }
   }, [store]);
 
@@ -151,6 +159,8 @@ const Dashboard = () => {
         email: storeEmail,
         instagram_url: storeInstagram,
         facebook_url: storeFacebook,
+        logo_url: storeLogo || null,
+        banner_url: storeBanner || null,
       });
       toast({
         title: "Cambios guardados",
@@ -702,22 +712,156 @@ const Dashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Nombre de la tienda</Label>
-                      <Input
-                        value={storeName}
-                        onChange={(e) => setStoreName(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>URL</Label>
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground text-sm">/tienda/</span>
-                        <Input
-                          value={storeSlug}
-                          onChange={(e) => setStoreSlug(generateSlug(e.target.value))}
+                  {/* Logo and Banner Section */}
+                  <div className="space-y-4">
+                    <h3 className="font-medium text-lg">Identidad Visual</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Logo Upload */}
+                      <div className="space-y-3">
+                        <Label>Logo de la tienda</Label>
+                        <input
+                          type="file"
+                          ref={logoInputRef}
+                          accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file && store) {
+                              const url = await uploadStoreAsset(file, store.id, 'logo');
+                              if (url) setStoreLogo(url);
+                            }
+                            if (logoInputRef.current) logoInputRef.current.value = "";
+                          }}
                         />
+                        <div className="flex items-center gap-4">
+                          <div 
+                            className="w-24 h-24 border-2 border-dashed rounded-xl flex items-center justify-center overflow-hidden bg-muted/50 cursor-pointer hover:border-primary transition-colors"
+                            onClick={() => logoInputRef.current?.click()}
+                          >
+                            {storeLogo ? (
+                              <img src={storeLogo} alt="Logo" className="w-full h-full object-contain p-2" />
+                            ) : (
+                              <Image className="h-8 w-8 text-muted-foreground" />
+                            )}
+                          </div>
+                          <div className="flex-1 space-y-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => logoInputRef.current?.click()}
+                              disabled={uploadingAsset}
+                            >
+                              {uploadingAsset ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <Upload className="h-4 w-4 mr-2" />
+                              )}
+                              Subir logo
+                            </Button>
+                            {storeLogo && (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="text-destructive"
+                                onClick={() => setStoreLogo("")}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Eliminar
+                              </Button>
+                            )}
+                            <p className="text-xs text-muted-foreground">
+                              Recomendado: 200x200px, PNG o SVG
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Banner Upload */}
+                      <div className="space-y-3">
+                        <Label>Banner de la tienda</Label>
+                        <input
+                          type="file"
+                          ref={bannerInputRef}
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file && store) {
+                              const url = await uploadStoreAsset(file, store.id, 'banner');
+                              if (url) setStoreBanner(url);
+                            }
+                            if (bannerInputRef.current) bannerInputRef.current.value = "";
+                          }}
+                        />
+                        <div 
+                          className="w-full h-32 border-2 border-dashed rounded-xl flex items-center justify-center overflow-hidden bg-muted/50 cursor-pointer hover:border-primary transition-colors"
+                          onClick={() => bannerInputRef.current?.click()}
+                        >
+                          {storeBanner ? (
+                            <img src={storeBanner} alt="Banner" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-center space-y-2">
+                              <ImageIcon className="h-8 w-8 mx-auto text-muted-foreground" />
+                              <p className="text-sm text-muted-foreground">Click para subir banner</p>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => bannerInputRef.current?.click()}
+                            disabled={uploadingAsset}
+                          >
+                            {uploadingAsset ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            ) : (
+                              <Upload className="h-4 w-4 mr-2" />
+                            )}
+                            Subir banner
+                          </Button>
+                          {storeBanner && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="text-destructive"
+                              onClick={() => setStoreBanner("")}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Eliminar
+                            </Button>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground">
+                          Recomendado: 1920x400px, JPG o PNG
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t pt-6">
+                    <h3 className="font-medium text-lg mb-4">Información General</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Nombre de la tienda</Label>
+                        <Input
+                          value={storeName}
+                          onChange={(e) => setStoreName(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>URL</Label>
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground text-sm">/tienda/</span>
+                          <Input
+                            value={storeSlug}
+                            onChange={(e) => setStoreSlug(generateSlug(e.target.value))}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
