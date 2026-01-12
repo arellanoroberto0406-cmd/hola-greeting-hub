@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import { useMyStore, useCreateStore, useUpdateStore, useStoreProducts } from "@/hooks/useStores";
@@ -9,11 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { useImageUpload } from "@/hooks/useImageUpload";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -24,6 +25,8 @@ const Dashboard = () => {
   const { data: products, isLoading: productsLoading, refetch: refetchProducts } = useStoreProducts(store?.id);
   const createStore = useCreateStore();
   const updateStore = useUpdateStore();
+  const { uploadImage, uploading } = useImageUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Store form state
   const [storeName, setStoreName] = useState("");
@@ -468,14 +471,59 @@ const Dashboard = () => {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <Label>URL de imagen *</Label>
-                        <Input
-                          value={productImage}
-                          onChange={(e) => setProductImage(e.target.value)}
-                          placeholder="https://..."
+                        <Label>Imagen del producto *</Label>
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          accept="image/jpeg,image/png,image/webp,image/gif"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (file && user) {
+                              const url = await uploadImage(file, user.id);
+                              if (url) {
+                                setProductImage(url);
+                              }
+                            }
+                          }}
                         />
-                        {productImage && (
-                          <img src={productImage} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={uploading}
+                          >
+                            {uploading ? (
+                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            ) : (
+                              <Upload className="h-4 w-4 mr-2" />
+                            )}
+                            {uploading ? "Subiendo..." : "Subir imagen"}
+                          </Button>
+                        </div>
+                        {productImage ? (
+                          <div className="relative w-32 h-32 group">
+                            <img 
+                              src={productImage} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover rounded-lg border"
+                            />
+                            <Button
+                              type="button"
+                              variant="destructive"
+                              size="icon"
+                              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                              onClick={() => setProductImage("")}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        ) : (
+                          <div className="w-32 h-32 border-2 border-dashed rounded-lg flex items-center justify-center text-muted-foreground">
+                            <ImageIcon className="h-8 w-8" />
+                          </div>
                         )}
                       </div>
                       <div className="space-y-2">
