@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
-import { Loader2, ShoppingCart, Heart, Menu } from "lucide-react";
+import { Loader2, ShoppingCart, Heart, Menu, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useMemo, useEffect } from "react";
@@ -12,6 +12,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { Minus, Plus, X, Truck } from "lucide-react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import ProductGallery from "@/components/ProductGallery";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -40,6 +42,7 @@ const StoreFront = () => {
   const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
   const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   const products = useMemo(() => {
     return (productsData || []).map(mapDbProduct);
@@ -312,17 +315,30 @@ const StoreFront = () => {
                 key={product.id}
                 className="group bg-card rounded-xl overflow-hidden border hover:shadow-lg transition-all duration-300"
               >
-                <div className="relative aspect-square overflow-hidden">
+                <div 
+                  className="relative aspect-square overflow-hidden cursor-pointer"
+                  onClick={() => setSelectedProduct(product)}
+                >
                   <img 
                     src={product.image} 
                     alt={product.name}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  {/* Image count indicator */}
+                  {product.images && product.images.length > 0 && (
+                    <div className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm text-xs px-2 py-1 rounded-full flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      {1 + product.images.length} fotos
+                    </div>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
                     className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full"
-                    onClick={() => toggleWishlist(product)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleWishlist(product);
+                    }}
                   >
                     <Heart 
                       className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''}`}
@@ -365,6 +381,96 @@ const StoreFront = () => {
           </div>
         )}
       </div>
+
+      {/* Product Detail Modal */}
+      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {selectedProduct && (
+            <div className="grid md:grid-cols-2 gap-0">
+              <div className="p-6 bg-muted/30">
+                <ProductGallery
+                  mainImage={selectedProduct.image}
+                  images={selectedProduct.images || []}
+                  productName={selectedProduct.name}
+                  primaryColor={store.primary_color}
+                />
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  {selectedProduct.isNew && (
+                    <Badge className="mb-2" style={{ backgroundColor: store.primary_color }}>
+                      Nuevo
+                    </Badge>
+                  )}
+                  {selectedProduct.isOnSale && selectedProduct.originalPrice && (
+                    <Badge className="mb-2 ml-2 bg-red-500">
+                      Oferta
+                    </Badge>
+                  )}
+                  <h2 className="text-2xl font-heading font-bold mt-2">{selectedProduct.name}</h2>
+                  <p className="text-sm text-muted-foreground">{selectedProduct.collection}</p>
+                </div>
+                
+                <div className="flex items-baseline gap-3">
+                  <span className="text-3xl font-bold" style={{ color: store.primary_color }}>
+                    ${selectedProduct.price.toLocaleString()}
+                  </span>
+                  {selectedProduct.originalPrice && (
+                    <span className="text-lg text-muted-foreground line-through">
+                      ${selectedProduct.originalPrice.toLocaleString()}
+                    </span>
+                  )}
+                </div>
+
+                {selectedProduct.description && (
+                  <p className="text-muted-foreground">{selectedProduct.description}</p>
+                )}
+
+                {selectedProduct.features && selectedProduct.features.length > 0 && (
+                  <div>
+                    <h4 className="font-medium mb-2">Características:</h4>
+                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                      {selectedProduct.features.map((feature, i) => (
+                        <li key={i}>{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-2 text-sm">
+                  <span className={selectedProduct.stock > 0 ? "text-green-600" : "text-red-500"}>
+                    {selectedProduct.stock > 0 ? `${selectedProduct.stock} en stock` : "Agotado"}
+                  </span>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    className="flex-1"
+                    size="lg"
+                    style={{ backgroundColor: store.primary_color }}
+                    onClick={() => {
+                      addItem(selectedProduct);
+                      setSelectedProduct(null);
+                    }}
+                    disabled={selectedProduct.stock === 0}
+                  >
+                    {selectedProduct.stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={() => toggleWishlist(selectedProduct)}
+                  >
+                    <Heart 
+                      className={`h-5 w-5 ${isInWishlist(selectedProduct.id) ? 'fill-red-500 text-red-500' : ''}`}
+                    />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer 
