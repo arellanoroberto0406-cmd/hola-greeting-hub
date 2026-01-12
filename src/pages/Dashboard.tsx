@@ -9,13 +9,15 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useStoreAssets } from "@/hooks/useStoreAssets";
+import OrdersPanel from "@/components/dashboard/OrdersPanel";
+import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -405,8 +407,16 @@ const Dashboard = () => {
           </Card>
         ) : (
           // Store Dashboard
-          <Tabs defaultValue="products" className="space-y-6">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+          <Tabs defaultValue="orders" className="space-y-6">
+            <TabsList className="grid w-full max-w-2xl grid-cols-4">
+              <TabsTrigger value="orders" className="gap-2">
+                <ShoppingBag className="h-4 w-4" />
+                Pedidos
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </TabsTrigger>
               <TabsTrigger value="products" className="gap-2">
                 <Package className="h-4 w-4" />
                 Productos
@@ -416,6 +426,14 @@ const Dashboard = () => {
                 Configuración
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="orders">
+              <OrdersPanel storeId={store.id} />
+            </TabsContent>
+
+            <TabsContent value="analytics">
+              <AnalyticsPanel storeId={store.id} />
+            </TabsContent>
 
             <TabsContent value="products" className="space-y-4">
               <div className="flex items-center justify-between">
