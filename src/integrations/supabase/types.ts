@@ -145,6 +145,7 @@ export type Database = {
           rating: number | null
           review_count: number | null
           stock: number
+          store_id: string | null
           updated_at: string
         }
         Insert: {
@@ -166,6 +167,7 @@ export type Database = {
           rating?: number | null
           review_count?: number | null
           stock?: number
+          store_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -187,9 +189,18 @@ export type Database = {
           rating?: number | null
           review_count?: number | null
           stock?: number
+          store_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "products_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
