@@ -7,33 +7,42 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { MenuProvider } from "@/context/MenuContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import BrandPage from "./pages/BrandPage";
 import Checkout from "./pages/Checkout";
+import Auth from "./pages/Auth";
+import Dashboard from "./pages/Dashboard";
+import StoreFront from "./pages/StoreFront";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <MenuProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/marca/:slug" element={<BrandPage />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </WishlistProvider>
-        </CartProvider>
-      </MenuProvider>
+      <AuthProvider>
+        <MenuProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/tienda/:slug" element={<StoreFront />} />
+                  <Route path="/marca/:slug" element={<BrandPage />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </WishlistProvider>
+          </CartProvider>
+        </MenuProvider>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

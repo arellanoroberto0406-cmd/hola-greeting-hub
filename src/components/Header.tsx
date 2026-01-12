@@ -60,6 +60,9 @@ const Header = () => {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+            <Link to="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
+              Mi Tienda
+            </Link>
           </nav>
 
           {/* Actions */}
