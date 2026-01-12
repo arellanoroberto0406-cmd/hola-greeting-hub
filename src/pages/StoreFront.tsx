@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { Minus, Plus, X, Truck } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import ProductGallery from "@/components/ProductGallery";
+import ProductReviews from "@/components/ProductReviews";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -465,6 +466,11 @@ const StoreFront = () => {
                       className={`h-5 w-5 ${isInWishlist(selectedProduct.id) ? 'fill-red-500 text-red-500' : ''}`}
                     />
                   </Button>
+                </div>
+
+                {/* Reviews Section */}
+                <div className="border-t pt-6 mt-6">
+                  <ProductReviews productId={selectedProduct.id} />
                 </div>
               </div>
             </div>
