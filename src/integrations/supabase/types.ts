@@ -739,7 +739,9 @@ export type Database = {
           address: string | null
           announcement_active: boolean | null
           announcement_text: string | null
+          bank_info: Json | null
           banner_url: string | null
+          cash_instructions: string | null
           created_at: string
           currency: string | null
           dark_mode_enabled: boolean | null
@@ -752,9 +754,12 @@ export type Database = {
           instagram_url: string | null
           is_active: boolean | null
           logo_url: string | null
+          mercadopago_access_token: string | null
           min_order_amount: number | null
           name: string
           owner_id: string
+          payment_methods: Json | null
+          paypal_email: string | null
           phone: string | null
           primary_color: string | null
           return_policy: string | null
@@ -777,7 +782,9 @@ export type Database = {
           address?: string | null
           announcement_active?: boolean | null
           announcement_text?: string | null
+          bank_info?: Json | null
           banner_url?: string | null
+          cash_instructions?: string | null
           created_at?: string
           currency?: string | null
           dark_mode_enabled?: boolean | null
@@ -790,9 +797,12 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           logo_url?: string | null
+          mercadopago_access_token?: string | null
           min_order_amount?: number | null
           name: string
           owner_id: string
+          payment_methods?: Json | null
+          paypal_email?: string | null
           phone?: string | null
           primary_color?: string | null
           return_policy?: string | null
@@ -815,7 +825,9 @@ export type Database = {
           address?: string | null
           announcement_active?: boolean | null
           announcement_text?: string | null
+          bank_info?: Json | null
           banner_url?: string | null
+          cash_instructions?: string | null
           created_at?: string
           currency?: string | null
           dark_mode_enabled?: boolean | null
@@ -828,9 +840,12 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           logo_url?: string | null
+          mercadopago_access_token?: string | null
           min_order_amount?: number | null
           name?: string
           owner_id?: string
+          payment_methods?: Json | null
+          paypal_email?: string | null
           phone?: string | null
           primary_color?: string | null
           return_policy?: string | null
