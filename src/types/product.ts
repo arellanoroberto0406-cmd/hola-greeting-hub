@@ -8,6 +8,15 @@ export interface Review {
   images?: string[];
 }
 
+export interface ProductVariant {
+  id: string;
+  name: string;
+  value: string;
+  stock: number;
+  priceAdjustment: number;
+  sku?: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -26,11 +35,13 @@ export interface Product {
   reviews?: Review[];
   materials?: string;
   features?: string[];
+  variants?: ProductVariant[];
 }
 
 export interface CartItem extends Product {
   quantity: number;
   selectedColor?: string;
+  selectedVariant?: ProductVariant;
 }
 
 export type FilterOptions = {

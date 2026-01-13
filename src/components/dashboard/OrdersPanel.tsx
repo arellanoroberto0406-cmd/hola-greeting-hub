@@ -16,9 +16,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import TrackingInput from "./TrackingInput";
+import ExportOrdersButton from "./ExportOrdersButton";
 
 interface OrdersPanelProps {
   storeId: string;
@@ -60,21 +62,23 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-heading">Pedidos</h2>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Filtrar por estado" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            {STATUS_OPTIONS.map((status) => (
-              <SelectItem key={status.value} value={status.value}>
-                {status.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center gap-4">
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Filtrar por estado" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {STATUS_OPTIONS.map((status) => (
+                <SelectItem key={status.value} value={status.value}>
+                  {status.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <ExportOrdersButton orders={filteredOrders || []} storeName="tienda" />
       </div>
 
       {!filteredOrders?.length ? (
@@ -223,6 +227,38 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
                 {selectedOrder.payment_method === "cash" ? "Efectivo" : 
                  selectedOrder.payment_method === "card" ? "Tarjeta" : 
                  selectedOrder.payment_method}
+              </div>
+
+              {/* Tracking */}
+              <div className="border-t pt-4 space-y-3">
+                <h4 className="font-medium">Información de envío</h4>
+                <TrackingInput 
+                  orderId={selectedOrder.id}
+                  currentTracking={{
+                    tracking_number: (selectedOrder as any).tracking_number,
+                    tracking_url: (selectedOrder as any).tracking_url,
+                    carrier: (selectedOrder as any).carrier,
+                    estimated_delivery: (selectedOrder as any).estimated_delivery,
+                  }}
+                />
+                {(selectedOrder as any).tracking_number && (
+                  <div className="p-3 bg-muted/50 rounded-lg space-y-1">
+                    <p className="text-sm"><strong>Guía:</strong> {(selectedOrder as any).tracking_number}</p>
+                    {(selectedOrder as any).carrier && (
+                      <p className="text-sm"><strong>Paquetería:</strong> {(selectedOrder as any).carrier}</p>
+                    )}
+                    {(selectedOrder as any).tracking_url && (
+                      <a 
+                        href={(selectedOrder as any).tracking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-primary flex items-center gap-1 hover:underline"
+                      >
+                        Ver rastreo <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
