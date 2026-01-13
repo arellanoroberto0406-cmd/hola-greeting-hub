@@ -82,6 +82,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [hasChanges, setHasChanges] = useState(false);
   const [showLivePreview, setShowLivePreview] = useState(true);
+  const [templatePreview, setTemplatePreview] = useState<{
+    globalStyles: GlobalStyles;
+    sectionIds: string[];
+  } | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -187,6 +191,29 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
     setHasChanges(true);
   };
 
+  // Get preview sections/styles for template hover
+  const getPreviewData = () => {
+    if (templatePreview) {
+      const previewSections = DEFAULT_SECTIONS.map(section => ({
+        ...section,
+        enabled: templatePreview.sectionIds.includes(section.id),
+      }));
+      const orderedSections = templatePreview.sectionIds
+        .map(id => previewSections.find(s => s.id === id))
+        .filter(Boolean) as StoreSection[];
+      const remainingSections = previewSections.filter(
+        s => !templatePreview.sectionIds.includes(s.id)
+      );
+      return {
+        sections: [...orderedSections, ...remainingSections],
+        styles: templatePreview.globalStyles,
+      };
+    }
+    return { sections, styles: globalStyles };
+  };
+
+  const previewData = getPreviewData();
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -255,17 +282,64 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         </TabsList>
 
         <TabsContent value="templates" className="space-y-6">
-          <TemplatesPanel
-            currentStyles={globalStyles}
-            currentSections={sections}
-            onApplyTemplate={(newStyles, newSections) => {
-              setGlobalStyles(newStyles);
-              setSections(newSections);
-              setHasChanges(true);
-            }}
-            primaryColor={store.primary_color}
-            store={store}
-          />
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <TemplatesPanel
+                currentStyles={globalStyles}
+                currentSections={sections}
+                onApplyTemplate={(newStyles, newSections) => {
+                  setGlobalStyles(newStyles);
+                  setSections(newSections);
+                  setHasChanges(true);
+                  setTemplatePreview(null);
+                }}
+                onPreviewTemplate={setTemplatePreview}
+                primaryColor={store.primary_color}
+                store={store}
+              />
+            </div>
+            
+            {/* Live Preview Panel for Templates */}
+            <div className="hidden lg:block">
+              <div className="sticky top-4 space-y-4">
+                <Card className={`transition-all duration-300 ${templatePreview ? 'ring-2 ring-primary shadow-lg' : ''}`}>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Eye className="h-4 w-4" style={{ color: store.primary_color }} />
+                      {templatePreview ? 'Vista previa de plantilla' : 'Vista previa actual'}
+                    </CardTitle>
+                    {templatePreview && (
+                      <CardDescription className="text-xs text-primary font-medium">
+                        Pasa el cursor sobre las plantillas para previsualizar
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <LivePreviewPanel
+                      sections={previewData.sections}
+                      store={store}
+                      globalStyles={previewData.styles}
+                      device="desktop"
+                      onDeviceChange={() => {}}
+                      showDeviceControls={false}
+                    />
+                  </CardContent>
+                </Card>
+                
+                {templatePreview && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 bg-primary/10 rounded-lg border border-primary/20"
+                  >
+                    <p className="text-sm text-center text-primary font-medium">
+                      Haz clic en la plantilla para aplicarla
+                    </p>
+                  </motion.div>
+                )}
+              </div>
+            </div>
+          </div>
         </TabsContent>
 
         <TabsContent value="editor" className="space-y-6">
