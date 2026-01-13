@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { StoreSection } from "@/types/storeLayout";
+import { StoreSection, ANIMATION_OPTIONS, BACKGROUND_COLORS, AnimationType } from "@/types/storeLayout";
 import {
   Dialog,
   DialogContent,
@@ -20,6 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Palette, Sparkles, Settings2 } from "lucide-react";
 
 interface SectionSettingsDialogProps {
   section: StoreSection | null;
@@ -471,30 +474,289 @@ export const SectionSettingsDialog = ({
         );
 
       default:
-        return <p className="text-muted-foreground">No hay configuraciones disponibles para esta sección.</p>;
+        return null;
     }
+  };
+
+  const renderStyleFields = () => {
+    return (
+      <div className="space-y-4">
+        {/* Background Color */}
+        <div className="space-y-3">
+          <Label className="flex items-center gap-2">
+            <Palette className="h-4 w-4" />
+            Color de fondo
+          </Label>
+          <Select
+            value={editedSection.settings.backgroundColor || 'transparent'}
+            onValueChange={(value) => updateSetting('backgroundColor', value)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {BACKGROUND_COLORS.map((bg) => (
+                <SelectItem key={bg.value} value={bg.value}>
+                  <div className="flex items-center gap-2">
+                    <div 
+                      className="h-4 w-4 rounded border"
+                      style={{ 
+                        backgroundColor: bg.color === 'primary-light' ? `${primaryColor}15` : bg.color,
+                        borderColor: bg.color === 'transparent' ? '#e5e7eb' : 'transparent'
+                      }}
+                    />
+                    {bg.label}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          {editedSection.settings.backgroundColor === 'custom' && (
+            <div className="space-y-2">
+              <Label>Color personalizado</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="color"
+                  value={editedSection.settings.customBgColor || '#ffffff'}
+                  onChange={(e) => updateSetting('customBgColor', e.target.value)}
+                  className="w-12 h-10 p-1 cursor-pointer"
+                />
+                <Input
+                  value={editedSection.settings.customBgColor || '#ffffff'}
+                  onChange={(e) => updateSetting('customBgColor', e.target.value)}
+                  placeholder="#ffffff"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+          )}
+
+          {editedSection.settings.backgroundColor === 'primary-light' && (
+            <div className="space-y-2">
+              <Label>Opacidad ({editedSection.settings.bgOpacity || 10}%)</Label>
+              <Slider
+                value={[editedSection.settings.bgOpacity || 10]}
+                onValueChange={([value]) => updateSetting('bgOpacity', value)}
+                min={5}
+                max={30}
+                step={5}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Background Pattern */}
+        <div className="space-y-2">
+          <Label>Patrón de fondo</Label>
+          <Select
+            value={editedSection.settings.backgroundPattern || 'none'}
+            onValueChange={(value) => updateSetting('backgroundPattern', value)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Sin patrón</SelectItem>
+              <SelectItem value="dots">Puntos</SelectItem>
+              <SelectItem value="grid">Cuadrícula</SelectItem>
+              <SelectItem value="diagonal">Líneas diagonales</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Padding */}
+        <div className="space-y-2">
+          <Label>Espaciado interno</Label>
+          <Select
+            value={editedSection.settings.padding || 'normal'}
+            onValueChange={(value) => updateSetting('padding', value)}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Sin espaciado</SelectItem>
+              <SelectItem value="compact">Compacto</SelectItem>
+              <SelectItem value="normal">Normal</SelectItem>
+              <SelectItem value="relaxed">Amplio</SelectItem>
+              <SelectItem value="spacious">Extra amplio</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Border */}
+        <div className="flex items-center justify-between">
+          <Label>Mostrar borde</Label>
+          <Switch
+            checked={editedSection.settings.showBorder || false}
+            onCheckedChange={(checked) => updateSetting('showBorder', checked)}
+          />
+        </div>
+
+        {editedSection.settings.showBorder && (
+          <div className="space-y-2">
+            <Label>Estilo de borde</Label>
+            <Select
+              value={editedSection.settings.borderStyle || 'subtle'}
+              onValueChange={(value) => updateSetting('borderStyle', value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="subtle">Sutil</SelectItem>
+                <SelectItem value="medium">Medio</SelectItem>
+                <SelectItem value="strong">Pronunciado</SelectItem>
+                <SelectItem value="primary">Color primario</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderAnimationFields = () => {
+    return (
+      <div className="space-y-4">
+        {/* Animation Type */}
+        <div className="space-y-3">
+          <Label className="flex items-center gap-2">
+            <Sparkles className="h-4 w-4" />
+            Tipo de animación
+          </Label>
+          <div className="grid grid-cols-2 gap-2">
+            {ANIMATION_OPTIONS.map((anim) => (
+              <button
+                key={anim.value}
+                type="button"
+                className={`p-3 text-left rounded-lg border-2 transition-all text-sm ${
+                  editedSection.settings.animation === anim.value
+                    ? 'border-primary bg-primary/5'
+                    : 'border-transparent bg-muted/50 hover:bg-muted'
+                }`}
+                onClick={() => updateSetting('animation', anim.value)}
+              >
+                {anim.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Animation Duration */}
+        {editedSection.settings.animation && editedSection.settings.animation !== 'none' && (
+          <>
+            <div className="space-y-2">
+              <Label>Duración ({editedSection.settings.animationDuration || 0.5}s)</Label>
+              <Slider
+                value={[editedSection.settings.animationDuration || 0.5]}
+                onValueChange={([value]) => updateSetting('animationDuration', value)}
+                min={0.2}
+                max={1.5}
+                step={0.1}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Retraso ({editedSection.settings.animationDelay || 0}s)</Label>
+              <Slider
+                value={[editedSection.settings.animationDelay || 0]}
+                onValueChange={([value]) => updateSetting('animationDelay', value)}
+                min={0}
+                max={1}
+                step={0.1}
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <Label>Animar elementos individualmente</Label>
+              <Switch
+                checked={editedSection.settings.staggerChildren || false}
+                onCheckedChange={(checked) => updateSetting('staggerChildren', checked)}
+              />
+            </div>
+
+            {editedSection.settings.staggerChildren && (
+              <div className="space-y-2">
+                <Label>Intervalo entre elementos ({editedSection.settings.staggerDelay || 0.1}s)</Label>
+                <Slider
+                  value={[editedSection.settings.staggerDelay || 0.1]}
+                  onValueChange={([value]) => updateSetting('staggerDelay', value)}
+                  min={0.05}
+                  max={0.3}
+                  step={0.05}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Preview */}
+        <Card className="bg-muted/30">
+          <CardContent className="pt-4">
+            <p className="text-xs text-muted-foreground text-center">
+              La animación se activará cuando el usuario haga scroll y la sección sea visible.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Configurar: {editedSection.title}</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label>Nombre de la sección</Label>
-            <Input
-              value={editedSection.title}
-              onChange={(e) => setEditedSection({ ...editedSection, title: e.target.value })}
-            />
+        <div className="flex-1 overflow-y-auto pr-2">
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label>Nombre de la sección</Label>
+              <Input
+                value={editedSection.title}
+                onChange={(e) => setEditedSection({ ...editedSection, title: e.target.value })}
+              />
+            </div>
+            
+            <Tabs defaultValue="content" className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="content" className="gap-1 text-xs">
+                  <Settings2 className="h-3 w-3" />
+                  Contenido
+                </TabsTrigger>
+                <TabsTrigger value="style" className="gap-1 text-xs">
+                  <Palette className="h-3 w-3" />
+                  Estilo
+                </TabsTrigger>
+                <TabsTrigger value="animation" className="gap-1 text-xs">
+                  <Sparkles className="h-3 w-3" />
+                  Animación
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="content" className="mt-4 space-y-4">
+                {renderSettingsFields() || (
+                  <p className="text-muted-foreground text-sm py-4 text-center">
+                    No hay configuraciones de contenido para esta sección.
+                  </p>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="style" className="mt-4">
+                {renderStyleFields()}
+              </TabsContent>
+              
+              <TabsContent value="animation" className="mt-4">
+                {renderAnimationFields()}
+              </TabsContent>
+            </Tabs>
           </div>
-          
-          {renderSettingsFields()}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancelar
           </Button>

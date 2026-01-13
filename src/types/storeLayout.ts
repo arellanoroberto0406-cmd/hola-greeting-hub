@@ -25,6 +25,52 @@ export type FontFamily =
   | 'merriweather'
   | 'nunito';
 
+export type AnimationType = 
+  | 'none'
+  | 'fade'
+  | 'slide-up'
+  | 'slide-down'
+  | 'slide-left'
+  | 'slide-right'
+  | 'zoom'
+  | 'bounce';
+
+export interface SectionBackground {
+  type: 'none' | 'solid' | 'gradient' | 'pattern';
+  color?: string;
+  gradientFrom?: string;
+  gradientTo?: string;
+  gradientDirection?: 'to-r' | 'to-l' | 'to-t' | 'to-b' | 'to-br' | 'to-bl' | 'to-tr' | 'to-tl';
+  pattern?: 'dots' | 'grid' | 'waves' | 'none';
+  opacity?: number;
+}
+
+export const ANIMATION_OPTIONS: { value: AnimationType; label: string }[] = [
+  { value: 'none', label: 'Sin animación' },
+  { value: 'fade', label: 'Aparecer' },
+  { value: 'slide-up', label: 'Deslizar hacia arriba' },
+  { value: 'slide-down', label: 'Deslizar hacia abajo' },
+  { value: 'slide-left', label: 'Deslizar desde la izquierda' },
+  { value: 'slide-right', label: 'Deslizar desde la derecha' },
+  { value: 'zoom', label: 'Zoom' },
+  { value: 'bounce', label: 'Rebote' },
+];
+
+export const BACKGROUND_COLORS: { value: string; label: string; color: string }[] = [
+  { value: 'transparent', label: 'Transparente', color: 'transparent' },
+  { value: 'white', label: 'Blanco', color: '#ffffff' },
+  { value: 'light-gray', label: 'Gris claro', color: '#f5f5f5' },
+  { value: 'warm-gray', label: 'Gris cálido', color: '#fafaf9' },
+  { value: 'cool-gray', label: 'Gris frío', color: '#f8fafc' },
+  { value: 'cream', label: 'Crema', color: '#fffbeb' },
+  { value: 'soft-pink', label: 'Rosa suave', color: '#fdf2f8' },
+  { value: 'soft-blue', label: 'Azul suave', color: '#eff6ff' },
+  { value: 'soft-green', label: 'Verde suave', color: '#f0fdf4' },
+  { value: 'soft-purple', label: 'Morado suave', color: '#faf5ff' },
+  { value: 'primary-light', label: 'Primario claro', color: 'primary-light' },
+  { value: 'custom', label: 'Personalizado', color: 'custom' },
+];
+
 export interface GlobalStyles {
   headingFont: FontFamily;
   bodyFont: FontFamily;
