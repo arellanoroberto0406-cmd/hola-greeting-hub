@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -953,19 +953,42 @@ const Dashboard = () => {
                     </div>
                   </div>
 
+                  <div className="border-t pt-6">
+                    <h3 className="font-medium text-lg mb-4 flex items-center gap-2">
+                      <MessageCircle className="h-5 w-5 text-green-500" />
+                      WhatsApp para Clientes
+                    </h3>
+                    <div className="space-y-2">
+                      <Label>Número de WhatsApp</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          value={storePhone}
+                          onChange={(e) => setStorePhone(e.target.value)}
+                          placeholder="+52 55 1234 5678"
+                          className="flex-1"
+                        />
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        Este número aparecerá como botón flotante en tu tienda. Los clientes podrán contactarte directamente por WhatsApp. Incluye el código de país (ej: +52 para México, +1 para USA).
+                      </p>
+                      {storePhone && (
+                        <div className="flex items-center gap-2 mt-2 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900">
+                          <MessageCircle className="h-5 w-5 text-green-600" />
+                          <span className="text-sm text-green-700 dark:text-green-400">
+                            Vista previa: Botón de WhatsApp activo en tu tienda
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Teléfono</Label>
-                      <Input
-                        value={storePhone}
-                        onChange={(e) => setStorePhone(e.target.value)}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Email</Label>
+                      <Label>Email de contacto</Label>
                       <Input
                         value={storeEmail}
                         onChange={(e) => setStoreEmail(e.target.value)}
+                        placeholder="tienda@ejemplo.com"
                       />
                     </div>
                   </div>
