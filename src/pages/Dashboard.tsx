@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -438,61 +439,211 @@ const Dashboard = () => {
           </Card>
         ) : (
           // Store Dashboard
+          <TooltipProvider delayDuration={300}>
           <Tabs defaultValue="orders" className="space-y-6">
             <TabsList className="grid w-full max-w-5xl grid-cols-7">
-              <TabsTrigger value="orders" className="gap-2">
-                <ShoppingBag className="h-4 w-4" />
-                <span className="hidden sm:inline">Pedidos</span>
-              </TabsTrigger>
-              <TabsTrigger value="analytics" className="gap-2">
-                <BarChart3 className="h-4 w-4" />
-                <span className="hidden sm:inline">Analytics</span>
-              </TabsTrigger>
-              <TabsTrigger value="coupons" className="gap-2">
-                <Tag className="h-4 w-4" />
-                <span className="hidden sm:inline">Cupones</span>
-              </TabsTrigger>
-              <TabsTrigger value="products" className="gap-2">
-                <Package className="h-4 w-4" />
-                <span className="hidden sm:inline">Productos</span>
-              </TabsTrigger>
-              <TabsTrigger value="editor" className="gap-2">
-                <Layers className="h-4 w-4" />
-                <span className="hidden sm:inline">Editor</span>
-              </TabsTrigger>
-              <TabsTrigger value="subscription" className="gap-2">
-                <CreditCard className="h-4 w-4" />
-                <span className="hidden sm:inline">Plan</span>
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="gap-2">
-                <Settings className="h-4 w-4" />
-                <span className="hidden sm:inline">Config</span>
-              </TabsTrigger>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="orders" className="gap-2">
+                    <ShoppingBag className="h-4 w-4" />
+                    <span className="hidden sm:inline">Pedidos</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Gestión de Pedidos</p>
+                  <p className="text-xs text-muted-foreground">Ve todos los pedidos, actualiza estados y gestiona envíos</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="analytics" className="gap-2">
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden sm:inline">Analytics</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Estadísticas</p>
+                  <p className="text-xs text-muted-foreground">Analiza ventas, ingresos, productos más vendidos y tendencias</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="coupons" className="gap-2">
+                    <Tag className="h-4 w-4" />
+                    <span className="hidden sm:inline">Cupones</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Cupones de Descuento</p>
+                  <p className="text-xs text-muted-foreground">Crea códigos promocionales con descuentos fijos o porcentuales</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="products" className="gap-2">
+                    <Package className="h-4 w-4" />
+                    <span className="hidden sm:inline">Productos</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Catálogo de Productos</p>
+                  <p className="text-xs text-muted-foreground">Agrega, edita y organiza tus productos con imágenes y precios</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="editor" className="gap-2">
+                    <Layers className="h-4 w-4" />
+                    <span className="hidden sm:inline">Editor</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Editor Visual</p>
+                  <p className="text-xs text-muted-foreground">Personaliza el diseño de tu tienda con secciones arrastrables y estilos</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="subscription" className="gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    <span className="hidden sm:inline">Plan</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Suscripción</p>
+                  <p className="text-xs text-muted-foreground">Gestiona tu plan, límites de productos y funcionalidades premium</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="settings" className="gap-2">
+                    <Settings className="h-4 w-4" />
+                    <span className="hidden sm:inline">Config</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Configuración</p>
+                  <p className="text-xs text-muted-foreground">Ajusta datos de contacto, envíos, colores y redes sociales</p>
+                </TooltipContent>
+              </Tooltip>
             </TabsList>
 
             <TabsContent value="orders">
-              <OrdersPanel storeId={store.id} />
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Pedidos</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">💡 Consejo</p>
+                      <p className="text-xs">Haz clic en un pedido para ver los detalles completos. Puedes cambiar el estado entre: Pendiente, Confirmado, En proceso, Enviado y Entregado.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <OrdersPanel storeId={store.id} />
+              </div>
             </TabsContent>
 
             <TabsContent value="analytics">
-              <AnalyticsPanel storeId={store.id} />
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Analytics</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">📊 Métricas importantes</p>
+                      <p className="text-xs">Revisa tus ingresos totales, pedidos del mes, productos más vendidos y la distribución de estados. Los datos se actualizan en tiempo real.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <AnalyticsPanel storeId={store.id} />
+              </div>
             </TabsContent>
 
             <TabsContent value="coupons">
-              <CouponsPanel storeId={store.id} />
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Cupones</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">🎟️ Crea promociones</p>
+                      <p className="text-xs">Puedes crear cupones con descuento fijo ($100 off) o porcentual (20% off). Configura mínimo de compra, límite de usos y fecha de expiración.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <CouponsPanel storeId={store.id} />
+              </div>
             </TabsContent>
 
             <TabsContent value="editor">
-              <StoreEditorPanel store={store} />
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Editor de Tienda</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">🎨 Personaliza tu tienda</p>
+                      <p className="text-xs">Arrastra secciones para reordenarlas, edita contenido haciendo clic en ⚙️, usa plantillas predefinidas y ajusta los estilos globales como colores y tipografía.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <StoreEditorPanel store={store} />
+              </div>
             </TabsContent>
 
             <TabsContent value="subscription">
-              <SubscriptionPanel storeId={store.id} primaryColor={store.primary_color} />
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Mi Suscripción</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">💳 Planes disponibles</p>
+                      <p className="text-xs">Compara los planes disponibles y sus beneficios. Los planes premium incluyen más productos, analytics avanzados, cupones y dominio personalizado.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <SubscriptionPanel storeId={store.id} primaryColor={store.primary_color} />
+              </div>
             </TabsContent>
 
             <TabsContent value="products" className="space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-heading">Productos</h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Productos</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">📦 Gestión de productos</p>
+                      <p className="text-xs">Agrega productos con múltiples imágenes, configura precios originales para mostrar descuentos, organiza por colecciones y marca como "Nuevo" o "En oferta".</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
                 <Dialog open={isProductDialogOpen} onOpenChange={(open) => {
                   setIsProductDialogOpen(open);
                   if (!open) resetProductForm();
@@ -779,7 +930,20 @@ const Dashboard = () => {
             <TabsContent value="settings">
               <Card>
                 <CardHeader>
-                  <CardTitle>Configuración de la Tienda</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle>Configuración de la Tienda</CardTitle>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-6 w-6">
+                          <Info className="h-4 w-4 text-muted-foreground" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-sm">
+                        <p className="font-medium mb-1">⚙️ Ajustes generales</p>
+                        <p className="text-xs">Configura el logo, banner, colores de marca, datos de contacto, redes sociales y políticas de envío. Los cambios se guardan al hacer clic en "Guardar cambios".</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                   <CardDescription>
                     Personaliza tu tienda a tu gusto
                   </CardDescription>
@@ -1095,6 +1259,7 @@ const Dashboard = () => {
               </div>
             </TabsContent>
           </Tabs>
+          </TooltipProvider>
         )}
       </main>
 
