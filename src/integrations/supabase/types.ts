@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_carts: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          items: Json
+          recovered: boolean | null
+          reminder_sent_at: string | null
+          store_id: string
+          total: number
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          items?: Json
+          recovered?: boolean | null
+          reminder_sent_at?: string | null
+          store_id: string
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          items?: Json
+          recovered?: boolean | null
+          reminder_sent_at?: string | null
+          store_id?: string
+          total?: number
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_carts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       coupons: {
         Row: {
           code: string
@@ -111,6 +158,38 @@ export type Database = {
           },
         ]
       }
+      newsletter_subscribers: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          is_active: boolean | null
+          store_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          is_active?: boolean | null
+          store_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          is_active?: boolean | null
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "newsletter_subscribers_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
@@ -165,9 +244,11 @@ export type Database = {
       orders: {
         Row: {
           address: string
+          carrier: string | null
           city: string
           created_at: string
           email: string
+          estimated_delivery: string | null
           first_name: string
           id: string
           last_name: string
@@ -179,15 +260,19 @@ export type Database = {
           store_id: string | null
           subtotal: number
           total: number
+          tracking_number: string | null
+          tracking_url: string | null
           updated_at: string
           user_id: string | null
           zip_code: string
         }
         Insert: {
           address: string
+          carrier?: string | null
           city: string
           created_at?: string
           email: string
+          estimated_delivery?: string | null
           first_name: string
           id?: string
           last_name: string
@@ -199,15 +284,19 @@ export type Database = {
           store_id?: string | null
           subtotal: number
           total: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
           zip_code: string
         }
         Update: {
           address?: string
+          carrier?: string | null
           city?: string
           created_at?: string
           email?: string
+          estimated_delivery?: string | null
           first_name?: string
           id?: string
           last_name?: string
@@ -219,6 +308,8 @@ export type Database = {
           store_id?: string | null
           subtotal?: number
           total?: number
+          tracking_number?: string | null
+          tracking_url?: string | null
           updated_at?: string
           user_id?: string | null
           zip_code?: string
@@ -274,6 +365,47 @@ export type Database = {
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_variants: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          price_adjustment: number | null
+          product_id: string
+          sku: string | null
+          stock: number
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          price_adjustment?: number | null
+          product_id: string
+          sku?: string | null
+          stock?: number
+          value: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          price_adjustment?: number | null
+          product_id?: string
+          sku?: string | null
+          stock?: number
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_variants_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
             referencedColumns: ["id"]
           },
         ]
@@ -610,6 +742,8 @@ export type Database = {
           banner_url: string | null
           created_at: string
           currency: string | null
+          dark_mode_enabled: boolean | null
+          default_theme: string | null
           description: string | null
           email: string | null
           facebook_url: string | null
@@ -646,6 +780,8 @@ export type Database = {
           banner_url?: string | null
           created_at?: string
           currency?: string | null
+          dark_mode_enabled?: boolean | null
+          default_theme?: string | null
           description?: string | null
           email?: string | null
           facebook_url?: string | null
@@ -682,6 +818,8 @@ export type Database = {
           banner_url?: string | null
           created_at?: string
           currency?: string | null
+          dark_mode_enabled?: boolean | null
+          default_theme?: string | null
           description?: string | null
           email?: string | null
           facebook_url?: string | null
@@ -776,6 +914,45 @@ export type Database = {
           sort_order?: number | null
         }
         Relationships: []
+      }
+      wishlists: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          store_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          store_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          store_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wishlists_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wishlists_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
