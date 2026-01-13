@@ -4,6 +4,7 @@ import { useStoreLayout } from "@/hooks/useStoreLayout";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, ShoppingCart, Heart, Menu, Eye, Search, User, Package, LogOut, Store, ChevronRight } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import LiveChatWidget from "@/components/store/LiveChatWidget";
 import ProductFilters, { FilterState } from "@/components/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -885,6 +886,13 @@ const StoreFront = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Live Chat Widget */}
+      <LiveChatWidget 
+        storeId={store.id}
+        storeName={store.name}
+        primaryColor={store.primary_color}
+      />
 
       {/* WhatsApp Button */}
       {(store as any).whatsapp_number && (
