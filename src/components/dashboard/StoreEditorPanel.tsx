@@ -57,6 +57,10 @@ const availableSectionTypes: { type: SectionType; label: string }[] = [
   { type: 'newsletter', label: 'Newsletter' },
   { type: 'about', label: 'Sobre Nosotros' },
   { type: 'contact', label: 'Contacto' },
+  { type: 'testimonials', label: 'Testimonios' },
+  { type: 'image_slider', label: 'Slider de Imágenes' },
+  { type: 'video', label: 'Video de Presentación' },
+  { type: 'faq', label: 'Preguntas Frecuentes' },
   { type: 'custom_text', label: 'Texto Personalizado' },
 ];
 
@@ -143,6 +147,25 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
       setSections([...sections, newSection]);
       setHasChanges(true);
     }
+  };
+
+  const handleDuplicateSection = (section: StoreSection) => {
+    const duplicatedSection: StoreSection = {
+      ...section,
+      id: `${section.type}-${Date.now()}`,
+      title: `${section.title} (copia)`,
+      settings: { ...section.settings },
+    };
+    const index = sections.findIndex(s => s.id === section.id);
+    const newSections = [...sections];
+    newSections.splice(index + 1, 0, duplicatedSection);
+    setSections(newSections);
+    setHasChanges(true);
+  };
+
+  const handleDeleteSection = (id: string) => {
+    setSections(sections.filter(s => s.id !== id));
+    setHasChanges(true);
   };
 
   if (isLoading) {
@@ -250,6 +273,8 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                               section={section}
                               onToggle={handleToggleSection}
                               onEdit={handleEditSection}
+                              onDuplicate={handleDuplicateSection}
+                              onDelete={handleDeleteSection}
                               primaryColor={store.primary_color}
                             />
                           ))}
