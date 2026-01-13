@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -21,6 +21,7 @@ import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
 import CouponsPanel from "@/components/dashboard/CouponsPanel";
 import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
+import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -411,7 +412,7 @@ const Dashboard = () => {
         ) : (
           // Store Dashboard
           <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full max-w-4xl grid-cols-6">
+            <TabsList className="grid w-full max-w-5xl grid-cols-7">
               <TabsTrigger value="orders" className="gap-2">
                 <ShoppingBag className="h-4 w-4" />
                 <span className="hidden sm:inline">Pedidos</span>
@@ -427,6 +428,10 @@ const Dashboard = () => {
               <TabsTrigger value="products" className="gap-2">
                 <Package className="h-4 w-4" />
                 <span className="hidden sm:inline">Productos</span>
+              </TabsTrigger>
+              <TabsTrigger value="editor" className="gap-2">
+                <Layers className="h-4 w-4" />
+                <span className="hidden sm:inline">Editor</span>
               </TabsTrigger>
               <TabsTrigger value="subscription" className="gap-2">
                 <CreditCard className="h-4 w-4" />
@@ -448,6 +453,10 @@ const Dashboard = () => {
 
             <TabsContent value="coupons">
               <CouponsPanel storeId={store.id} />
+            </TabsContent>
+
+            <TabsContent value="editor">
+              <StoreEditorPanel store={store} />
             </TabsContent>
 
             <TabsContent value="subscription">
