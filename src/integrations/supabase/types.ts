@@ -158,6 +158,57 @@ export type Database = {
           },
         ]
       }
+      mercadopago_payments: {
+        Row: {
+          created_at: string
+          id: string
+          mp_payment_id: string | null
+          order_id: string
+          payment_type: string | null
+          preference_id: string
+          status: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          mp_payment_id?: string | null
+          order_id: string
+          payment_type?: string | null
+          preference_id: string
+          status?: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mp_payment_id?: string | null
+          order_id?: string
+          payment_type?: string | null
+          preference_id?: string
+          status?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mercadopago_payments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mercadopago_payments_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           created_at: string
