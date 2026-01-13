@@ -51,8 +51,92 @@ Deno.serve(async (req) => {
 
     // Handle refund request
     if (action === 'refund') {
+      // SECURITY: Verify user authentication
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader) {
+        console.error('Refund attempt without authorization header');
+        return new Response(
+          JSON.stringify({ error: 'No autorizado - Se requiere autenticación' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Get the user from the JWT token
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+      
+      if (authError || !user) {
+        console.error('Invalid auth token for refund:', authError);
+        return new Response(
+          JSON.stringify({ error: 'Token de autenticación inválido' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('Refund requested by user:', user.id);
+
       const body: RefundRequest = await req.json();
       console.log('Processing refund for order:', body.orderId);
+
+      // SECURITY: Verify user owns the store
+      const { data: store, error: storeError } = await supabase
+        .from('stores')
+        .select('id, owner_id, name')
+        .eq('id', body.storeId)
+        .single();
+
+      if (storeError || !store) {
+        console.error('Store not found:', storeError);
+        return new Response(
+          JSON.stringify({ error: 'Tienda no encontrada' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (store.owner_id !== user.id) {
+        console.error('Unauthorized refund attempt - User:', user.id, 'Store owner:', store.owner_id);
+        return new Response(
+          JSON.stringify({ error: 'No tienes permisos para realizar reembolsos en esta tienda' }),
+          { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      console.log('User authorized for refund on store:', store.name);
+
+      // SECURITY: Verify the order belongs to this store and check its status
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .select('id, status, total, store_id')
+        .eq('id', body.orderId)
+        .eq('store_id', body.storeId)
+        .single();
+
+      if (orderError || !order) {
+        console.error('Order not found:', orderError);
+        return new Response(
+          JSON.stringify({ error: 'Pedido no encontrado' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // SECURITY: Prevent duplicate refunds
+      if (order.status === 'refunded') {
+        console.error('Order already refunded:', body.orderId);
+        return new Response(
+          JSON.stringify({ error: 'Este pedido ya ha sido reembolsado' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // SECURITY: Only allow refunds for paid/confirmed/shipped orders
+      const refundableStatuses = ['paid', 'confirmed', 'shipped'];
+      if (!refundableStatuses.includes(order.status)) {
+        console.error('Order status not refundable:', order.status);
+        return new Response(
+          JSON.stringify({ error: `No se puede reembolsar un pedido con estado "${order.status}"` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
 
       // Get the MercadoPago payment record
       const { data: mpPayment, error: mpError } = await supabase
