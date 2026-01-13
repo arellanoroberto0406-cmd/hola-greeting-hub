@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
 import { useStoreLayout } from "@/hooks/useStoreLayout";
+import { useStorePlanTier } from "@/hooks/useStorePlanTier";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, ShoppingCart, Heart, Menu, Eye, Search, User, Package, LogOut, Store, ChevronRight } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -45,6 +46,7 @@ import {
   VideoSection,
   FAQSection,
 } from "@/components/store/sections";
+import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
 import SectionWrapper from "@/components/store/SectionWrapper";
 
 const mapDbProduct = (dbProduct: any): Product => ({
@@ -71,6 +73,7 @@ const StoreFront = () => {
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
+  const { planTier } = useStorePlanTier(store?.id);
   const { items, addItem, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
   const { user, signOut } = useAuth();
@@ -658,7 +661,7 @@ const StoreFront = () => {
                   return (
                     <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
                       <div id="products-section">
-                        <ProductsGridSection
+                        <PremiumProductsGridSection
                           section={section}
                           store={store}
                           products={products}
@@ -671,6 +674,7 @@ const StoreFront = () => {
                           onAddToCart={addItem}
                           onToggleWishlist={toggleWishlist}
                           isInWishlist={isInWishlist}
+                          planTier={planTier}
                         />
                       </div>
                     </SectionWrapper>
