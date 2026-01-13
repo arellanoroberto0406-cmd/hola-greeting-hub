@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -25,6 +25,7 @@ import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
 import { TutorialOverlay, TutorialHelpButton } from "@/components/dashboard/TutorialOverlay";
 import PaymentSettingsPanel from "@/components/dashboard/PaymentSettingsPanel";
+import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
 import StoreUrlPanel from "@/components/dashboard/StoreUrlPanel";
 
 const Dashboard = () => {
@@ -443,7 +444,7 @@ const Dashboard = () => {
           // Store Dashboard
           <TooltipProvider delayDuration={300}>
           <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full max-w-6xl grid-cols-9">
+            <TabsList className="grid w-full max-w-7xl grid-cols-10">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="orders" className="gap-2">
@@ -482,6 +483,18 @@ const Dashboard = () => {
               </Tooltip>
               <Tooltip>
                 <TooltipTrigger asChild>
+                  <TabsTrigger value="payment-stats" className="gap-2">
+                    <PieChart className="h-4 w-4" />
+                    <span className="hidden sm:inline">Ventas</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Estadísticas de Ventas</p>
+                  <p className="text-xs text-muted-foreground">Gráficas de ingresos y pedidos por método de pago</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <TabsTrigger value="analytics" className="gap-2">
                     <BarChart3 className="h-4 w-4" />
                     <span className="hidden sm:inline">Analytics</span>
@@ -489,7 +502,7 @@ const Dashboard = () => {
                 </TooltipTrigger>
                 <TooltipContent side="bottom" className="max-w-xs">
                   <p className="font-medium">Estadísticas</p>
-                  <p className="text-xs text-muted-foreground">Analiza ventas, ingresos, productos más vendidos y tendencias</p>
+                  <p className="text-xs text-muted-foreground">Analiza ventas, productos más vendidos y tendencias</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -619,6 +632,26 @@ const Dashboard = () => {
                   </Tooltip>
                 </div>
                 <PaymentSettingsPanel storeId={store.id} primaryColor={store.primary_color} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="payment-stats">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Estadísticas de Ventas</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">📊 Ingresos por método de pago</p>
+                      <p className="text-xs">Analiza tus ventas por método de pago: tarjeta, transferencia, efectivo, PayPal y MercadoPago. Compara el rendimiento semanal.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <PaymentStatsPanel storeId={store.id} primaryColor={store.primary_color} />
               </div>
             </TabsContent>
 
