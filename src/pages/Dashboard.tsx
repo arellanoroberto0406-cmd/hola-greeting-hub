@@ -56,6 +56,7 @@ const Dashboard = () => {
   const [storeEmail, setStoreEmail] = useState("");
   const [storeInstagram, setStoreInstagram] = useState("");
   const [storeFacebook, setStoreFacebook] = useState("");
+  const [storeWhatsapp, setStoreWhatsapp] = useState("");
   const [storeLogo, setStoreLogo] = useState("");
   const [storeBanner, setStoreBanner] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -109,6 +110,7 @@ const Dashboard = () => {
       setStoreEmail(store.email || "");
       setStoreInstagram(store.instagram_url || "");
       setStoreFacebook(store.facebook_url || "");
+      setStoreWhatsapp((store as any).whatsapp_number || "");
       setStoreLogo(store.logo_url || "");
       setStoreBanner(store.banner_url || "");
     }
@@ -186,6 +188,7 @@ const Dashboard = () => {
         email: storeEmail,
         instagram_url: storeInstagram,
         facebook_url: storeFacebook,
+        whatsapp_number: storeWhatsapp || null,
         logo_url: storeLogo || null,
         banner_url: storeBanner || null,
       });
@@ -1306,60 +1309,82 @@ const Dashboard = () => {
                   <div className="border-t pt-6">
                     <h3 className="font-medium text-lg mb-4 flex items-center gap-2">
                       <MessageCircle className="h-5 w-5 text-green-500" />
-                      WhatsApp para Clientes
+                      Contacto y Redes Sociales
                     </h3>
-                    <div className="space-y-2">
-                      <Label>Número de WhatsApp</Label>
-                      <div className="flex gap-2">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Añade tu información de contacto y redes sociales para que tus clientes puedan encontrarte fácilmente y tengan más confianza en tu tienda.
+                    </p>
+                    
+                    {/* WhatsApp - Destacado */}
+                    <div className="p-4 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900 mb-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <MessageCircle className="h-5 w-5 text-green-600" />
+                        <Label className="font-medium text-green-700 dark:text-green-400">WhatsApp Business</Label>
+                      </div>
+                      <Input
+                        value={storeWhatsapp}
+                        onChange={(e) => setStoreWhatsapp(e.target.value)}
+                        placeholder="+52 55 1234 5678"
+                        className="bg-white dark:bg-background"
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Aparecerá como botón flotante en tu tienda. Incluye el código de país (+52 México, +1 USA, +34 España).
+                      </p>
+                      {storeWhatsapp && (
+                        <div className="flex items-center gap-2 mt-3 text-green-700 dark:text-green-400">
+                          <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                          <span className="text-sm font-medium">Botón de WhatsApp activo</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="space-y-2">
+                        <Label>Teléfono de contacto</Label>
                         <Input
                           value={storePhone}
                           onChange={(e) => setStorePhone(e.target.value)}
                           placeholder="+52 55 1234 5678"
-                          className="flex-1"
                         />
                       </div>
-                      <p className="text-xs text-muted-foreground">
-                        Este número aparecerá como botón flotante en tu tienda. Los clientes podrán contactarte directamente por WhatsApp. Incluye el código de país (ej: +52 para México, +1 para USA).
-                      </p>
-                      {storePhone && (
-                        <div className="flex items-center gap-2 mt-2 p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-900">
-                          <MessageCircle className="h-5 w-5 text-green-600" />
-                          <span className="text-sm text-green-700 dark:text-green-400">
-                            Vista previa: Botón de WhatsApp activo en tu tienda
-                          </span>
-                        </div>
-                      )}
+                      <div className="space-y-2">
+                        <Label>Email de contacto</Label>
+                        <Input
+                          value={storeEmail}
+                          onChange={(e) => setStoreEmail(e.target.value)}
+                          placeholder="tienda@ejemplo.com"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Email de contacto</Label>
-                      <Input
-                        value={storeEmail}
-                        onChange={(e) => setStoreEmail(e.target.value)}
-                        placeholder="tienda@ejemplo.com"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                          Instagram
+                        </Label>
+                        <Input
+                          value={storeInstagram}
+                          onChange={(e) => setStoreInstagram(e.target.value)}
+                          placeholder="https://instagram.com/tutienda"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                          Facebook
+                        </Label>
+                        <Input
+                          value={storeFacebook}
+                          onChange={(e) => setStoreFacebook(e.target.value)}
+                          placeholder="https://facebook.com/tutienda"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Instagram URL</Label>
-                      <Input
-                        value={storeInstagram}
-                        onChange={(e) => setStoreInstagram(e.target.value)}
-                        placeholder="https://instagram.com/..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Facebook URL</Label>
-                      <Input
-                        value={storeFacebook}
-                        onChange={(e) => setStoreFacebook(e.target.value)}
-                        placeholder="https://facebook.com/..."
-                      />
-                    </div>
+                    <p className="text-xs text-muted-foreground mt-4">
+                      Puedes configurar Twitter, TikTok y tu sitio web en la sección de "Configuración Avanzada" más abajo.
+                    </p>
                   </div>
 
                   <Button 

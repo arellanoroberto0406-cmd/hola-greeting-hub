@@ -16,6 +16,9 @@ export interface Store {
   address?: string;
   instagram_url?: string;
   facebook_url?: string;
+  twitter_url?: string;
+  tiktok_url?: string;
+  whatsapp_number?: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
