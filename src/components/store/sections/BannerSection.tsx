@@ -41,8 +41,11 @@ export const BannerSection = ({ section, store }: BannerSectionProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5 }}
-      className="py-4 px-6 rounded-xl text-white text-center flex items-center justify-center gap-3"
-      style={{ backgroundColor: getBgColor() }}
+      className="py-4 px-6 text-white text-center flex items-center justify-center gap-3"
+      style={{ 
+        backgroundColor: getBgColor(),
+        borderRadius: 'var(--store-radius, 12px)',
+      }}
     >
       {Icon && <Icon className="h-5 w-5 flex-shrink-0" />}
       <p className="font-medium">

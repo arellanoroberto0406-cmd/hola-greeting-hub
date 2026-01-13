@@ -13,6 +13,49 @@ export type SectionType =
   | 'video'
   | 'faq';
 
+export type FontFamily = 
+  | 'inter'
+  | 'montserrat'
+  | 'playfair'
+  | 'poppins'
+  | 'roboto'
+  | 'lora'
+  | 'oswald'
+  | 'raleway'
+  | 'merriweather'
+  | 'nunito';
+
+export interface GlobalStyles {
+  headingFont: FontFamily;
+  bodyFont: FontFamily;
+  borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  sectionSpacing: 'compact' | 'normal' | 'relaxed' | 'spacious';
+  buttonStyle: 'solid' | 'outline' | 'ghost';
+  cardShadow: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+}
+
+export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
+  headingFont: 'oswald',
+  bodyFont: 'montserrat',
+  borderRadius: 'lg',
+  sectionSpacing: 'normal',
+  buttonStyle: 'solid',
+  cardShadow: 'md',
+};
+
+export const FONT_OPTIONS: { value: FontFamily; label: string; googleFont: string }[] = [
+  { value: 'inter', label: 'Inter', googleFont: 'Inter:wght@400;500;600;700' },
+  { value: 'montserrat', label: 'Montserrat', googleFont: 'Montserrat:wght@400;500;600;700' },
+  { value: 'playfair', label: 'Playfair Display', googleFont: 'Playfair+Display:wght@400;500;600;700' },
+  { value: 'poppins', label: 'Poppins', googleFont: 'Poppins:wght@400;500;600;700' },
+  { value: 'roboto', label: 'Roboto', googleFont: 'Roboto:wght@400;500;700' },
+  { value: 'lora', label: 'Lora', googleFont: 'Lora:wght@400;500;600;700' },
+  { value: 'oswald', label: 'Oswald', googleFont: 'Oswald:wght@400;500;600;700' },
+  { value: 'raleway', label: 'Raleway', googleFont: 'Raleway:wght@400;500;600;700' },
+  { value: 'merriweather', label: 'Merriweather', googleFont: 'Merriweather:wght@400;700' },
+  { value: 'nunito', label: 'Nunito', googleFont: 'Nunito:wght@400;500;600;700' },
+];
+
 export interface StoreSection {
   id: string;
   type: SectionType;
@@ -25,6 +68,7 @@ export interface StoreLayout {
   id: string;
   store_id: string;
   sections: StoreSection[];
+  globalStyles?: GlobalStyles;
   created_at: string;
   updated_at: string;
 }

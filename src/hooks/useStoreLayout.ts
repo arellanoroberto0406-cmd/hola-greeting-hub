@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { StoreLayout, StoreSection, DEFAULT_SECTIONS } from "@/types/storeLayout";
+import { StoreLayout, StoreSection, GlobalStyles, DEFAULT_SECTIONS, DEFAULT_GLOBAL_STYLES } from "@/types/storeLayout";
 import { useToast } from "@/hooks/use-toast";
 
 export const useStoreLayout = (storeId: string | undefined) => {
@@ -23,14 +23,28 @@ export const useStoreLayout = (storeId: string | undefined) => {
           id: '',
           store_id: storeId,
           sections: DEFAULT_SECTIONS,
+          globalStyles: DEFAULT_GLOBAL_STYLES,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         } as StoreLayout;
       }
       
+      // Parse sections and globalStyles from JSON
+      const sections = data.sections as unknown as { sections?: StoreSection[]; globalStyles?: GlobalStyles };
+      
+      // Handle both old format (array) and new format (object with sections and globalStyles)
+      if (Array.isArray(sections)) {
+        return {
+          ...data,
+          sections: sections || DEFAULT_SECTIONS,
+          globalStyles: DEFAULT_GLOBAL_STYLES
+        } as StoreLayout;
+      }
+      
       return {
         ...data,
-        sections: (data.sections as unknown as StoreSection[]) || DEFAULT_SECTIONS
+        sections: sections?.sections || DEFAULT_SECTIONS,
+        globalStyles: sections?.globalStyles || DEFAULT_GLOBAL_STYLES
       } as StoreLayout;
     },
     enabled: !!storeId,
@@ -42,9 +56,20 @@ export const useSaveStoreLayout = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ storeId, sections }: { storeId: string; sections: StoreSection[] }) => {
-      // Convert sections to JSON-compatible format
-      const sectionsJson = JSON.parse(JSON.stringify(sections));
+    mutationFn: async ({ 
+      storeId, 
+      sections, 
+      globalStyles 
+    }: { 
+      storeId: string; 
+      sections: StoreSection[]; 
+      globalStyles?: GlobalStyles;
+    }) => {
+      // Convert to JSON-compatible format with both sections and globalStyles
+      const sectionsJson = JSON.parse(JSON.stringify({
+        sections,
+        globalStyles: globalStyles || DEFAULT_GLOBAL_STYLES
+      }));
       
       // Try to update first
       const { data: existing } = await supabase
