@@ -887,9 +887,9 @@ const StoreFront = () => {
       </Dialog>
 
       {/* WhatsApp Button */}
-      {store.phone && (
+      {(store as any).whatsapp_number && (
         <WhatsAppButton 
-          phone={store.phone} 
+          phone={(store as any).whatsapp_number} 
           storeName={store.name}
           primaryColor={store.primary_color}
         />
@@ -943,13 +943,13 @@ const StoreFront = () => {
                     Facebook
                   </a>
                 )}
-                {(store as any).twitter_url && (
-                  <a href={(store as any).twitter_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                {store.twitter_url && (
+                  <a href={store.twitter_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                     Twitter
                   </a>
                 )}
-                {(store as any).tiktok_url && (
-                  <a href={(store as any).tiktok_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                {store.tiktok_url && (
+                  <a href={store.tiktok_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                     TikTok
                   </a>
                 )}

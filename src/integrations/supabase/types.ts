@@ -884,6 +884,7 @@ export type Database = {
           updated_at: string
           website_url: string | null
           welcome_message: string | null
+          whatsapp_number: string | null
         }
         Insert: {
           accent_color?: string | null
@@ -927,6 +928,7 @@ export type Database = {
           updated_at?: string
           website_url?: string | null
           welcome_message?: string | null
+          whatsapp_number?: string | null
         }
         Update: {
           accent_color?: string | null
@@ -970,6 +972,7 @@ export type Database = {
           updated_at?: string
           website_url?: string | null
           welcome_message?: string | null
+          whatsapp_number?: string | null
         }
         Relationships: [
           {
