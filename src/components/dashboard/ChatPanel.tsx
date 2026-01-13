@@ -13,8 +13,28 @@ import {
   Clock, 
   CheckCircle,
   XCircle,
-  ChevronLeft
+  ChevronLeft,
+  Zap,
+  Plus,
+  X,
+  Save
 } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { 
   useStoreConversations, 
   useConversationMessages, 
@@ -35,6 +55,14 @@ interface ChatPanelProps {
 const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
   const [selectedConversation, setSelectedConversation] = useState<ChatConversation | null>(null);
   const [message, setMessage] = useState("");
+  const [showQuickReplies, setShowQuickReplies] = useState(false);
+  const [showCustomReplyDialog, setShowCustomReplyDialog] = useState(false);
+  const [newReplyTitle, setNewReplyTitle] = useState("");
+  const [newReplyContent, setNewReplyContent] = useState("");
+  const [customReplies, setCustomReplies] = useState<{ title: string; content: string }[]>(() => {
+    const saved = localStorage.getItem(`chat_quick_replies_${storeId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { data: conversations = [], isLoading: conversationsLoading } = useStoreConversations(storeId);
@@ -141,6 +169,42 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  // Default quick replies
+  const defaultQuickReplies = [
+    { title: "Saludo", content: "¡Hola! Gracias por contactarnos. ¿En qué podemos ayudarte?" },
+    { title: "Envío", content: "El tiempo de envío es de 3-5 días hábiles. Te notificaremos cuando tu pedido sea enviado con el número de seguimiento." },
+    { title: "Pago", content: "Aceptamos transferencia bancaria, MercadoPago y efectivo al momento de la entrega. ¿Qué método prefieres?" },
+    { title: "Stock", content: "Déjame verificar la disponibilidad del producto. Te confirmo en un momento." },
+    { title: "Horario", content: "Nuestro horario de atención es de lunes a viernes de 9:00 a 18:00 hrs. Responderemos tu mensaje lo antes posible." },
+    { title: "Agradecimiento", content: "¡Gracias por tu compra! Si tienes alguna duda, no dudes en escribirnos." },
+    { title: "Devolución", content: "Tienes 30 días para realizar devoluciones. El producto debe estar en su empaque original y sin uso." },
+    { title: "Despedida", content: "¡Fue un placer atenderte! Si necesitas algo más, aquí estaremos. ¡Que tengas un excelente día!" },
+  ];
+
+  const allQuickReplies = [...defaultQuickReplies, ...customReplies];
+
+  const handleQuickReply = (content: string) => {
+    setMessage(content);
+    setShowQuickReplies(false);
+  };
+
+  const handleAddCustomReply = () => {
+    if (!newReplyTitle.trim() || !newReplyContent.trim()) return;
+    
+    const newReplies = [...customReplies, { title: newReplyTitle.trim(), content: newReplyContent.trim() }];
+    setCustomReplies(newReplies);
+    localStorage.setItem(`chat_quick_replies_${storeId}`, JSON.stringify(newReplies));
+    setNewReplyTitle("");
+    setNewReplyContent("");
+    setShowCustomReplyDialog(false);
+  };
+
+  const handleDeleteCustomReply = (index: number) => {
+    const newReplies = customReplies.filter((_, i) => i !== index);
+    setCustomReplies(newReplies);
+    localStorage.setItem(`chat_quick_replies_${storeId}`, JSON.stringify(newReplies));
   };
 
   const handleCloseConversation = async () => {
@@ -333,7 +397,115 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
 
               {/* Message Input */}
               {selectedConversation.status === 'active' && (
-                <div className="p-4 border-t">
+                <div className="p-4 border-t space-y-3">
+                  {/* Quick Replies */}
+                  <div className="flex items-center gap-2">
+                    <Popover open={showQuickReplies} onOpenChange={setShowQuickReplies}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-2"
+                        >
+                          <Zap className="h-4 w-4" />
+                          Respuestas rápidas
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-80 p-0" align="start">
+                        <div className="p-3 border-b">
+                          <div className="flex items-center justify-between">
+                            <h4 className="font-semibold text-sm">Respuestas rápidas</h4>
+                            <Dialog open={showCustomReplyDialog} onOpenChange={setShowCustomReplyDialog}>
+                              <DialogTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-7 gap-1">
+                                  <Plus className="h-3 w-3" />
+                                  Añadir
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>Nueva respuesta rápida</DialogTitle>
+                                  <DialogDescription>
+                                    Crea una respuesta personalizada para usar en tus conversaciones.
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 py-4">
+                                  <div className="space-y-2">
+                                    <Label htmlFor="reply-title">Título</Label>
+                                    <Input
+                                      id="reply-title"
+                                      placeholder="Ej: Promoción especial"
+                                      value={newReplyTitle}
+                                      onChange={(e) => setNewReplyTitle(e.target.value)}
+                                    />
+                                  </div>
+                                  <div className="space-y-2">
+                                    <Label htmlFor="reply-content">Mensaje</Label>
+                                    <Textarea
+                                      id="reply-content"
+                                      placeholder="Escribe el mensaje de la respuesta..."
+                                      value={newReplyContent}
+                                      onChange={(e) => setNewReplyContent(e.target.value)}
+                                      rows={4}
+                                    />
+                                  </div>
+                                </div>
+                                <DialogFooter>
+                                  <Button variant="outline" onClick={() => setShowCustomReplyDialog(false)}>
+                                    Cancelar
+                                  </Button>
+                                  <Button 
+                                    onClick={handleAddCustomReply}
+                                    disabled={!newReplyTitle.trim() || !newReplyContent.trim()}
+                                    style={{ backgroundColor: primaryColor }}
+                                  >
+                                    <Save className="h-4 w-4 mr-2" />
+                                    Guardar
+                                  </Button>
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                          </div>
+                        </div>
+                        <ScrollArea className="h-64">
+                          <div className="p-2 space-y-1">
+                            {allQuickReplies.map((reply, index) => (
+                              <div
+                                key={`${reply.title}-${index}`}
+                                className="group relative"
+                              >
+                                <button
+                                  onClick={() => handleQuickReply(reply.content)}
+                                  className="w-full text-left p-2 rounded-md hover:bg-muted transition-colors"
+                                >
+                                  <span className="font-medium text-sm block">{reply.title}</span>
+                                  <span className="text-xs text-muted-foreground line-clamp-2">
+                                    {reply.content}
+                                  </span>
+                                </button>
+                                {index >= defaultQuickReplies.length && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleDeleteCustomReply(index - defaultQuickReplies.length);
+                                    }}
+                                    className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded"
+                                  >
+                                    <X className="h-3 w-3 text-destructive" />
+                                  </button>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </ScrollArea>
+                      </PopoverContent>
+                    </Popover>
+                    <span className="text-xs text-muted-foreground">
+                      Haz clic para insertar una respuesta predefinida
+                    </span>
+                  </div>
+                  
+                  {/* Input */}
                   <div className="flex gap-2">
                     <Input
                       placeholder="Escribe tu respuesta..."
