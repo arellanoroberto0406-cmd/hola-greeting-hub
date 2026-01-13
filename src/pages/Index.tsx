@@ -10,13 +10,19 @@ import {
   Star, 
   ArrowRight, 
   Sparkles, 
-  Users,
   Package,
   TrendingUp,
   Loader2,
   Plus,
   LayoutDashboard,
-  MessageCircle
+  MessageCircle,
+  Zap,
+  Shield,
+  Globe,
+  CreditCard,
+  ChevronRight,
+  CheckCircle2,
+  Rocket
 } from "lucide-react";
 
 const Index = () => {
@@ -24,277 +30,435 @@ const Index = () => {
   const { user } = useAuth();
   const { data: stores, isLoading } = useAllStores();
 
+  const features = [
+    {
+      icon: ShoppingBag,
+      title: "Gestión de Pedidos",
+      description: "Administra pedidos en tiempo real con seguimiento completo",
+      color: "from-orange-500 to-red-500"
+    },
+    {
+      icon: MessageCircle,
+      title: "WhatsApp Integrado",
+      description: "Conecta con clientes directamente desde tu tienda",
+      color: "from-green-500 to-emerald-500"
+    },
+    {
+      icon: TrendingUp,
+      title: "Analytics Avanzados",
+      description: "Visualiza ventas, tendencias y productos estrella",
+      color: "from-blue-500 to-cyan-500"
+    },
+    {
+      icon: CreditCard,
+      title: "Pagos Seguros",
+      description: "Acepta pagos con múltiples métodos de pago",
+      color: "from-purple-500 to-pink-500"
+    },
+    {
+      icon: Globe,
+      title: "Tu Dominio",
+      description: "Tienda personalizada con tu propia URL única",
+      color: "from-amber-500 to-orange-500"
+    },
+    {
+      icon: Shield,
+      title: "100% Seguro",
+      description: "Protección de datos y transacciones seguras",
+      color: "from-teal-500 to-green-500"
+    }
+  ];
+
+  const stats = [
+    { value: "500+", label: "Tiendas Activas" },
+    { value: "50K+", label: "Productos" },
+    { value: "100K+", label: "Ventas" },
+    { value: "99.9%", label: "Uptime" }
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/5 to-background">
+    <div className="min-h-screen bg-background overflow-hidden">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
-              <Store className="h-5 w-5 text-primary-foreground" />
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/50 blur-xl rounded-full" />
+                <div className="relative h-10 w-10 md:h-12 md:w-12 rounded-2xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center shadow-lg shadow-primary/25">
+                  <Store className="h-5 w-5 md:h-6 md:w-6 text-primary-foreground" />
+                </div>
+              </div>
+              <div>
+                <span className="font-heading text-xl md:text-2xl font-bold tracking-tight">MiTienda</span>
+                <span className="hidden md:inline text-primary font-bold">.</span>
+              </div>
             </div>
-            <span className="font-heading text-xl font-bold">MiTienda</span>
-          </div>
-          <div className="flex items-center gap-3">
-            {user ? (
-              <Button onClick={() => navigate("/dashboard")} className="gap-2">
-                <LayoutDashboard className="h-4 w-4" />
-                Mi Dashboard
-              </Button>
-            ) : (
-              <>
-                <Button variant="ghost" onClick={() => navigate("/auth")}>
-                  Iniciar Sesión
+            
+            <nav className="hidden md:flex items-center gap-8">
+              <a href="#features" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Características
+              </a>
+              <a href="#tiendas" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Tiendas
+              </a>
+              <a href="#pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+                Precios
+              </a>
+            </nav>
+
+            <div className="flex items-center gap-3">
+              {user ? (
+                <Button onClick={() => navigate("/dashboard")} className="gap-2 rounded-xl px-6">
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dashboard</span>
                 </Button>
-                <Button onClick={() => navigate("/auth")} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Crear Tienda
-                </Button>
-              </>
-            )}
+              ) : (
+                <>
+                  <Button variant="ghost" onClick={() => navigate("/auth")} className="hidden sm:flex">
+                    Iniciar Sesión
+                  </Button>
+                  <Button onClick={() => navigate("/auth")} className="gap-2 rounded-xl px-6 hover-shine">
+                    <Rocket className="h-4 w-4" />
+                    <span>Comenzar</span>
+                  </Button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5" />
-        <div className="absolute top-20 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+      <section className="relative min-h-screen flex items-center pt-20">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/20 rounded-full blur-[128px] animate-float" />
+          <div className="absolute bottom-1/4 -right-32 w-[500px] h-[500px] bg-gold/10 rounded-full blur-[128px] animate-float animation-delay-500" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[200px]" />
+          
+          {/* Grid Pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        </div>
         
-        <div className="container mx-auto px-4 relative">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <Badge variant="secondary" className="px-4 py-2 text-sm font-medium">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Plataforma de E-commerce
-            </Badge>
+        <div className="container mx-auto px-4 md:px-8 relative">
+          <div className="max-w-5xl mx-auto text-center space-y-8">
+            {/* Badge */}
+            <div className="inline-flex animate-fade-in-up">
+              <Badge variant="outline" className="px-5 py-2.5 rounded-full border-primary/30 bg-primary/10 backdrop-blur-sm">
+                <Sparkles className="h-4 w-4 mr-2 text-primary animate-bounce-soft" />
+                <span className="text-sm font-medium">Plataforma #1 de E-commerce en LATAM</span>
+              </Badge>
+            </div>
             
-            <h1 className="text-5xl md:text-7xl font-bold font-heading leading-tight">
-              Crea tu tienda online
-              <span className="block text-primary">en minutos</span>
-            </h1>
+            {/* Title */}
+            <div className="space-y-4 animate-fade-in-up animation-delay-200">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-heading leading-[0.9] tracking-tight">
+                Crea tu tienda
+                <span className="block gradient-text">en minutos</span>
+              </h1>
+            </div>
             
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Vende tus productos, gestiona pedidos, analiza ventas y conecta con tus clientes por WhatsApp. Todo en un solo lugar.
+            {/* Description */}
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in-up animation-delay-300">
+              Todo lo que necesitas para vender online. Gestiona productos, pedidos, pagos y conecta con clientes por WhatsApp. 
+              <span className="text-foreground font-medium"> Sin código, sin complicaciones.</span>
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Button size="lg" className="text-lg px-8 py-6 gap-2" onClick={() => navigate("/auth")}>
-                Comenzar Gratis
-                <ArrowRight className="h-5 w-5" />
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 animate-fade-in-up animation-delay-400">
+              <Button 
+                size="lg" 
+                className="text-lg px-8 py-7 gap-3 rounded-2xl hover-shine shadow-lg shadow-primary/25 group"
+                onClick={() => navigate("/auth")}
+              >
+                <Zap className="h-5 w-5" />
+                Crear Tienda Gratis
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6" onClick={() => {
-                document.getElementById('tiendas')?.scrollIntoView({ behavior: 'smooth' });
-              }}>
-                Ver Tiendas
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg px-8 py-7 rounded-2xl border-2 hover:bg-muted/50"
+                onClick={() => document.getElementById('tiendas')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Explorar Tiendas
               </Button>
             </div>
+
+            {/* Stats */}
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16 pt-12 animate-fade-in-up animation-delay-500">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center group">
+                  <p className="text-4xl md:text-5xl font-bold font-heading text-primary group-hover:scale-110 transition-transform">
+                    {stat.value}
+                  </p>
+                  <p className="text-sm text-muted-foreground font-medium mt-1">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-soft">
+          <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2">
+            <div className="w-1 h-2 rounded-full bg-muted-foreground/50" />
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">
-              Todo lo que necesitas para vender
+      <section id="features" className="py-24 md:py-32 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-muted/20 to-background" />
+        
+        <div className="container mx-auto px-4 md:px-8 relative">
+          <div className="text-center mb-16 md:mb-20">
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full">
+              Características
+            </Badge>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-6">
+              Todo lo que necesitas
+              <span className="block text-muted-foreground text-3xl md:text-4xl lg:text-5xl mt-2">para vender online</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Herramientas profesionales para hacer crecer tu negocio
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Herramientas profesionales diseñadas para hacer crecer tu negocio
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                  <ShoppingBag className="h-7 w-7 text-primary" />
-                </div>
-                <h3 className="font-semibold text-lg">Gestión de Pedidos</h3>
-                <p className="text-sm text-muted-foreground">
-                  Administra todos tus pedidos en tiempo real con actualizaciones de estado
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="h-14 w-14 rounded-2xl bg-green-500/10 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                  <MessageCircle className="h-7 w-7 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-lg">WhatsApp Integrado</h3>
-                <p className="text-sm text-muted-foreground">
-                  Tus clientes pueden contactarte directamente desde tu tienda
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="h-14 w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                  <TrendingUp className="h-7 w-7 text-blue-600" />
-                </div>
-                <h3 className="font-semibold text-lg">Analytics de Ventas</h3>
-                <p className="text-sm text-muted-foreground">
-                  Visualiza tus ingresos, productos más vendidos y tendencias
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card className="group hover:shadow-lg transition-all duration-300 border-2 hover:border-primary/50">
-              <CardContent className="p-6 text-center space-y-4">
-                <div className="h-14 w-14 rounded-2xl bg-orange-500/10 flex items-center justify-center mx-auto group-hover:scale-110 transition-transform">
-                  <Star className="h-7 w-7 text-orange-500" />
-                </div>
-                <h3 className="font-semibold text-lg">Reseñas de Productos</h3>
-                <p className="text-sm text-muted-foreground">
-                  Los clientes pueden dejar opiniones y calificaciones
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            {features.map((feature, index) => (
+              <Card 
+                key={index} 
+                className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-all duration-500 hover-lift"
+              >
+                <div className={`absolute inset-0 bg-gradient-to-br ${feature.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`} />
+                <CardContent className="p-8 relative">
+                  <div className={`h-14 w-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                    <feature.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="font-heading font-semibold text-xl mb-3 group-hover:text-primary transition-colors">
+                    {feature.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Stores Section */}
-      <section id="tiendas" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold font-heading mb-4">
+      <section id="tiendas" className="py-24 md:py-32 relative">
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="text-center mb-16 md:mb-20">
+            <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full">
               Tiendas Destacadas
+            </Badge>
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-6">
+              Conoce nuestras
+              <span className="text-primary"> tiendas</span>
             </h2>
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Explora las tiendas que ya están vendiendo en nuestra plataforma
             </p>
           </div>
           
           {isLoading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="flex justify-center py-20">
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
+                <Loader2 className="h-12 w-12 animate-spin text-primary relative" />
+              </div>
             </div>
           ) : stores && stores.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {stores.map((store) => (
+              {stores.map((store, index) => (
                 <Card 
                   key={store.id} 
-                  className="group overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/30"
+                  className="group overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-500 cursor-pointer hover-lift"
                   onClick={() => navigate(`/tienda/${store.slug}`)}
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="relative h-40 overflow-hidden">
+                  {/* Banner */}
+                  <div className="relative h-48 overflow-hidden">
                     {store.banner_url ? (
                       <img 
                         src={store.banner_url} 
                         alt={store.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                     ) : (
                       <div 
                         className="w-full h-full"
                         style={{ 
-                          background: `linear-gradient(135deg, ${store.primary_color || '#8B4513'}40, ${store.secondary_color || '#D4A574'}40)` 
+                          background: `linear-gradient(135deg, ${store.primary_color || '#f97316'}40, ${store.secondary_color || '#fb923c'}20)` 
                         }}
                       />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent" />
                     
+                    {/* Logo */}
                     {store.logo_url && (
-                      <div className="absolute bottom-4 left-4">
-                        <img 
-                          src={store.logo_url} 
-                          alt={store.name}
-                          className="h-12 w-12 rounded-xl object-cover bg-background shadow-lg"
-                        />
+                      <div className="absolute bottom-4 left-6 group-hover:scale-110 transition-transform duration-300">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-primary/30 blur-xl rounded-xl" />
+                          <img 
+                            src={store.logo_url} 
+                            alt={store.name}
+                            className="relative h-16 w-16 rounded-2xl object-cover bg-card shadow-2xl border-2 border-border/50"
+                          />
+                        </div>
                       </div>
                     )}
                   </div>
                   
-                  <CardContent className="p-6 space-y-3">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h3 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                          {store.name}
-                        </h3>
-                        {store.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                            {store.description}
-                          </p>
-                        )}
-                      </div>
+                  <CardContent className="p-6 pt-4 space-y-4">
+                    <div>
+                      <h3 className="font-heading font-semibold text-xl group-hover:text-primary transition-colors">
+                        {store.name}
+                      </h3>
+                      {store.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-2 mt-2 leading-relaxed">
+                          {store.description}
+                        </p>
+                      )}
                     </div>
                     
-                    <div className="flex items-center gap-4 pt-2">
+                    <div className="flex items-center gap-3">
                       {store.phone && (
-                        <Badge variant="secondary" className="gap-1 text-xs">
+                        <Badge variant="secondary" className="gap-1.5 rounded-full px-3">
                           <MessageCircle className="h-3 w-3" />
                           WhatsApp
                         </Badge>
                       )}
-                      <Badge variant="outline" className="gap-1 text-xs">
+                      <Badge variant="outline" className="gap-1.5 rounded-full px-3">
                         <Package className="h-3 w-3" />
                         Productos
                       </Badge>
                     </div>
                     
-                    <Button 
-                      variant="ghost" 
-                      className="w-full mt-2 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                    >
-                      Visitar Tienda
-                      <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
+                    <div className="pt-2">
+                      <Button 
+                        variant="ghost" 
+                        className="w-full rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300"
+                      >
+                        Visitar Tienda
+                        <ChevronRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 space-y-6">
-              <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center mx-auto">
-                <Store className="h-10 w-10 text-muted-foreground" />
+            <div className="text-center py-20 space-y-8">
+              <div className="relative inline-block">
+                <div className="absolute inset-0 bg-muted/50 blur-3xl rounded-full" />
+                <div className="relative h-24 w-24 rounded-3xl bg-muted/50 flex items-center justify-center mx-auto">
+                  <Store className="h-12 w-12 text-muted-foreground" />
+                </div>
               </div>
-              <div>
-                <h3 className="text-xl font-semibold mb-2">Aún no hay tiendas</h3>
-                <p className="text-muted-foreground mb-6">
-                  ¡Sé el primero en crear tu tienda online!
+              <div className="space-y-3">
+                <h3 className="text-2xl font-heading font-semibold">Aún no hay tiendas</h3>
+                <p className="text-muted-foreground max-w-md mx-auto">
+                  ¡Sé el primero en crear tu tienda online y empieza a vender hoy!
                 </p>
-                <Button onClick={() => navigate("/auth")} size="lg" className="gap-2">
-                  <Plus className="h-5 w-5" />
-                  Crear Mi Tienda
-                </Button>
               </div>
+              <Button onClick={() => navigate("/auth")} size="lg" className="gap-2 rounded-xl px-8">
+                <Plus className="h-5 w-5" />
+                Crear Mi Tienda
+              </Button>
             </div>
           )}
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary/5">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-8">
-            <h2 className="text-3xl md:text-4xl font-bold font-heading">
-              ¿Listo para empezar a vender?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Crea tu tienda en minutos y comienza a recibir pedidos hoy mismo
-            </p>
-            <Button size="lg" className="text-lg px-10 py-6 gap-2" onClick={() => navigate("/auth")}>
-              Crear Mi Tienda Gratis
-              <ArrowRight className="h-5 w-5" />
-            </Button>
+      <section className="py-24 md:py-32 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-gold/5" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-[128px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gold/10 rounded-full blur-[128px]" />
+        
+        <div className="container mx-auto px-4 md:px-8 relative">
+          <div className="max-w-4xl mx-auto">
+            <Card className="border-primary/20 bg-card/80 backdrop-blur-xl overflow-hidden">
+              <CardContent className="p-8 md:p-16 text-center space-y-8">
+                <Badge variant="outline" className="px-4 py-1.5 rounded-full border-primary/30 bg-primary/10">
+                  <CheckCircle2 className="h-4 w-4 mr-2 text-primary" />
+                  14 días gratis
+                </Badge>
+                
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading leading-tight">
+                  ¿Listo para
+                  <span className="gradient-text"> empezar?</span>
+                </h2>
+                
+                <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Crea tu tienda en minutos y comienza a recibir pedidos hoy mismo. 
+                  Sin tarjeta de crédito, sin compromisos.
+                </p>
+                
+                <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+                  <Button 
+                    size="lg" 
+                    className="text-lg px-10 py-7 gap-3 rounded-2xl hover-shine shadow-lg shadow-primary/25 group"
+                    onClick={() => navigate("/auth")}
+                  >
+                    <Rocket className="h-5 w-5" />
+                    Crear Mi Tienda Gratis
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Button>
+                </div>
+
+                <div className="flex flex-wrap justify-center gap-6 pt-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    Sin código
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    Configuración en 5 min
+                  </span>
+                  <span className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    Soporte 24/7
+                  </span>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t py-12 bg-muted/20">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+      <footer className="border-t border-border/40 py-12 md:py-16 bg-muted/10">
+        <div className="container mx-auto px-4 md:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-                <Store className="h-4 w-4 text-primary-foreground" />
+              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+                <Store className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="font-heading font-semibold">MiTienda</span>
+              <span className="font-heading text-xl font-bold">MiTienda</span>
             </div>
+            
+            <nav className="flex items-center gap-8">
+              <a href="#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Características
+              </a>
+              <a href="#tiendas" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Tiendas
+              </a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Términos
+              </a>
+              <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Privacidad
+              </a>
+            </nav>
+            
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} MiTienda. Todos los derechos reservados.
             </p>
