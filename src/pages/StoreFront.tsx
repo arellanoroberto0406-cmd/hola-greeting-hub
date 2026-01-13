@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
+import { useStoreLayout } from "@/hooks/useStoreLayout";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, ShoppingCart, Heart, Menu, Eye, Search, User, Package, LogOut, Store, ChevronRight } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -7,7 +8,7 @@ import ProductFilters, { FilterState } from "@/components/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
@@ -27,8 +28,18 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import ProductGallery from "@/components/ProductGallery";
 import ProductReviews from "@/components/ProductReviews";
-import CategorySection from "@/components/store/CategorySection";
 import { motion } from "framer-motion";
+import { StoreSection, DEFAULT_SECTIONS } from "@/types/storeLayout";
+import {
+  HeroSection,
+  FeaturedProductsSection,
+  BannerSection,
+  NewsletterSection,
+  AboutSection,
+  ContactSection,
+  CategoriesSection,
+  ProductsGridSection,
+} from "@/components/store/sections";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -53,6 +64,7 @@ const StoreFront = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
+  const { data: layout } = useStoreLayout(store?.id);
   const { items, addItem, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
   const { user, signOut } = useAuth();
@@ -61,6 +73,11 @@ const StoreFront = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Get sections from layout or use defaults
+  const sections = useMemo(() => {
+    return layout?.sections?.filter(s => s.enabled) || DEFAULT_SECTIONS.filter(s => s.enabled);
+  }, [layout]);
 
   // All products mapped
   const allProducts = useMemo(() => {
@@ -511,151 +528,151 @@ const StoreFront = () => {
       </header>
 
 
-      {/* Banner */}
-      {store.banner_url && (
-        <div className="relative h-64 md:h-80 overflow-hidden">
-          <img 
-            src={store.banner_url} 
-            alt={store.name}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
-        </div>
-      )}
-
-      {/* Store Info */}
+      {/* Dynamic Sections */}
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-8">
-          <h2 
-            className="text-3xl md:text-5xl font-bold mb-4 font-heading"
-            style={{ color: store.primary_color }}
-          >
-            {store.name}
-          </h2>
-          {(store as any).welcome_message ? (
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {(store as any).welcome_message}
-            </p>
-          ) : store.description && (
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {store.description}
-            </p>
-          )}
-        </div>
-
-        {/* Filters */}
-        {!productsLoading && allProducts.length > 0 && (
-          <div className="mb-8">
-            <ProductFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              collections={collections}
-              maxPrice={maxPrice}
-              primaryColor={store.primary_color}
-              totalProducts={allProducts.length}
-              filteredCount={products.length}
-            />
-          </div>
-        )}
-
-        {/* Products Grid */}
         {productsLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin" style={{ color: store.primary_color }} />
           </div>
-        ) : allProducts.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-lg text-muted-foreground">Esta tienda aún no tiene productos</p>
-          </div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-16 space-y-4">
-            <Search className="h-12 w-12 mx-auto text-muted-foreground" />
-            <p className="text-lg text-muted-foreground">No se encontraron productos con esos filtros</p>
-            <Button 
-              variant="outline" 
-              onClick={() => setFilters({
-                search: "",
-                collection: "all",
-                sortBy: "default",
-                priceRange: [0, maxPrice],
-                showOnSale: false,
-                showNew: false,
-                showInStock: false,
-              })}
-            >
-              Limpiar filtros
-            </Button>
-          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <div 
-                key={product.id}
-                className="group bg-card rounded-xl overflow-hidden border hover:shadow-lg transition-all duration-300"
-              >
-                <div 
-                  className="relative aspect-square overflow-hidden cursor-pointer"
-                  onClick={() => setSelectedProduct(product)}
-                >
-                  <img 
-                    src={product.image} 
-                    alt={product.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Image count indicator */}
-                  {product.images && product.images.length > 0 && (
-                    <div className="absolute bottom-2 left-2 bg-background/80 backdrop-blur-sm text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      {1 + product.images.length} fotos
-                    </div>
-                  )}
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleWishlist(product);
-                    }}
-                  >
-                    <Heart 
-                      className={`h-5 w-5 ${isInWishlist(product.id) ? 'fill-red-500 text-red-500' : ''}`}
+          <div className="space-y-8">
+            {sections.map((section) => {
+              switch (section.type) {
+                case 'hero':
+                  return (
+                    <HeroSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                      onAction={() => {
+                        const productsSection = document.getElementById('products-section');
+                        productsSection?.scrollIntoView({ behavior: 'smooth' });
+                      }}
                     />
-                  </Button>
-                  {product.isNew && (
-                    <Badge className="absolute top-2 left-2" style={{ backgroundColor: store.primary_color }}>
-                      Nuevo
-                    </Badge>
-                  )}
-                  {product.isOnSale && product.originalPrice && (
-                    <Badge className="absolute top-2 left-2 bg-red-500">
-                      Oferta
-                    </Badge>
-                  )}
-                </div>
-                <div className="p-4 space-y-2">
-                  <h3 className="font-medium truncate">{product.name}</h3>
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-lg" style={{ color: store.primary_color }}>
-                      ${product.price.toLocaleString()}
-                    </span>
-                    {product.originalPrice && (
-                      <span className="text-sm text-muted-foreground line-through">
-                        ${product.originalPrice.toLocaleString()}
-                      </span>
-                    )}
-                  </div>
-                  <Button 
-                    className="w-full"
-                    style={{ backgroundColor: store.primary_color }}
-                    onClick={() => addItem(product)}
-                    disabled={product.stock === 0}
-                  >
-                    {product.stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
-                  </Button>
-                </div>
+                  );
+
+                case 'categories':
+                  return collections.length > 0 ? (
+                    <CategoriesSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                      collections={collections}
+                      onCollectionSelect={(collection) => {
+                        setFilters(prev => ({ ...prev, collection }));
+                        const productsSection = document.getElementById('products-section');
+                        productsSection?.scrollIntoView({ behavior: 'smooth' });
+                      }}
+                    />
+                  ) : null;
+
+                case 'featured_products':
+                  return allProducts.length > 0 ? (
+                    <FeaturedProductsSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                      products={allProducts}
+                      onProductClick={setSelectedProduct}
+                      onAddToCart={addItem}
+                      onToggleWishlist={toggleWishlist}
+                      isInWishlist={isInWishlist}
+                    />
+                  ) : null;
+
+                case 'banner':
+                  return (
+                    <BannerSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'products_grid':
+                  return (
+                    <div key={section.id} id="products-section">
+                      <ProductsGridSection
+                        section={section}
+                        store={store}
+                        products={products}
+                        allProducts={allProducts}
+                        filters={filters}
+                        onFiltersChange={setFilters}
+                        collections={collections}
+                        maxPrice={maxPrice}
+                        onProductClick={setSelectedProduct}
+                        onAddToCart={addItem}
+                        onToggleWishlist={toggleWishlist}
+                        isInWishlist={isInWishlist}
+                      />
+                    </div>
+                  );
+
+                case 'newsletter':
+                  return (
+                    <NewsletterSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'about':
+                  return (
+                    <AboutSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'contact':
+                  return (
+                    <ContactSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                default:
+                  return null;
+              }
+            })}
+
+            {/* Show products grid if no sections have it */}
+            {!sections.some(s => s.type === 'products_grid') && allProducts.length > 0 && (
+              <div id="products-section">
+                <ProductsGridSection
+                  section={{
+                    id: 'default-products',
+                    type: 'products_grid',
+                    title: 'Productos',
+                    enabled: true,
+                    settings: { showFilters: true, columns: 4 }
+                  }}
+                  store={store}
+                  products={products}
+                  allProducts={allProducts}
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  collections={collections}
+                  maxPrice={maxPrice}
+                  onProductClick={setSelectedProduct}
+                  onAddToCart={addItem}
+                  onToggleWishlist={toggleWishlist}
+                  isInWishlist={isInWishlist}
+                />
               </div>
-            ))}
+            )}
+
+            {/* Empty state */}
+            {allProducts.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-lg text-muted-foreground">Esta tienda aún no tiene productos</p>
+              </div>
+            )}
           </div>
         )}
       </div>
