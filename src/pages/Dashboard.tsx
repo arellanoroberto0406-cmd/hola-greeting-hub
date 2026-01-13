@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart, RotateCcw } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -26,6 +26,7 @@ import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
 import { TutorialOverlay, TutorialHelpButton } from "@/components/dashboard/TutorialOverlay";
 import PaymentSettingsPanel from "@/components/dashboard/PaymentSettingsPanel";
 import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
+import RefundsHistoryPanel from "@/components/dashboard/RefundsHistoryPanel";
 import StoreUrlPanel from "@/components/dashboard/StoreUrlPanel";
 
 const Dashboard = () => {
@@ -444,7 +445,7 @@ const Dashboard = () => {
           // Store Dashboard
           <TooltipProvider delayDuration={300}>
           <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full max-w-7xl grid-cols-10">
+            <TabsList className="grid w-full max-w-7xl grid-cols-11">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="orders" className="gap-2">
@@ -491,6 +492,18 @@ const Dashboard = () => {
                 <TooltipContent side="bottom" className="max-w-xs">
                   <p className="font-medium">Estadísticas de Ventas</p>
                   <p className="text-xs text-muted-foreground">Gráficas de ingresos y pedidos por método de pago</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="refunds" className="gap-2">
+                    <RotateCcw className="h-4 w-4" />
+                    <span className="hidden sm:inline">Reembolsos</span>
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Historial de Reembolsos</p>
+                  <p className="text-xs text-muted-foreground">Ve todos los reembolsos procesados con fechas y montos</p>
                 </TooltipContent>
               </Tooltip>
               <Tooltip>
@@ -652,6 +665,26 @@ const Dashboard = () => {
                   </Tooltip>
                 </div>
                 <PaymentStatsPanel storeId={store.id} primaryColor={store.primary_color} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="refunds">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Historial de Reembolsos</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">💰 Reembolsos procesados</p>
+                      <p className="text-xs">Consulta todos los reembolsos realizados a través de MercadoPago. Ve el monto total reembolsado y el historial completo.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <RefundsHistoryPanel storeId={store.id} />
               </div>
             </TabsContent>
 
