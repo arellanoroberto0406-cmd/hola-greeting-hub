@@ -23,7 +23,7 @@ export interface StoreSubscription {
   id: string;
   store_id: string;
   plan_id: string;
-  status: 'trial' | 'active' | 'expired' | 'cancelled';
+  status: 'trial' | 'active' | 'expired' | 'cancelled' | 'pending_renewal' | 'trial_expired';
   trial_start_date: string | null;
   trial_end_date: string | null;
   subscription_start_date: string | null;
@@ -146,7 +146,7 @@ export const useSubscriptionStatus = (storeId: string | undefined) => {
       }
     }
 
-    if (subscription.status === 'active') {
+    if (subscription.status === 'active' || subscription.status === 'pending_renewal') {
       const endDate = subscription.subscription_end_date 
         ? new Date(subscription.subscription_end_date) 
         : null;
@@ -155,11 +155,15 @@ export const useSubscriptionStatus = (storeId: string | undefined) => {
         const daysLeft = endDate 
           ? Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
           : 999;
-        return { isActive: true, status: 'active', daysLeft };
+        return { 
+          isActive: subscription.status === 'active', 
+          status: subscription.status, 
+          daysLeft 
+        };
       }
     }
 
-    return { isActive: false, status: subscription.status, daysLeft: 0 };
+    return { isActive: false, status: subscription.status as 'trial' | 'active' | 'expired' | 'cancelled' | 'pending_renewal' | 'trial_expired', daysLeft: 0 };
   };
 
   return {

@@ -98,7 +98,14 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
         return (
           <Badge className="bg-green-500 flex items-center gap-1">
             <Check className="h-3 w-3" />
-            Activo
+            Activo - {daysLeft} días restantes
+          </Badge>
+        );
+      case 'pending_renewal':
+        return (
+          <Badge variant="outline" className="flex items-center gap-1 bg-amber-100 text-amber-800 border-amber-300">
+            <Clock className="h-3 w-3" />
+            Renovación pendiente
           </Badge>
         );
       case 'trial_expired':
@@ -146,9 +153,24 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
             {getStatusBadge()}
           </div>
         </CardHeader>
-        {!isActive && status !== 'none' && (
+        {status === 'pending_renewal' && (
           <CardContent>
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-amber-800">
+              <div className="flex items-start gap-3">
+                <Clock className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-medium">Tu suscripción está por vencer</p>
+                  <p className="text-sm mt-1">
+                    Tu suscripción expira pronto. Renueva ahora para mantener acceso a todas las funciones.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        )}
+        {!isActive && status !== 'none' && status !== 'pending_renewal' && (
+          <CardContent>
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 mt-0.5 flex-shrink-0" />
                 <div>
