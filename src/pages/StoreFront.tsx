@@ -47,6 +47,7 @@ import {
   FAQSection,
 } from "@/components/store/sections";
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
+import { PremiumProductModal } from "@/components/store/PremiumProductModal";
 import SectionWrapper from "@/components/store/SectionWrapper";
 
 const mapDbProduct = (dbProduct: any): Product => ({
@@ -791,105 +792,17 @@ const StoreFront = () => {
         )}
       </div>
 
-      {/* Product Detail Modal */}
-      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
-          {selectedProduct && (
-            <div className="grid md:grid-cols-2 gap-0">
-              <div className="p-6 bg-muted/30">
-                <ProductGallery
-                  mainImage={selectedProduct.image}
-                  images={selectedProduct.images || []}
-                  productName={selectedProduct.name}
-                  primaryColor={store.primary_color}
-                />
-              </div>
-              <div className="p-6 space-y-4">
-                <div>
-                  {selectedProduct.isNew && (
-                    <Badge className="mb-2" style={{ backgroundColor: store.primary_color }}>
-                      Nuevo
-                    </Badge>
-                  )}
-                  {selectedProduct.isOnSale && selectedProduct.originalPrice && (
-                    <Badge className="mb-2 ml-2 bg-red-500">
-                      Oferta
-                    </Badge>
-                  )}
-                  <h2 className="text-2xl font-heading font-bold mt-2">{selectedProduct.name}</h2>
-                  <p className="text-sm text-muted-foreground">{selectedProduct.collection}</p>
-                </div>
-                
-                <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-bold" style={{ color: store.primary_color }}>
-                    ${selectedProduct.price.toLocaleString()}
-                  </span>
-                  {selectedProduct.originalPrice && (
-                    <span className="text-lg text-muted-foreground line-through">
-                      ${selectedProduct.originalPrice.toLocaleString()}
-                    </span>
-                  )}
-                </div>
-
-                {selectedProduct.description && (
-                  <p className="text-muted-foreground">{selectedProduct.description}</p>
-                )}
-
-                {selectedProduct.features && selectedProduct.features.length > 0 && (
-                  <div>
-                    <h4 className="font-medium mb-2">Características:</h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {selectedProduct.features.map((feature, i) => (
-                        <li key={i}>{feature}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Stock info - respects show_stock setting */}
-                {((store as any).show_stock !== false) && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className={selectedProduct.stock > 0 ? "text-green-600" : "text-red-500"}>
-                      {selectedProduct.stock > 0 ? `${selectedProduct.stock} en stock` : "Agotado"}
-                    </span>
-                  </div>
-                )}
-
-                <div className="flex gap-2 pt-4">
-                  <Button
-                    className="flex-1"
-                    size="lg"
-                    style={{ backgroundColor: store.primary_color }}
-                    onClick={() => {
-                      addItem(selectedProduct);
-                      setSelectedProduct(null);
-                    }}
-                    disabled={selectedProduct.stock === 0}
-                  >
-                    {selectedProduct.stock === 0 ? 'Agotado' : 'Agregar al Carrito'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="lg"
-                    onClick={() => toggleWishlist(selectedProduct)}
-                  >
-                    <Heart 
-                      className={`h-5 w-5 ${isInWishlist(selectedProduct.id) ? 'fill-red-500 text-red-500' : ''}`}
-                    />
-                  </Button>
-                </div>
-
-                {/* Reviews Section - respects show_reviews setting */}
-                {((store as any).show_reviews !== false) && (
-                  <div className="border-t pt-6 mt-6">
-                    <ProductReviews productId={selectedProduct.id} />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Premium Product Detail Modal */}
+      <PremiumProductModal
+        product={selectedProduct}
+        store={store}
+        planTier={planTier}
+        isOpen={!!selectedProduct}
+        onClose={() => setSelectedProduct(null)}
+        onAddToCart={addItem}
+        onToggleWishlist={toggleWishlist}
+        isInWishlist={selectedProduct ? isInWishlist(selectedProduct.id) : false}
+      />
 
       {/* Live Chat Widget */}
       <LiveChatWidget 
