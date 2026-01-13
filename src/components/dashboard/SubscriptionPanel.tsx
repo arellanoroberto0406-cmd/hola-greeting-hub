@@ -36,10 +36,10 @@ const PlanIcon = ({ slug }: { slug: string }) => {
 
 const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
+  const { data: plans, isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
   const { subscription, isActive, status, daysLeft, plan: currentPlan } = useSubscriptionStatus(storeId);
   const createSubscription = useCreateSubscription();
-  const { createOrder, isProcessing } = usePayPalPayment();
+  const { createOrder, isProcessing, error: paymentError } = usePayPalPayment();
   
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
