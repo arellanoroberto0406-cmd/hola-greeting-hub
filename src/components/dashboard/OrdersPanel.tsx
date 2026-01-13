@@ -30,14 +30,23 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink, RotateCcw, CreditCard } from "lucide-react";
+import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink, RotateCcw, CreditCard, Printer } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import TrackingInput from "./TrackingInput";
 import ExportOrdersButton from "./ExportOrdersButton";
+import OrderInvoice from "./OrderInvoice";
 
 interface OrdersPanelProps {
   storeId: string;
+  store?: {
+    name: string;
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    logo_url?: string | null;
+    primary_color?: string | null;
+  };
 }
 
 const STATUS_OPTIONS = [
@@ -65,7 +74,7 @@ const canRefund = (order: OrderWithItems) => {
     (order.status === 'paid' || order.status === 'confirmed' || order.status === 'shipped');
 };
 
-const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
+const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
   const { data: orders, isLoading } = useStoreOrders(storeId);
   const updateStatus = useUpdateOrderStatus();
   const refundMutation = useMercadoPagoRefund();
@@ -344,6 +353,22 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
                   </Badge>
                 )}
               </div>
+
+              {/* Print Invoice */}
+              {store && (
+                <div className="border-t pt-4">
+                  <h4 className="font-medium mb-3">Factura</h4>
+                  <OrderInvoice 
+                    order={{
+                      ...selectedOrder,
+                      tracking_number: (selectedOrder as any).tracking_number,
+                      carrier: (selectedOrder as any).carrier,
+                    }}
+                    store={store}
+                    primaryColor={store.primary_color || "#8B4513"}
+                  />
+                </div>
+              )}
 
               {/* Tracking */}
               <div className="border-t pt-4 space-y-3">

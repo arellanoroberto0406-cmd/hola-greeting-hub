@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { useStoreAssets } from "@/hooks/useStoreAssets";
 import OrdersPanel from "@/components/dashboard/OrdersPanel";
+import LowStockAlert from "@/components/dashboard/LowStockAlert";
 import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
 import CouponsPanel from "@/components/dashboard/CouponsPanel";
 import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel";
@@ -623,7 +624,27 @@ const Dashboard = () => {
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                <OrdersPanel storeId={store.id} />
+                
+                {/* Low Stock Alert */}
+                {products && products.length > 0 && (
+                  <LowStockAlert 
+                    products={products.map(p => ({ id: p.id, name: p.name, stock: p.stock, image: p.image }))}
+                    lowStockThreshold={5}
+                    primaryColor={store.primary_color}
+                  />
+                )}
+                
+                <OrdersPanel 
+                  storeId={store.id} 
+                  store={{
+                    name: store.name,
+                    email: store.email,
+                    phone: store.phone,
+                    address: store.address,
+                    logo_url: store.logo_url,
+                    primary_color: store.primary_color,
+                  }}
+                />
               </div>
             </TabsContent>
 
