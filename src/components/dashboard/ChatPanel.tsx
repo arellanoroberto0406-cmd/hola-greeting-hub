@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,69 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
   const sendMessage = useSendMessage();
   const markAsRead = useMarkMessagesAsRead();
   const closeConversation = useCloseConversation();
+
+  // Track previous message count and conversations for notification
+  const prevMessagesCountRef = useRef<number>(0);
+  const prevConversationsRef = useRef<string[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+
+  // Play notification sound
+  const playNotificationSound = useCallback(() => {
+    try {
+      // Create or reuse AudioContext
+      if (!audioContextRef.current) {
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+      }
+      const ctx = audioContextRef.current;
+      
+      // Create oscillator for a pleasant notification tone
+      const oscillator = ctx.createOscillator();
+      const gainNode = ctx.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(ctx.destination);
+      
+      // Pleasant notification sound (two-tone chime)
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, ctx.currentTime); // A5
+      oscillator.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.1); // D6
+      
+      gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      
+      oscillator.start(ctx.currentTime);
+      oscillator.stop(ctx.currentTime + 0.3);
+    } catch (error) {
+      console.error('Error playing notification sound:', error);
+    }
+  }, []);
+
+  // Detect new messages from customers (not from store)
+  useEffect(() => {
+    if (messages.length > 0 && prevMessagesCountRef.current > 0) {
+      const newMessagesCount = messages.length - prevMessagesCountRef.current;
+      if (newMessagesCount > 0) {
+        // Check if the newest message is from a customer
+        const latestMessage = messages[messages.length - 1];
+        if (latestMessage.sender_type === 'customer') {
+          playNotificationSound();
+        }
+      }
+    }
+    prevMessagesCountRef.current = messages.length;
+  }, [messages, playNotificationSound]);
+
+  // Detect new conversations
+  useEffect(() => {
+    if (conversations.length > 0 && prevConversationsRef.current.length > 0) {
+      const currentIds = conversations.map(c => c.id);
+      const newConversations = currentIds.filter(id => !prevConversationsRef.current.includes(id));
+      if (newConversations.length > 0) {
+        playNotificationSound();
+      }
+    }
+    prevConversationsRef.current = conversations.map(c => c.id);
+  }, [conversations, playNotificationSound]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
