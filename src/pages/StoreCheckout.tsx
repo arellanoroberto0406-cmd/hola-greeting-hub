@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet } from "lucide-react";
+import { useNavigate, useParams, Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet, AlertCircle, Clock } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import { useCart } from "@/context/CartContext";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
+import { useMercadoPagoPayment } from "@/hooks/useMercadoPagoPayment";
 import {
   Form,
   FormControl,
@@ -72,13 +73,30 @@ const mexicanStates = [
 
 const StoreCheckout = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { items, totalPrice, clearCart } = useCart();
   const { toast } = useToast();
   const [orderComplete, setOrderComplete] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'success' | 'failure' | 'pending' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
+  const { createPreference, isProcessing: isMPProcessing } = useMercadoPagoPayment();
+
+  // Check for payment status from URL (MercadoPago redirect)
+  useEffect(() => {
+    const status = searchParams.get('status') as 'success' | 'failure' | 'pending' | null;
+    const orderId = searchParams.get('order');
+    
+    if (status && orderId) {
+      setPaymentStatus(status);
+      if (status === 'success') {
+        setOrderComplete(true);
+        clearCart();
+      }
+    }
+  }, [searchParams, clearCart]);
 
   // Get available payment methods from store config
   const availablePaymentMethods = useMemo(() => {
@@ -151,7 +169,7 @@ const StoreCheckout = () => {
           subtotal: totalPrice,
           shipping_cost: shippingCost,
           total: finalTotal,
-          status: "pending",
+          status: data.paymentMethod === 'mercadopago' ? 'awaiting_payment' : 'pending',
         })
         .select()
         .single();
@@ -174,6 +192,38 @@ const StoreCheckout = () => {
         .insert(orderItems);
 
       if (itemsError) throw itemsError;
+
+      // Handle MercadoPago payment
+      if (data.paymentMethod === 'mercadopago') {
+        const mpItems = items.map(item => ({
+          title: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+        }));
+
+        // Add shipping as an item if not free
+        if (shippingCost > 0) {
+          mpItems.push({
+            title: 'Envío',
+            quantity: 1,
+            unit_price: shippingCost,
+          });
+        }
+
+        await createPreference(
+          store.id,
+          order.id,
+          mpItems,
+          {
+            email: data.email,
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+          slug || ''
+        );
+        // The hook will redirect to MercadoPago
+        return;
+      }
 
       setOrderComplete(true);
       clearCart();
@@ -213,6 +263,84 @@ const StoreCheckout = () => {
   }
 
   const primaryColor = store.primary_color || "#8B4513";
+
+  // Handle payment failure from MercadoPago
+  if (paymentStatus === 'failure') {
+    return (
+      <div className="min-h-screen bg-background">
+        <header 
+          className="border-b py-4"
+          style={{ backgroundColor: `${primaryColor}10` }}
+        >
+          <div className="container mx-auto px-4 flex items-center gap-3">
+            {store.logo_url ? (
+              <img src={store.logo_url} alt={store.name} className="h-8 w-auto" />
+            ) : (
+              <Store className="h-6 w-6" style={{ color: primaryColor }} />
+            )}
+            <span className="font-heading text-lg" style={{ color: primaryColor }}>{store.name}</span>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-lg mx-auto text-center animate-fade-in">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-100">
+              <AlertCircle className="w-10 h-10 text-red-500" />
+            </div>
+            <h1 className="text-4xl font-heading mb-4">Pago no completado</h1>
+            <p className="text-muted-foreground mb-8">
+              Hubo un problema con tu pago. Por favor intenta de nuevo o elige otro método de pago.
+            </p>
+            <Link to={`/tienda/${slug}`}>
+              <Button size="lg" style={{ backgroundColor: primaryColor }}>
+                Volver a la tienda
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle pending payment from MercadoPago (e.g., OXXO)
+  if (paymentStatus === 'pending') {
+    return (
+      <div className="min-h-screen bg-background">
+        <header 
+          className="border-b py-4"
+          style={{ backgroundColor: `${primaryColor}10` }}
+        >
+          <div className="container mx-auto px-4 flex items-center gap-3">
+            {store.logo_url ? (
+              <img src={store.logo_url} alt={store.name} className="h-8 w-auto" />
+            ) : (
+              <Store className="h-6 w-6" style={{ color: primaryColor }} />
+            )}
+            <span className="font-heading text-lg" style={{ color: primaryColor }}>{store.name}</span>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-20">
+          <div className="max-w-lg mx-auto text-center animate-fade-in">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-yellow-100">
+              <Clock className="w-10 h-10 text-yellow-600" />
+            </div>
+            <h1 className="text-4xl font-heading mb-4">Pago pendiente</h1>
+            <p className="text-muted-foreground mb-4">
+              Tu pago está siendo procesado. Si elegiste pagar en OXXO u otro punto de pago, 
+              recuerda completar el pago antes de la fecha límite.
+            </p>
+            <p className="text-sm text-muted-foreground mb-8">
+              Te enviaremos un correo cuando el pago sea confirmado.
+            </p>
+            <Link to={`/tienda/${slug}`}>
+              <Button size="lg" style={{ backgroundColor: primaryColor }}>
+                Seguir comprando
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (items.length === 0 && !orderComplete) {
     return (
@@ -557,12 +685,12 @@ const StoreCheckout = () => {
                     size="lg" 
                     className="w-full"
                     style={{ backgroundColor: primaryColor }}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isMPProcessing}
                   >
-                    {isSubmitting ? (
+                    {isSubmitting || isMPProcessing ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        Procesando...
+                        {isMPProcessing ? 'Redirigiendo a MercadoPago...' : 'Procesando...'}
                       </>
                     ) : (
                       `Pagar $${finalTotal.toLocaleString()}`
@@ -634,13 +762,13 @@ const StoreCheckout = () => {
                   size="lg" 
                   className="w-full"
                   style={{ backgroundColor: primaryColor }}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isMPProcessing}
                   onClick={form.handleSubmit(onSubmit)}
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || isMPProcessing ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      Procesando...
+                      {isMPProcessing ? 'Redirigiendo a MercadoPago...' : 'Procesando...'}
                     </>
                   ) : (
                     "Confirmar Pedido"
