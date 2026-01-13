@@ -1,7 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
-import { Loader2, ShoppingCart, Heart, Menu, Eye } from "lucide-react";
+import { Loader2, ShoppingCart, Heart, Menu, Eye, Search } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import ProductFilters, { FilterState } from "@/components/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useMemo, useEffect } from "react";
@@ -46,9 +47,98 @@ const StoreFront = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
-  const products = useMemo(() => {
+  // All products mapped
+  const allProducts = useMemo(() => {
     return (productsData || []).map(mapDbProduct);
   }, [productsData]);
+
+  // Calculate max price for filters
+  const maxPrice = useMemo(() => {
+    if (allProducts.length === 0) return 10000;
+    return Math.ceil(Math.max(...allProducts.map(p => p.price)) / 100) * 100;
+  }, [allProducts]);
+
+  // Get unique collections
+  const collections = useMemo(() => {
+    const uniqueCollections = [...new Set(allProducts.map(p => p.collection).filter(Boolean))];
+    return uniqueCollections.sort();
+  }, [allProducts]);
+
+  // Filters state
+  const [filters, setFilters] = useState<FilterState>({
+    search: "",
+    collection: "all",
+    sortBy: "default",
+    priceRange: [0, maxPrice],
+    showOnSale: false,
+    showNew: false,
+    showInStock: false,
+  });
+
+  // Update price range when maxPrice changes
+  useEffect(() => {
+    if (filters.priceRange[1] === 10000 && maxPrice !== 10000) {
+      setFilters(prev => ({ ...prev, priceRange: [0, maxPrice] }));
+    }
+  }, [maxPrice]);
+
+  // Filtered and sorted products
+  const products = useMemo(() => {
+    let filtered = [...allProducts];
+
+    // Search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        p =>
+          p.name.toLowerCase().includes(searchLower) ||
+          p.description?.toLowerCase().includes(searchLower) ||
+          p.collection?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Collection filter
+    if (filters.collection !== "all") {
+      filtered = filtered.filter(p => p.collection === filters.collection);
+    }
+
+    // Price range filter
+    filtered = filtered.filter(
+      p => p.price >= filters.priceRange[0] && p.price <= filters.priceRange[1]
+    );
+
+    // Quick filters
+    if (filters.showOnSale) {
+      filtered = filtered.filter(p => p.isOnSale);
+    }
+    if (filters.showNew) {
+      filtered = filtered.filter(p => p.isNew);
+    }
+    if (filters.showInStock) {
+      filtered = filtered.filter(p => p.stock > 0);
+    }
+
+    // Sorting
+    switch (filters.sortBy) {
+      case "price-asc":
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+      case "price-desc":
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+      case "name-asc":
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case "name-desc":
+        filtered.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case "newest":
+        filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+        break;
+    }
+
+    return filtered;
+  }, [allProducts, filters]);
 
   // Apply store colors as CSS variables
   useEffect(() => {
@@ -287,7 +377,7 @@ const StoreFront = () => {
 
       {/* Store Info */}
       <div className="container mx-auto px-4 py-8">
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 
             className="text-3xl md:text-5xl font-bold mb-4 font-heading"
             style={{ color: store.primary_color }}
@@ -301,14 +391,48 @@ const StoreFront = () => {
           )}
         </div>
 
+        {/* Filters */}
+        {!productsLoading && allProducts.length > 0 && (
+          <div className="mb-8">
+            <ProductFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              collections={collections}
+              maxPrice={maxPrice}
+              primaryColor={store.primary_color}
+              totalProducts={allProducts.length}
+              filteredCount={products.length}
+            />
+          </div>
+        )}
+
         {/* Products Grid */}
         {productsLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="w-8 h-8 animate-spin" style={{ color: store.primary_color }} />
           </div>
-        ) : products.length === 0 ? (
+        ) : allProducts.length === 0 ? (
           <div className="text-center py-16">
             <p className="text-lg text-muted-foreground">Esta tienda aún no tiene productos</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-16 space-y-4">
+            <Search className="h-12 w-12 mx-auto text-muted-foreground" />
+            <p className="text-lg text-muted-foreground">No se encontraron productos con esos filtros</p>
+            <Button 
+              variant="outline" 
+              onClick={() => setFilters({
+                search: "",
+                collection: "all",
+                sortBy: "default",
+                priceRange: [0, maxPrice],
+                showOnSale: false,
+                showNew: false,
+                showInStock: false,
+              })}
+            >
+              Limpiar filtros
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
