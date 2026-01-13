@@ -62,10 +62,16 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+interface TemplatePreviewData {
+  globalStyles: GlobalStyles;
+  sectionIds: string[];
+}
+
 interface TemplatesPanelProps {
   currentStyles: GlobalStyles;
   currentSections: StoreSection[];
   onApplyTemplate: (styles: GlobalStyles, sections: StoreSection[]) => void;
+  onPreviewTemplate?: (preview: TemplatePreviewData | null) => void;
   primaryColor?: string;
   store: Store;
 }
@@ -94,6 +100,7 @@ export const TemplatesPanel = ({
   currentStyles,
   currentSections,
   onApplyTemplate,
+  onPreviewTemplate,
   primaryColor = '#6366f1',
   store,
 }: TemplatesPanelProps) => {
@@ -132,6 +139,27 @@ export const TemplatesPanel = ({
   const handleSelectCustomTemplate = (template: CustomTemplate) => {
     setSelectedCustomTemplate(template);
     setIsCustomConfirmOpen(true);
+  };
+
+  const handlePreviewEnter = (template: DesignTemplate | CustomTemplate, isCustom: boolean) => {
+    if (!onPreviewTemplate) return;
+    
+    const globalStyles = isCustom 
+      ? (template as CustomTemplate).global_styles 
+      : (template as DesignTemplate).globalStyles;
+    const sectionIds = isCustom 
+      ? (template as CustomTemplate).section_ids 
+      : (template as DesignTemplate).sectionIds;
+    
+    onPreviewTemplate({ globalStyles, sectionIds });
+    setPreviewTemplate(template.id);
+  };
+
+  const handlePreviewLeave = () => {
+    if (onPreviewTemplate) {
+      onPreviewTemplate(null);
+    }
+    setPreviewTemplate(null);
   };
 
   const handleApplyTemplate = () => {
@@ -384,10 +412,10 @@ export const TemplatesPanel = ({
       >
         <Card 
           className={`cursor-pointer transition-all duration-200 hover:shadow-lg group overflow-hidden ${
-            isHovered ? 'ring-2 ring-primary' : ''
+            isHovered ? 'ring-2 ring-primary scale-[1.02]' : ''
           }`}
-          onMouseEnter={() => setPreviewTemplate(id)}
-          onMouseLeave={() => setPreviewTemplate(null)}
+          onMouseEnter={() => handlePreviewEnter(template, isCustom)}
+          onMouseLeave={handlePreviewLeave}
           onClick={() => isCustom 
             ? handleSelectCustomTemplate(template as CustomTemplate) 
             : handleSelectTemplate(template as DesignTemplate)
