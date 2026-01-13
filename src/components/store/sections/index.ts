@@ -6,3 +6,7 @@ export { AboutSection } from './AboutSection';
 export { ContactSection } from './ContactSection';
 export { CategoriesSection } from './CategoriesSection';
 export { ProductsGridSection } from './ProductsGridSection';
+export { TestimonialsSection } from './TestimonialsSection';
+export { ImageSliderSection } from './ImageSliderSection';
+export { VideoSection } from './VideoSection';
+export { FAQSection } from './FAQSection';

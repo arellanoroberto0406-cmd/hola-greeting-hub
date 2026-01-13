@@ -8,7 +8,10 @@ export type SectionType =
   | 'about'
   | 'contact'
   | 'products_grid'
-  | 'custom_text';
+  | 'custom_text'
+  | 'image_slider'
+  | 'video'
+  | 'faq';
 
 export interface StoreSection {
   id: string;
@@ -108,6 +111,52 @@ export const DEFAULT_SECTIONS: StoreSection[] = [
     settings: {
       showMap: false,
       showSocial: true
+    }
+  },
+  {
+    id: 'testimonials-1',
+    type: 'testimonials',
+    title: 'Testimonios',
+    enabled: false,
+    settings: {
+      headline: 'Lo que dicen nuestros clientes',
+      subtitle: 'Opiniones reales de clientes satisfechos',
+      columns: 3
+    }
+  },
+  {
+    id: 'image-slider-1',
+    type: 'image_slider',
+    title: 'Galería de Imágenes',
+    enabled: false,
+    settings: {
+      autoplay: true,
+      interval: 5000,
+      showCaptions: true,
+      aspectRatio: '16/9'
+    }
+  },
+  {
+    id: 'video-1',
+    type: 'video',
+    title: 'Video de Presentación',
+    enabled: false,
+    settings: {
+      videoUrl: '',
+      youtubeId: '',
+      autoplay: false,
+      loop: true,
+      showControls: true
+    }
+  },
+  {
+    id: 'faq-1',
+    type: 'faq',
+    title: 'Preguntas Frecuentes',
+    enabled: false,
+    settings: {
+      headline: 'Preguntas Frecuentes',
+      subtitle: 'Encuentra respuestas a las preguntas más comunes'
     }
   }
 ];

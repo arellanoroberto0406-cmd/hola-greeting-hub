@@ -39,6 +39,10 @@ import {
   ContactSection,
   CategoriesSection,
   ProductsGridSection,
+  TestimonialsSection,
+  ImageSliderSection,
+  VideoSection,
+  FAQSection,
 } from "@/components/store/sections";
 
 const mapDbProduct = (dbProduct: any): Product => ({
@@ -630,6 +634,42 @@ const StoreFront = () => {
                 case 'contact':
                   return (
                     <ContactSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'testimonials':
+                  return (
+                    <TestimonialsSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'image_slider':
+                  return (
+                    <ImageSliderSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'video':
+                  return (
+                    <VideoSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                    />
+                  );
+
+                case 'faq':
+                  return (
+                    <FAQSection
                       key={section.id}
                       section={section}
                       store={store}
