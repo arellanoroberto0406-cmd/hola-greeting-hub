@@ -15,11 +15,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useStoreLayout, useSaveStoreLayout } from "@/hooks/useStoreLayout";
-import { StoreSection, DEFAULT_SECTIONS } from "@/types/storeLayout";
+import { StoreSection, GlobalStyles, DEFAULT_SECTIONS, DEFAULT_GLOBAL_STYLES } from "@/types/storeLayout";
 import { Store } from "@/types/store";
 import { SortableSection } from "./store-editor/SortableSection";
 import { SectionSettingsDialog } from "./store-editor/SectionSettingsDialog";
 import { StorePreview } from "./store-editor/StorePreview";
+import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -32,7 +33,8 @@ import {
   Smartphone, 
   Monitor,
   Plus,
-  Sparkles
+  Sparkles,
+  Palette
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -69,6 +71,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const saveLayout = useSaveStoreLayout();
   
   const [sections, setSections] = useState<StoreSection[]>([]);
+  const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
   const [editingSection, setEditingSection] = useState<StoreSection | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
@@ -84,6 +87,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   useEffect(() => {
     if (layout?.sections) {
       setSections(layout.sections);
+    }
+    if (layout?.globalStyles) {
+      setGlobalStyles(layout.globalStyles);
     }
   }, [layout]);
 
@@ -123,16 +129,23 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
     setHasChanges(true);
   };
 
+  const handleGlobalStylesChange = (newStyles: GlobalStyles) => {
+    setGlobalStyles(newStyles);
+    setHasChanges(true);
+  };
+
   const handleSaveLayout = async () => {
     await saveLayout.mutateAsync({
       storeId: store.id,
       sections,
+      globalStyles,
     });
     setHasChanges(false);
   };
 
   const handleResetLayout = () => {
     setSections(DEFAULT_SECTIONS);
+    setGlobalStyles(DEFAULT_GLOBAL_STYLES);
     setHasChanges(true);
   };
 
@@ -219,7 +232,11 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         <TabsList>
           <TabsTrigger value="editor" className="gap-2">
             <Layers className="h-4 w-4" />
-            Editor
+            Secciones
+          </TabsTrigger>
+          <TabsTrigger value="styles" className="gap-2">
+            <Palette className="h-4 w-4" />
+            Estilos
           </TabsTrigger>
           <TabsTrigger value="preview" className="gap-2">
             <Eye className="h-4 w-4" />
@@ -342,6 +359,14 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
               </Card>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="styles" className="space-y-6">
+          <GlobalStylesPanel
+            styles={globalStyles}
+            onChange={handleGlobalStylesChange}
+            primaryColor={store.primary_color}
+          />
         </TabsContent>
 
         <TabsContent value="preview">

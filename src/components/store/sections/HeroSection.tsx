@@ -32,11 +32,12 @@ export const HeroSection = ({ section, store, onAction }: HeroSectionProps) => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="relative py-16 md:py-24 px-6 rounded-2xl overflow-hidden"
+      className="relative py-16 md:py-24 px-6 overflow-hidden"
       style={{
         background: getBackground(),
         backgroundSize: 'cover',
         backgroundPosition: 'center',
+        borderRadius: 'var(--store-radius, 12px)',
       }}
     >
       {backgroundType === 'image' && store.banner_url && (
@@ -49,10 +50,13 @@ export const HeroSection = ({ section, store, onAction }: HeroSectionProps) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className={`text-3xl md:text-5xl font-bold font-heading mb-4 ${
+          className={`text-3xl md:text-5xl font-bold mb-4 ${
             backgroundType === 'image' && store.banner_url ? 'text-white' : ''
           }`}
-          style={{ color: backgroundType !== 'image' ? store.primary_color : undefined }}
+          style={{ 
+            color: backgroundType !== 'image' ? store.primary_color : undefined,
+            fontFamily: 'var(--store-heading-font, inherit)'
+          }}
         >
           {headline || '¡Bienvenido a nuestra tienda!'}
         </motion.h1>

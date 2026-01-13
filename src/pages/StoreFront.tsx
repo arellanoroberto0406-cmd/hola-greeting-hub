@@ -29,7 +29,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import ProductGallery from "@/components/ProductGallery";
 import ProductReviews from "@/components/ProductReviews";
 import { motion } from "framer-motion";
-import { StoreSection, DEFAULT_SECTIONS } from "@/types/storeLayout";
+import { StoreSection, GlobalStyles, DEFAULT_SECTIONS, DEFAULT_GLOBAL_STYLES, FONT_OPTIONS } from "@/types/storeLayout";
 import {
   HeroSection,
   FeaturedProductsSection,
@@ -78,9 +78,13 @@ const StoreFront = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
-  // Get sections from layout or use defaults
+  // Get sections and global styles from layout or use defaults
   const sections = useMemo(() => {
     return layout?.sections?.filter(s => s.enabled) || DEFAULT_SECTIONS.filter(s => s.enabled);
+  }, [layout]);
+
+  const globalStyles = useMemo(() => {
+    return layout?.globalStyles || DEFAULT_GLOBAL_STYLES;
   }, [layout]);
 
   // All products mapped
@@ -176,19 +180,62 @@ const StoreFront = () => {
     return filtered;
   }, [allProducts, filters]);
 
-  // Apply store colors as CSS variables
+  // Apply store colors and global styles as CSS variables
   useEffect(() => {
     if (store) {
       document.documentElement.style.setProperty('--store-primary', store.primary_color);
       document.documentElement.style.setProperty('--store-secondary', store.secondary_color);
       document.documentElement.style.setProperty('--store-accent', store.accent_color);
     }
+    
+    // Apply global styles
+    const headingFontName = FONT_OPTIONS.find(f => f.value === globalStyles.headingFont)?.label || 'Oswald';
+    const bodyFontName = FONT_OPTIONS.find(f => f.value === globalStyles.bodyFont)?.label || 'Montserrat';
+    
+    document.documentElement.style.setProperty('--store-heading-font', `'${headingFontName}', sans-serif`);
+    document.documentElement.style.setProperty('--store-body-font', `'${bodyFontName}', sans-serif`);
+    
+    // Border radius
+    const radiusMap: Record<string, string> = {
+      none: '0px',
+      sm: '4px',
+      md: '8px',
+      lg: '12px',
+      xl: '16px',
+      full: '9999px',
+    };
+    document.documentElement.style.setProperty('--store-radius', radiusMap[globalStyles.borderRadius] || '12px');
+    
+    // Section spacing
+    const spacingMap: Record<string, string> = {
+      compact: '2rem',
+      normal: '4rem',
+      relaxed: '6rem',
+      spacious: '8rem',
+    };
+    document.documentElement.style.setProperty('--store-section-spacing', spacingMap[globalStyles.sectionSpacing] || '4rem');
+    
+    // Card shadow
+    const shadowMap: Record<string, string> = {
+      none: 'none',
+      sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+      md: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+      lg: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+      xl: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)',
+    };
+    document.documentElement.style.setProperty('--store-card-shadow', shadowMap[globalStyles.cardShadow] || shadowMap.md);
+    
     return () => {
       document.documentElement.style.removeProperty('--store-primary');
       document.documentElement.style.removeProperty('--store-secondary');
       document.documentElement.style.removeProperty('--store-accent');
+      document.documentElement.style.removeProperty('--store-heading-font');
+      document.documentElement.style.removeProperty('--store-body-font');
+      document.documentElement.style.removeProperty('--store-radius');
+      document.documentElement.style.removeProperty('--store-section-spacing');
+      document.documentElement.style.removeProperty('--store-card-shadow');
     };
-  }, [store]);
+  }, [store, globalStyles]);
 
   if (storeLoading) {
     return (
@@ -214,7 +261,12 @@ const StoreFront = () => {
   const freeShippingThreshold = store.free_shipping_threshold || 999;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div 
+      className="min-h-screen bg-background"
+      style={{ 
+        fontFamily: 'var(--store-body-font, inherit)',
+      }}
+    >
       {/* Announcement Bar */}
       {(store as any).announcement_active && (store as any).announcement_text && (
         <div 
@@ -539,7 +591,10 @@ const StoreFront = () => {
             <Loader2 className="w-8 h-8 animate-spin" style={{ color: store.primary_color }} />
           </div>
         ) : (
-          <div className="space-y-8">
+          <div 
+            className="flex flex-col"
+            style={{ gap: 'var(--store-section-spacing, 4rem)' }}
+          >
             {sections.map((section) => {
               switch (section.type) {
                 case 'hero':

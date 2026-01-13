@@ -50,7 +50,13 @@ export const FeaturedProductsSection = ({
         transition={{ duration: 0.5 }}
         className="flex items-center justify-between mb-8"
       >
-        <h2 className="text-2xl md:text-3xl font-bold font-heading" style={{ color: store.primary_color }}>
+        <h2 
+          className="text-2xl md:text-3xl font-bold" 
+          style={{ 
+            color: store.primary_color,
+            fontFamily: 'var(--store-heading-font, inherit)'
+          }}
+        >
           {section.title}
         </h2>
       </motion.div>
@@ -63,7 +69,11 @@ export const FeaturedProductsSection = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group bg-card rounded-xl overflow-hidden border hover:shadow-lg transition-all duration-300"
+            className="group bg-card overflow-hidden border hover:shadow-lg transition-all duration-300"
+            style={{
+              borderRadius: 'var(--store-radius, 12px)',
+              boxShadow: 'var(--store-card-shadow, 0 4px 6px -1px rgb(0 0 0 / 0.1))',
+            }}
           >
             <div
               className="relative aspect-square overflow-hidden cursor-pointer"
