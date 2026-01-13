@@ -17,7 +17,8 @@ import {
   Zap,
   Plus,
   X,
-  Save
+  Save,
+  Pencil
 } from "lucide-react";
 import {
   Popover,
@@ -57,6 +58,7 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
   const [message, setMessage] = useState("");
   const [showQuickReplies, setShowQuickReplies] = useState(false);
   const [showCustomReplyDialog, setShowCustomReplyDialog] = useState(false);
+  const [editingReplyIndex, setEditingReplyIndex] = useState<number | null>(null);
   const [newReplyTitle, setNewReplyTitle] = useState("");
   const [newReplyContent, setNewReplyContent] = useState("");
   const [customReplies, setCustomReplies] = useState<{ title: string; content: string }[]>(() => {
@@ -193,11 +195,40 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
   const handleAddCustomReply = () => {
     if (!newReplyTitle.trim() || !newReplyContent.trim()) return;
     
-    const newReplies = [...customReplies, { title: newReplyTitle.trim(), content: newReplyContent.trim() }];
-    setCustomReplies(newReplies);
-    localStorage.setItem(`chat_quick_replies_${storeId}`, JSON.stringify(newReplies));
+    if (editingReplyIndex !== null) {
+      // Editing existing reply
+      const newReplies = customReplies.map((reply, i) => 
+        i === editingReplyIndex 
+          ? { title: newReplyTitle.trim(), content: newReplyContent.trim() }
+          : reply
+      );
+      setCustomReplies(newReplies);
+      localStorage.setItem(`chat_quick_replies_${storeId}`, JSON.stringify(newReplies));
+    } else {
+      // Adding new reply
+      const newReplies = [...customReplies, { title: newReplyTitle.trim(), content: newReplyContent.trim() }];
+      setCustomReplies(newReplies);
+      localStorage.setItem(`chat_quick_replies_${storeId}`, JSON.stringify(newReplies));
+    }
+    
     setNewReplyTitle("");
     setNewReplyContent("");
+    setEditingReplyIndex(null);
+    setShowCustomReplyDialog(false);
+  };
+
+  const handleEditCustomReply = (index: number) => {
+    const reply = customReplies[index];
+    setNewReplyTitle(reply.title);
+    setNewReplyContent(reply.content);
+    setEditingReplyIndex(index);
+    setShowCustomReplyDialog(true);
+  };
+
+  const handleCloseReplyDialog = () => {
+    setNewReplyTitle("");
+    setNewReplyContent("");
+    setEditingReplyIndex(null);
     setShowCustomReplyDialog(false);
   };
 
@@ -415,7 +446,10 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
                         <div className="p-3 border-b">
                           <div className="flex items-center justify-between">
                             <h4 className="font-semibold text-sm">Respuestas rápidas</h4>
-                            <Dialog open={showCustomReplyDialog} onOpenChange={setShowCustomReplyDialog}>
+                            <Dialog open={showCustomReplyDialog} onOpenChange={(open) => {
+                              if (!open) handleCloseReplyDialog();
+                              else setShowCustomReplyDialog(true);
+                            }}>
                               <DialogTrigger asChild>
                                 <Button variant="ghost" size="sm" className="h-7 gap-1">
                                   <Plus className="h-3 w-3" />
@@ -424,9 +458,13 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
                               </DialogTrigger>
                               <DialogContent>
                                 <DialogHeader>
-                                  <DialogTitle>Nueva respuesta rápida</DialogTitle>
+                                  <DialogTitle>
+                                    {editingReplyIndex !== null ? "Editar respuesta rápida" : "Nueva respuesta rápida"}
+                                  </DialogTitle>
                                   <DialogDescription>
-                                    Crea una respuesta personalizada para usar en tus conversaciones.
+                                    {editingReplyIndex !== null 
+                                      ? "Modifica tu respuesta personalizada."
+                                      : "Crea una respuesta personalizada para usar en tus conversaciones."}
                                   </DialogDescription>
                                 </DialogHeader>
                                 <div className="space-y-4 py-4">
@@ -451,7 +489,7 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
                                   </div>
                                 </div>
                                 <DialogFooter>
-                                  <Button variant="outline" onClick={() => setShowCustomReplyDialog(false)}>
+                                  <Button variant="outline" onClick={handleCloseReplyDialog}>
                                     Cancelar
                                   </Button>
                                   <Button 
@@ -460,7 +498,7 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
                                     style={{ backgroundColor: primaryColor }}
                                   >
                                     <Save className="h-4 w-4 mr-2" />
-                                    Guardar
+                                    {editingReplyIndex !== null ? "Actualizar" : "Guardar"}
                                   </Button>
                                 </DialogFooter>
                               </DialogContent>
@@ -484,15 +522,26 @@ const ChatPanel = ({ storeId, primaryColor }: ChatPanelProps) => {
                                   </span>
                                 </button>
                                 {index >= defaultQuickReplies.length && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      handleDeleteCustomReply(index - defaultQuickReplies.length);
-                                    }}
-                                    className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-destructive/10 rounded"
-                                  >
-                                    <X className="h-3 w-3 text-destructive" />
-                                  </button>
+                                  <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleEditCustomReply(index - defaultQuickReplies.length);
+                                      }}
+                                      className="p-1 hover:bg-muted rounded"
+                                    >
+                                      <Pencil className="h-3 w-3 text-muted-foreground" />
+                                    </button>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDeleteCustomReply(index - defaultQuickReplies.length);
+                                      }}
+                                      className="p-1 hover:bg-destructive/10 rounded"
+                                    >
+                                      <X className="h-3 w-3 text-destructive" />
+                                    </button>
+                                  </div>
                                 )}
                               </div>
                             ))}
