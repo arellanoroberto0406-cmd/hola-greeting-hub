@@ -5,6 +5,7 @@ import { toast } from "sonner";
 interface RefundParams {
   storeId: string;
   orderId: string;
+  reason: string;
   amount?: number;
 }
 
@@ -19,7 +20,7 @@ export const useMercadoPagoRefund = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ storeId, orderId, amount }: RefundParams): Promise<RefundResponse> => {
+    mutationFn: async ({ storeId, orderId, reason, amount }: RefundParams): Promise<RefundResponse> => {
       // Get current session for auth token
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
@@ -35,7 +36,7 @@ export const useMercadoPagoRefund = () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ storeId, orderId, amount }),
+          body: JSON.stringify({ storeId, orderId, reason, amount }),
         }
       );
 

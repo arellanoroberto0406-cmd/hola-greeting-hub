@@ -32,6 +32,7 @@ interface CreatePreferenceRequest {
 interface RefundRequest {
   storeId: string;
   orderId: string;
+  reason: string; // Required reason for audit
   amount?: number; // Optional for partial refunds
 }
 
@@ -217,6 +218,31 @@ Deno.serve(async (req) => {
         .from('mercadopago_payments')
         .update({ status: 'refunded' })
         .eq('id', mpPayment.id);
+
+      // AUDIT: Create refund audit log
+      const ipAddress = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+      const userAgent = req.headers.get('user-agent') || 'unknown';
+      
+      const { error: auditError } = await supabase
+        .from('refund_audit_logs')
+        .insert({
+          order_id: body.orderId,
+          store_id: body.storeId,
+          performed_by: user.id,
+          performed_by_email: user.email,
+          amount: refundResult.amount || order.total,
+          reason: body.reason,
+          mp_refund_id: refundResult.id?.toString(),
+          ip_address: ipAddress,
+          user_agent: userAgent,
+        });
+
+      if (auditError) {
+        console.error('Failed to create audit log:', auditError);
+        // Don't fail the request, just log the error
+      } else {
+        console.log('Refund audit log created successfully');
+      }
 
       return new Response(
         JSON.stringify({ 

@@ -4,6 +4,8 @@ import { useMercadoPagoRefund } from "@/hooks/useMercadoPagoRefund";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -69,9 +71,14 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
   const refundMutation = useMercadoPagoRefund();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [refundReason, setRefundReason] = useState("");
+  const [showRefundDialog, setShowRefundDialog] = useState(false);
 
   const handleRefund = async (orderId: string) => {
-    await refundMutation.mutateAsync({ storeId, orderId });
+    if (!refundReason.trim()) return;
+    await refundMutation.mutateAsync({ storeId, orderId, reason: refundReason });
+    setRefundReason("");
+    setShowRefundDialog(false);
   };
 
   const filteredOrders = orders?.filter((order) =>
@@ -267,12 +274,16 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
                 
                 {/* Refund Button */}
                 {canRefund(selectedOrder) && (
-                  <AlertDialog>
+                  <AlertDialog open={showRefundDialog} onOpenChange={setShowRefundDialog}>
                     <AlertDialogTrigger asChild>
                       <Button 
                         variant="destructive" 
                         size="sm"
                         disabled={refundMutation.isPending}
+                        onClick={() => {
+                          setRefundReason("");
+                          setShowRefundDialog(true);
+                        }}
                       >
                         {refundMutation.isPending ? (
                           <Loader2 className="h-4 w-4 mr-1 animate-spin" />
@@ -285,17 +296,40 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
                     <AlertDialogContent>
                       <AlertDialogHeader>
                         <AlertDialogTitle>¿Confirmar reembolso?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Esta acción procesará un reembolso completo de ${selectedOrder.total.toFixed(2)} 
-                          a través de MercadoPago. Esta acción no se puede deshacer.
+                        <AlertDialogDescription asChild>
+                          <div className="space-y-4">
+                            <p>
+                              Esta acción procesará un reembolso completo de ${selectedOrder.total.toFixed(2)} 
+                              a través de MercadoPago. Esta acción no se puede deshacer.
+                            </p>
+                            <div className="space-y-2">
+                              <Label htmlFor="refund-reason" className="text-foreground font-medium">
+                                Motivo del reembolso *
+                              </Label>
+                              <Textarea
+                                id="refund-reason"
+                                placeholder="Ej: Producto defectuoso, cliente solicitó cancelación..."
+                                value={refundReason}
+                                onChange={(e) => setRefundReason(e.target.value)}
+                                className="min-h-[80px]"
+                              />
+                              <p className="text-xs text-muted-foreground">
+                                Este motivo quedará registrado en el historial de auditoría.
+                              </p>
+                            </div>
+                          </div>
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel onClick={() => setRefundReason("")}>Cancelar</AlertDialogCancel>
                         <AlertDialogAction 
                           onClick={() => handleRefund(selectedOrder.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          disabled={!refundReason.trim() || refundMutation.isPending}
                         >
+                          {refundMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                          ) : null}
                           Confirmar reembolso
                         </AlertDialogAction>
                       </AlertDialogFooter>

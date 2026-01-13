@@ -565,6 +565,63 @@ export type Database = {
         }
         Relationships: []
       }
+      refund_audit_logs: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          ip_address: string | null
+          mp_refund_id: string | null
+          order_id: string
+          performed_by: string
+          performed_by_email: string | null
+          reason: string
+          store_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          mp_refund_id?: string | null
+          order_id: string
+          performed_by: string
+          performed_by_email?: string | null
+          reason: string
+          store_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          mp_refund_id?: string | null
+          order_id?: string
+          performed_by?: string
+          performed_by_email?: string | null
+          reason?: string
+          store_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refund_audit_logs_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refund_audit_logs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reviews: {
         Row: {
           comment: string | null

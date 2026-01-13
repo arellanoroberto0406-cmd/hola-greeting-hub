@@ -2,12 +2,24 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, RotateCcw, CreditCard, Calendar, DollarSign, TrendingDown, Package } from "lucide-react";
+import { Loader2, RotateCcw, CreditCard, Calendar, DollarSign, TrendingDown, Package, User, FileText } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface RefundsHistoryPanelProps {
   storeId: string;
+}
+
+interface RefundAuditLog {
+  id: string;
+  order_id: string;
+  performed_by: string;
+  performed_by_email: string | null;
+  amount: number;
+  reason: string;
+  mp_refund_id: string | null;
+  ip_address: string | null;
+  created_at: string;
 }
 
 interface RefundedOrder {
@@ -25,10 +37,12 @@ interface RefundedOrder {
     quantity: number;
     price: number;
   }>;
+  audit_log?: RefundAuditLog;
 }
 
 const RefundsHistoryPanel = ({ storeId }: RefundsHistoryPanelProps) => {
-  const { data: refundedOrders, isLoading } = useQuery({
+  // Fetch refunded orders
+  const { data: refundedOrders, isLoading: ordersLoading } = useQuery({
     queryKey: ['refunded-orders', storeId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -44,6 +58,29 @@ const RefundsHistoryPanel = ({ storeId }: RefundsHistoryPanelProps) => {
     enabled: !!storeId,
   });
 
+  // Fetch audit logs
+  const { data: auditLogs, isLoading: auditLoading } = useQuery({
+    queryKey: ['refund-audit-logs', storeId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('refund_audit_logs')
+        .select('*')
+        .eq('store_id', storeId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data as RefundAuditLog[];
+    },
+    enabled: !!storeId,
+  });
+
+  // Merge audit logs with orders
+  const ordersWithAudit = refundedOrders?.map(order => ({
+    ...order,
+    audit_log: auditLogs?.find(log => log.order_id === order.id),
+  }));
+
+  const isLoading = ordersLoading || auditLoading;
   const totalRefunded = refundedOrders?.reduce((sum, order) => sum + order.total, 0) || 0;
   const refundCount = refundedOrders?.length || 0;
 
@@ -120,7 +157,7 @@ const RefundsHistoryPanel = ({ storeId }: RefundsHistoryPanelProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {!refundedOrders?.length ? (
+          {!ordersWithAudit?.length ? (
             <div className="text-center py-12">
               <RotateCcw className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No hay reembolsos registrados</p>
@@ -130,7 +167,7 @@ const RefundsHistoryPanel = ({ storeId }: RefundsHistoryPanelProps) => {
             </div>
           ) : (
             <div className="space-y-4">
-              {refundedOrders.map((order) => (
+              {ordersWithAudit.map((order) => (
                 <div
                   key={order.id}
                   className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
@@ -179,6 +216,41 @@ const RefundsHistoryPanel = ({ storeId }: RefundsHistoryPanelProps) => {
                       </p>
                     </div>
                   </div>
+
+                  {/* Audit Information */}
+                  {order.audit_log && (
+                    <div className="mt-3 pt-3 border-t bg-muted/30 rounded-lg p-3 space-y-2">
+                      <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <FileText className="h-4 w-4" />
+                        Registro de Auditoría
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                        <div className="flex items-center gap-2">
+                          <User className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-muted-foreground">Realizado por:</span>
+                          <span className="font-medium">{order.audit_log.performed_by_email || 'Usuario desconocido'}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-3 w-3 text-muted-foreground" />
+                          <span className="text-muted-foreground">Fecha:</span>
+                          <span className="font-medium">
+                            {format(new Date(order.audit_log.created_at), "PPp", { locale: es })}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="mt-2">
+                        <span className="text-sm text-muted-foreground">Motivo:</span>
+                        <p className="text-sm font-medium mt-1 bg-background p-2 rounded border">
+                          {order.audit_log.reason}
+                        </p>
+                      </div>
+                      {order.audit_log.mp_refund_id && (
+                        <div className="text-xs text-muted-foreground">
+                          ID MercadoPago: <span className="font-mono">{order.audit_log.mp_refund_id}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   
                   {/* Products Summary */}
                   <div className="mt-3 pt-3 border-t">
