@@ -19,6 +19,23 @@ export interface Store {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  // Payment configuration
+  payment_methods?: {
+    card?: boolean;
+    transfer?: boolean;
+    cash?: boolean;
+    paypal?: boolean;
+    mercadopago?: boolean;
+  };
+  bank_info?: {
+    bank_name?: string;
+    account_holder?: string;
+    clabe?: string;
+    account_number?: string;
+  };
+  paypal_email?: string;
+  mercadopago_access_token?: string;
+  cash_instructions?: string;
 }
 
 export interface StoreCategory {

@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store } from "lucide-react";
+import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -30,7 +30,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const shippingSchema = z.object({
+// Dynamic schema based on available payment methods
+const createShippingSchema = (availablePaymentMethods: string[]) => z.object({
   firstName: z.string().min(2, "Mínimo 2 caracteres").max(50),
   lastName: z.string().min(2, "Mínimo 2 caracteres").max(50),
   email: z.string().email("Email inválido"),
@@ -39,10 +40,27 @@ const shippingSchema = z.object({
   city: z.string().min(2, "Ciudad requerida").max(100),
   state: z.string().min(1, "Estado requerido"),
   zipCode: z.string().min(5, "Código postal inválido").max(10),
-  paymentMethod: z.enum(["card", "transfer", "cash"]),
+  paymentMethod: z.enum(availablePaymentMethods as [string, ...string[]]),
 });
 
-type ShippingForm = z.infer<typeof shippingSchema>;
+interface PaymentMethods {
+  card?: boolean;
+  transfer?: boolean;
+  cash?: boolean;
+  paypal?: boolean;
+  mercadopago?: boolean;
+}
+
+interface BankInfo {
+  bank_name?: string;
+  account_holder?: string;
+  clabe?: string;
+  account_number?: string;
+}
+
+// Default schema for initial render
+const defaultShippingSchema = createShippingSchema(["card", "transfer", "cash"]);
+type ShippingForm = z.infer<typeof defaultShippingSchema>;
 
 const mexicanStates = [
   "Aguascalientes", "Baja California", "Baja California Sur", "Campeche", "Chiapas",
@@ -62,8 +80,24 @@ const StoreCheckout = () => {
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
 
+  // Get available payment methods from store config
+  const availablePaymentMethods = useMemo(() => {
+    const methods: string[] = [];
+    const paymentConfig = (store?.payment_methods as PaymentMethods) || { card: true, transfer: true, cash: true };
+    
+    if (paymentConfig.card) methods.push("card");
+    if (paymentConfig.transfer) methods.push("transfer");
+    if (paymentConfig.cash) methods.push("cash");
+    if (paymentConfig.paypal) methods.push("paypal");
+    if (paymentConfig.mercadopago) methods.push("mercadopago");
+    
+    return methods.length > 0 ? methods : ["card"];
+  }, [store?.payment_methods]);
+
   const shippingCost = store ? (totalPrice >= (store.free_shipping_threshold || 999) ? 0 : (store.shipping_cost || 99)) : 99;
   const finalTotal = totalPrice + shippingCost;
+
+  const shippingSchema = useMemo(() => createShippingSchema(availablePaymentMethods), [availablePaymentMethods]);
 
   const form = useForm<ShippingForm>({
     resolver: zodResolver(shippingSchema),
@@ -76,7 +110,7 @@ const StoreCheckout = () => {
       city: "",
       state: "",
       zipCode: "",
-      paymentMethod: "card",
+      paymentMethod: availablePaymentMethods[0] || "card",
     },
   });
 
@@ -437,37 +471,71 @@ const StoreCheckout = () => {
                             defaultValue={field.value}
                             className="space-y-3"
                           >
-                            <div 
-                              className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                              style={{ borderColor: field.value === "card" ? primaryColor : undefined }}
-                            >
-                              <RadioGroupItem value="card" id="card" />
-                              <Label htmlFor="card" className="flex-1 cursor-pointer">
-                                <div className="font-medium">Tarjeta de crédito/débito</div>
-                                <div className="text-sm text-muted-foreground">Visa, Mastercard, Amex</div>
-                              </Label>
-                              <CreditCard className="w-5 h-5 text-muted-foreground" />
-                            </div>
-                            <div 
-                              className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                              style={{ borderColor: field.value === "transfer" ? primaryColor : undefined }}
-                            >
-                              <RadioGroupItem value="transfer" id="transfer" />
-                              <Label htmlFor="transfer" className="flex-1 cursor-pointer">
-                                <div className="font-medium">Transferencia bancaria</div>
-                                <div className="text-sm text-muted-foreground">SPEI o depósito bancario</div>
-                              </Label>
-                            </div>
-                            <div 
-                              className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                              style={{ borderColor: field.value === "cash" ? primaryColor : undefined }}
-                            >
-                              <RadioGroupItem value="cash" id="cash" />
-                              <Label htmlFor="cash" className="flex-1 cursor-pointer">
-                                <div className="font-medium">Pago en efectivo</div>
-                                <div className="text-sm text-muted-foreground">OXXO, 7-Eleven, Farmacias</div>
-                              </Label>
-                            </div>
+                            {availablePaymentMethods.includes("card") && (
+                              <div 
+                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                style={{ borderColor: field.value === "card" ? primaryColor : undefined }}
+                              >
+                                <RadioGroupItem value="card" id="card" />
+                                <Label htmlFor="card" className="flex-1 cursor-pointer">
+                                  <div className="font-medium">Tarjeta de crédito/débito</div>
+                                  <div className="text-sm text-muted-foreground">Visa, Mastercard, Amex</div>
+                                </Label>
+                                <CreditCard className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            {availablePaymentMethods.includes("transfer") && (
+                              <div 
+                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                style={{ borderColor: field.value === "transfer" ? primaryColor : undefined }}
+                              >
+                                <RadioGroupItem value="transfer" id="transfer" />
+                                <Label htmlFor="transfer" className="flex-1 cursor-pointer">
+                                  <div className="font-medium">Transferencia bancaria</div>
+                                  <div className="text-sm text-muted-foreground">SPEI o depósito bancario</div>
+                                </Label>
+                                <Building2 className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            {availablePaymentMethods.includes("cash") && (
+                              <div 
+                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                style={{ borderColor: field.value === "cash" ? primaryColor : undefined }}
+                              >
+                                <RadioGroupItem value="cash" id="cash" />
+                                <Label htmlFor="cash" className="flex-1 cursor-pointer">
+                                  <div className="font-medium">Pago en efectivo</div>
+                                  <div className="text-sm text-muted-foreground">{store?.cash_instructions || "Pago contra entrega"}</div>
+                                </Label>
+                                <Banknote className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            {availablePaymentMethods.includes("paypal") && (
+                              <div 
+                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                style={{ borderColor: field.value === "paypal" ? primaryColor : undefined }}
+                              >
+                                <RadioGroupItem value="paypal" id="paypal" />
+                                <Label htmlFor="paypal" className="flex-1 cursor-pointer">
+                                  <div className="font-medium">PayPal</div>
+                                  <div className="text-sm text-muted-foreground">Pago seguro con PayPal</div>
+                                </Label>
+                                <Wallet className="w-5 h-5 text-muted-foreground" />
+                              </div>
+                            )}
+                            {availablePaymentMethods.includes("mercadopago") && (
+                              <div 
+                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                style={{ borderColor: field.value === "mercadopago" ? primaryColor : undefined }}
+                              >
+                                <RadioGroupItem value="mercadopago" id="mercadopago" />
+                                <Label htmlFor="mercadopago" className="flex-1 cursor-pointer">
+                                  <div className="font-medium">MercadoPago</div>
+                                  <div className="text-sm text-muted-foreground">Tarjeta, OXXO y más</div>
+                                </Label>
+                                <div className="w-5 h-5 bg-[#00b1ea] rounded flex items-center justify-center text-white text-xs font-bold">MP</div>
+                              </div>
+                            )}
                           </RadioGroup>
                         </FormControl>
                         <FormMessage />
