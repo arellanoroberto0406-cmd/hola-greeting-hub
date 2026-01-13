@@ -39,7 +39,10 @@ import {
   Palette,
   PanelLeftClose,
   PanelLeft,
-  LayoutTemplate
+  LayoutTemplate,
+  ArrowLeftRight,
+  X,
+  Check
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -85,6 +88,13 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const [templatePreview, setTemplatePreview] = useState<{
     globalStyles: GlobalStyles;
     sectionIds: string[];
+  } | null>(null);
+  const [compareTemplate, setCompareTemplate] = useState<{
+    name: string;
+    thumbnail: string;
+    globalStyles: GlobalStyles;
+    sectionIds: string[];
+    isCustom: boolean;
   } | null>(null);
 
   const sensors = useSensors(
@@ -212,7 +222,47 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
     return { sections, styles: globalStyles };
   };
 
+  // Get comparison sections/styles
+  const getCompareData = () => {
+    if (!compareTemplate) return null;
+    const compareSections = DEFAULT_SECTIONS.map(section => ({
+      ...section,
+      enabled: compareTemplate.sectionIds.includes(section.id),
+    }));
+    const orderedSections = compareTemplate.sectionIds
+      .map(id => compareSections.find(s => s.id === id))
+      .filter(Boolean) as StoreSection[];
+    const remainingSections = compareSections.filter(
+      s => !compareTemplate.sectionIds.includes(s.id)
+    );
+    return {
+      sections: [...orderedSections, ...remainingSections],
+      styles: compareTemplate.globalStyles,
+    };
+  };
+
   const previewData = getPreviewData();
+  const compareData = getCompareData();
+
+  const handleApplyCompareTemplate = () => {
+    if (!compareTemplate) return;
+    
+    const newSections = DEFAULT_SECTIONS.map(section => ({
+      ...section,
+      enabled: compareTemplate.sectionIds.includes(section.id),
+    }));
+    const orderedSections = compareTemplate.sectionIds
+      .map(id => newSections.find(s => s.id === id))
+      .filter(Boolean) as StoreSection[];
+    const remainingSections = newSections.filter(
+      s => !compareTemplate.sectionIds.includes(s.id)
+    );
+
+    setGlobalStyles(compareTemplate.globalStyles);
+    setSections([...orderedSections, ...remainingSections]);
+    setHasChanges(true);
+    setCompareTemplate(null);
+  };
 
   if (isLoading) {
     return (
@@ -294,6 +344,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                   setTemplatePreview(null);
                 }}
                 onPreviewTemplate={setTemplatePreview}
+                onCompareTemplate={setCompareTemplate}
                 primaryColor={store.primary_color}
                 store={store}
               />
@@ -540,6 +591,135 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         onSave={handleSaveSection}
         primaryColor={store.primary_color}
       />
+
+      {/* Compare Templates Dialog */}
+      <AnimatePresence>
+        {compareTemplate && compareData && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setCompareTemplate(null)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="bg-background rounded-xl border shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between p-4 border-b bg-muted/30">
+                <div className="flex items-center gap-3">
+                  <div 
+                    className="h-10 w-10 rounded-lg flex items-center justify-center"
+                    style={{ backgroundColor: store.primary_color }}
+                  >
+                    <ArrowLeftRight className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="font-semibold text-lg">Comparar diseños</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Tu diseño actual vs. {compareTemplate.thumbnail} {compareTemplate.name}
+                    </p>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setCompareTemplate(null)}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+
+              {/* Comparison Grid */}
+              <div className="grid md:grid-cols-2 gap-6 p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+                {/* Current Design */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-lg">
+                        📍
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">Diseño actual</h3>
+                        <p className="text-xs text-muted-foreground">Tu configuración guardada</p>
+                      </div>
+                    </div>
+                  </div>
+                  <Card className="overflow-hidden border-2 border-muted">
+                    <CardContent className="p-0">
+                      <LivePreviewPanel
+                        sections={sections}
+                        store={store}
+                        globalStyles={globalStyles}
+                        device="desktop"
+                        showDeviceControls={false}
+                      />
+                    </CardContent>
+                  </Card>
+                  <div className="text-xs text-muted-foreground space-y-1 p-3 bg-muted/30 rounded-lg">
+                    <p><strong>Fuente:</strong> {globalStyles.headingFont}</p>
+                    <p><strong>Bordes:</strong> {globalStyles.borderRadius}</p>
+                    <p><strong>Secciones:</strong> {sections.filter(s => s.enabled).length} activas</p>
+                  </div>
+                </div>
+
+                {/* Template Design */}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-lg">
+                        {compareTemplate.thumbnail}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold">{compareTemplate.name}</h3>
+                        <p className="text-xs text-muted-foreground">
+                          {compareTemplate.isCustom ? 'Plantilla personalizada' : 'Plantilla predefinida'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <Card className="overflow-hidden border-2 border-primary/50 ring-2 ring-primary/20">
+                    <CardContent className="p-0">
+                      <LivePreviewPanel
+                        sections={compareData.sections}
+                        store={store}
+                        globalStyles={compareData.styles}
+                        device="desktop"
+                        showDeviceControls={false}
+                      />
+                    </CardContent>
+                  </Card>
+                  <div className="text-xs text-muted-foreground space-y-1 p-3 bg-primary/5 rounded-lg border border-primary/20">
+                    <p><strong>Fuente:</strong> {compareTemplate.globalStyles.headingFont}</p>
+                    <p><strong>Bordes:</strong> {compareTemplate.globalStyles.borderRadius}</p>
+                    <p><strong>Secciones:</strong> {compareTemplate.sectionIds.length} activas</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Footer */}
+              <div className="flex items-center justify-between p-4 border-t bg-muted/30">
+                <p className="text-sm text-muted-foreground">
+                  ¿Te gusta la plantilla? Aplícala a tu tienda
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" onClick={() => setCompareTemplate(null)}>
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleApplyCompareTemplate}
+                    style={{ backgroundColor: store.primary_color }}
+                    className="gap-2"
+                  >
+                    <Check className="h-4 w-4" />
+                    Aplicar {compareTemplate.name}
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

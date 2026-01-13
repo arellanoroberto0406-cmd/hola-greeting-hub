@@ -32,7 +32,10 @@ import {
   User,
   Loader2,
   Download,
-  Upload
+  Upload,
+  Columns,
+  ArrowLeftRight,
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -67,11 +70,20 @@ interface TemplatePreviewData {
   sectionIds: string[];
 }
 
+interface CompareTemplateData {
+  name: string;
+  thumbnail: string;
+  globalStyles: GlobalStyles;
+  sectionIds: string[];
+  isCustom: boolean;
+}
+
 interface TemplatesPanelProps {
   currentStyles: GlobalStyles;
   currentSections: StoreSection[];
   onApplyTemplate: (styles: GlobalStyles, sections: StoreSection[]) => void;
   onPreviewTemplate?: (preview: TemplatePreviewData | null) => void;
+  onCompareTemplate?: (compareData: CompareTemplateData | null) => void;
   primaryColor?: string;
   store: Store;
 }
@@ -101,6 +113,7 @@ export const TemplatesPanel = ({
   currentSections,
   onApplyTemplate,
   onPreviewTemplate,
+  onCompareTemplate,
   primaryColor = '#6366f1',
   store,
 }: TemplatesPanelProps) => {
@@ -160,6 +173,26 @@ export const TemplatesPanel = ({
       onPreviewTemplate(null);
     }
     setPreviewTemplate(null);
+  };
+
+  const handleCompareTemplate = (template: DesignTemplate | CustomTemplate, isCustom: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!onCompareTemplate) return;
+    
+    const globalStyles = isCustom 
+      ? (template as CustomTemplate).global_styles 
+      : (template as DesignTemplate).globalStyles;
+    const sectionIds = isCustom 
+      ? (template as CustomTemplate).section_ids 
+      : (template as DesignTemplate).sectionIds;
+    
+    onCompareTemplate({
+      name: template.name,
+      thumbnail: template.thumbnail,
+      globalStyles,
+      sectionIds,
+      isCustom,
+    });
   };
 
   const handleApplyTemplate = () => {
@@ -465,15 +498,26 @@ export const TemplatesPanel = ({
             </div>
 
             <motion.div 
-              className="absolute inset-0 bg-primary/80 flex items-center justify-center gap-2"
+              className="absolute inset-0 bg-primary/80 flex items-center justify-center gap-2 flex-wrap p-2"
               initial={{ opacity: 0 }}
               animate={{ opacity: isHovered ? 1 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <Button variant="secondary" size="sm" className="gap-2">
+              <Button variant="secondary" size="sm" className="gap-1.5">
                 <Check className="h-4 w-4" />
                 Aplicar
               </Button>
+              {onCompareTemplate && (
+                <Button 
+                  variant="secondary" 
+                  size="sm"
+                  className="gap-1.5"
+                  onClick={(e) => handleCompareTemplate(template, isCustom, e)}
+                >
+                  <Columns className="h-4 w-4" />
+                  Comparar
+                </Button>
+              )}
               {isCustom && (
                 <>
                   <Button 
