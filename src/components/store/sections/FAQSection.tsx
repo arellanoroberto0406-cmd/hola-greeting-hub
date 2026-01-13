@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { HelpCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface FAQSectionProps {
   section: StoreSection;
@@ -43,46 +44,101 @@ const defaultFaqs = [
 export const FAQSection = ({ section, store }: FAQSectionProps) => {
   const faqs = section.settings.faqs || defaultFaqs;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -20 },
+    visible: {
+      opacity: 1,
+      x: 0,
+      transition: { duration: 0.5 }
+    }
+  };
+
   return (
-    <section className="py-12 md:py-16">
+    <motion.section 
+      className="py-12 md:py-16"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+    >
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
-          <div 
+        <motion.div 
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.div 
             className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4"
             style={{ backgroundColor: `${store?.primary_color}15` }}
+            initial={{ scale: 0, rotate: -180 }}
+            whileInView={{ scale: 1, rotate: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
           >
             <HelpCircle 
               className="h-8 w-8" 
               style={{ color: store?.primary_color }}
             />
-          </div>
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">
+          </motion.div>
+          <motion.h2 
+            className="text-2xl md:text-3xl font-bold mb-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             {section.settings.headline || "Preguntas Frecuentes"}
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-muted-foreground max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             {section.settings.subtitle || "Encuentra respuestas a las preguntas más comunes"}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className="max-w-3xl mx-auto">
+        <motion.div 
+          className="max-w-3xl mx-auto"
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
           <Accordion type="single" collapsible className="w-full space-y-4">
             {faqs.map((faq: any, index: number) => (
-              <AccordionItem 
-                key={faq.id || index} 
-                value={`item-${index}`}
-                className="border rounded-xl px-6 data-[state=open]:shadow-md transition-shadow"
-              >
-                <AccordionTrigger className="text-left hover:no-underline py-5">
-                  <span className="font-medium">{faq.question}</span>
-                </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-5">
-                  {faq.answer}
-                </AccordionContent>
-              </AccordionItem>
+              <motion.div key={faq.id || index} variants={itemVariants}>
+                <AccordionItem 
+                  value={`item-${index}`}
+                  className="border rounded-xl px-6 data-[state=open]:shadow-md transition-shadow"
+                >
+                  <AccordionTrigger className="text-left hover:no-underline py-5">
+                    <span className="font-medium">{faq.question}</span>
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pb-5">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              </motion.div>
             ))}
           </Accordion>
-        </div>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
