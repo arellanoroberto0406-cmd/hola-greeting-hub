@@ -289,6 +289,187 @@ export const SectionSettingsDialog = ({
           </>
         );
 
+      case 'testimonials':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Lo que dicen nuestros clientes"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtítulo</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Opiniones reales de clientes satisfechos"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Columnas</Label>
+              <Select
+                value={String(editedSection.settings.columns || 3)}
+                onValueChange={(value) => updateSetting('columns', parseInt(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="2">2 columnas</SelectItem>
+                  <SelectItem value="3">3 columnas</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        );
+
+      case 'image_slider':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Título (opcional)</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Galería de imágenes"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Reproducción automática</Label>
+              <Switch
+                checked={editedSection.settings.autoplay !== false}
+                onCheckedChange={(checked) => updateSetting('autoplay', checked)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Intervalo (ms)</Label>
+              <Slider
+                value={[editedSection.settings.interval || 5000]}
+                onValueChange={([value]) => updateSetting('interval', value)}
+                min={2000}
+                max={10000}
+                step={1000}
+              />
+              <p className="text-xs text-muted-foreground">
+                {(editedSection.settings.interval || 5000) / 1000} segundos
+              </p>
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Mostrar leyendas</Label>
+              <Switch
+                checked={editedSection.settings.showCaptions !== false}
+                onCheckedChange={(checked) => updateSetting('showCaptions', checked)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Proporción</Label>
+              <Select
+                value={editedSection.settings.aspectRatio || '16/9'}
+                onValueChange={(value) => updateSetting('aspectRatio', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="16/9">16:9 (Panorámico)</SelectItem>
+                  <SelectItem value="4/3">4:3 (Estándar)</SelectItem>
+                  <SelectItem value="21/9">21:9 (Ultra ancho)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </>
+        );
+
+      case 'video':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Título (opcional)</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Video de presentación"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtítulo (opcional)</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Conoce nuestra historia"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>ID de YouTube</Label>
+              <Input
+                value={editedSection.settings.youtubeId || ''}
+                onChange={(e) => updateSetting('youtubeId', e.target.value)}
+                placeholder="ej: dQw4w9WgXcQ"
+              />
+              <p className="text-xs text-muted-foreground">
+                El ID está después de "v=" en la URL de YouTube
+              </p>
+            </div>
+            <div className="space-y-2">
+              <Label>O URL de video directo</Label>
+              <Input
+                value={editedSection.settings.videoUrl || ''}
+                onChange={(e) => updateSetting('videoUrl', e.target.value)}
+                placeholder="https://ejemplo.com/video.mp4"
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Reproducción automática</Label>
+              <Switch
+                checked={editedSection.settings.autoplay}
+                onCheckedChange={(checked) => updateSetting('autoplay', checked)}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Repetir en bucle</Label>
+              <Switch
+                checked={editedSection.settings.loop !== false}
+                onCheckedChange={(checked) => updateSetting('loop', checked)}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Mostrar controles</Label>
+              <Switch
+                checked={editedSection.settings.showControls !== false}
+                onCheckedChange={(checked) => updateSetting('showControls', checked)}
+              />
+            </div>
+          </>
+        );
+
+      case 'faq':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Preguntas Frecuentes"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtítulo</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Encuentra respuestas a las preguntas más comunes"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Las preguntas se pueden editar directamente en la base de datos o mediante la API.
+            </p>
+          </>
+        );
+
       default:
         return <p className="text-muted-foreground">No hay configuraciones disponibles para esta sección.</p>;
     }
