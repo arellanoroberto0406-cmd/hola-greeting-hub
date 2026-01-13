@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
 import { Loader2, ShoppingCart, Heart, Menu, Eye } from "lucide-react";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useState, useMemo, useEffect } from "react";
@@ -477,6 +478,15 @@ const StoreFront = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* WhatsApp Button */}
+      {store.phone && (
+        <WhatsAppButton 
+          phone={store.phone} 
+          storeName={store.name}
+          primaryColor={store.primary_color}
+        />
+      )}
 
       {/* Footer */}
       <footer 
