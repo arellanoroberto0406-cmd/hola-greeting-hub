@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useStoreOrders, useUpdateOrderStatus, OrderWithItems } from "@/hooks/useStoreOrders";
+import { useMercadoPagoRefund } from "@/hooks/useMercadoPagoRefund";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,7 +17,18 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink, RotateCcw, CreditCard } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import TrackingInput from "./TrackingInput";
@@ -28,21 +40,39 @@ interface OrdersPanelProps {
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pendiente", color: "bg-yellow-500/20 text-yellow-600", icon: Clock },
+  { value: "awaiting_payment", label: "Esperando pago", color: "bg-orange-500/20 text-orange-600", icon: CreditCard },
+  { value: "paid", label: "Pagado", color: "bg-emerald-500/20 text-emerald-600", icon: CheckCircle },
   { value: "confirmed", label: "Confirmado", color: "bg-blue-500/20 text-blue-600", icon: CheckCircle },
   { value: "shipped", label: "Enviado", color: "bg-purple-500/20 text-purple-600", icon: Truck },
   { value: "delivered", label: "Entregado", color: "bg-green-500/20 text-green-600", icon: CheckCircle },
   { value: "cancelled", label: "Cancelado", color: "bg-red-500/20 text-red-600", icon: XCircle },
+  { value: "refunded", label: "Reembolsado", color: "bg-gray-500/20 text-gray-600", icon: RotateCcw },
+  { value: "payment_failed", label: "Pago fallido", color: "bg-red-500/20 text-red-600", icon: XCircle },
 ];
 
 const getStatusInfo = (status: string) => {
   return STATUS_OPTIONS.find((s) => s.value === status) || STATUS_OPTIONS[0];
 };
 
+const isMercadoPagoPayment = (paymentMethod: string) => {
+  return paymentMethod?.startsWith('mercadopago');
+};
+
+const canRefund = (order: OrderWithItems) => {
+  return isMercadoPagoPayment(order.payment_method) && 
+    (order.status === 'paid' || order.status === 'confirmed' || order.status === 'shipped');
+};
+
 const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
   const { data: orders, isLoading } = useStoreOrders(storeId);
   const updateStatus = useUpdateOrderStatus();
+  const refundMutation = useMercadoPagoRefund();
   const [selectedOrder, setSelectedOrder] = useState<OrderWithItems | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
+
+  const handleRefund = async (orderId: string) => {
+    await refundMutation.mutateAsync({ storeId, orderId });
+  };
 
   const filteredOrders = orders?.filter((order) =>
     statusFilter === "all" ? true : order.status === statusFilter
@@ -222,11 +252,63 @@ const OrdersPanel = ({ storeId }: OrdersPanelProps) => {
               </div>
 
               {/* Payment Method */}
-              <div className="text-sm text-muted-foreground">
-                <span className="font-medium">Método de pago:</span>{" "}
-                {selectedOrder.payment_method === "cash" ? "Efectivo" : 
-                 selectedOrder.payment_method === "card" ? "Tarjeta" : 
-                 selectedOrder.payment_method}
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  <span className="font-medium">Método de pago:</span>{" "}
+                  {selectedOrder.payment_method === "cash" ? "Efectivo" : 
+                   selectedOrder.payment_method === "card" ? "Tarjeta" : 
+                   selectedOrder.payment_method?.startsWith('mercadopago') ? (
+                     <Badge variant="outline" className="ml-1">
+                       <CreditCard className="h-3 w-3 mr-1" />
+                       MercadoPago
+                     </Badge>
+                   ) : selectedOrder.payment_method}
+                </div>
+                
+                {/* Refund Button */}
+                {canRefund(selectedOrder) && (
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        disabled={refundMutation.isPending}
+                      >
+                        {refundMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                        ) : (
+                          <RotateCcw className="h-4 w-4 mr-1" />
+                        )}
+                        Reembolsar
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>¿Confirmar reembolso?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Esta acción procesará un reembolso completo de ${selectedOrder.total.toFixed(2)} 
+                          a través de MercadoPago. Esta acción no se puede deshacer.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={() => handleRefund(selectedOrder.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Confirmar reembolso
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+                
+                {selectedOrder.status === 'refunded' && (
+                  <Badge variant="outline" className="bg-gray-100 text-gray-600">
+                    <RotateCcw className="h-3 w-3 mr-1" />
+                    Reembolsado
+                  </Badge>
+                )}
               </div>
 
               {/* Tracking */}

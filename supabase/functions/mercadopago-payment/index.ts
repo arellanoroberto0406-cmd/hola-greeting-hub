@@ -29,6 +29,12 @@ interface CreatePreferenceRequest {
   };
 }
 
+interface RefundRequest {
+  storeId: string;
+  orderId: string;
+  amount?: number; // Optional for partial refunds
+}
+
 Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -42,6 +48,102 @@ Deno.serve(async (req) => {
 
     const url = new URL(req.url);
     const action = url.searchParams.get('action');
+
+    // Handle refund request
+    if (action === 'refund') {
+      const body: RefundRequest = await req.json();
+      console.log('Processing refund for order:', body.orderId);
+
+      // Get the MercadoPago payment record
+      const { data: mpPayment, error: mpError } = await supabase
+        .from('mercadopago_payments')
+        .select('*, stores(mercadopago_access_token)')
+        .eq('order_id', body.orderId)
+        .eq('store_id', body.storeId)
+        .single();
+
+      if (mpError || !mpPayment) {
+        console.error('MercadoPago payment not found:', mpError);
+        return new Response(
+          JSON.stringify({ error: 'No se encontró el pago de MercadoPago para este pedido' }),
+          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!mpPayment.mp_payment_id) {
+        console.error('No MercadoPago payment ID found');
+        return new Response(
+          JSON.stringify({ error: 'El pago aún no ha sido procesado por MercadoPago' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (!mpPayment.stores?.mercadopago_access_token) {
+        console.error('Store has no MercadoPago token');
+        return new Response(
+          JSON.stringify({ error: 'MercadoPago no está configurado para esta tienda' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      const accessToken = mpPayment.stores.mercadopago_access_token;
+
+      // Create refund in MercadoPago
+      const refundData: { amount?: number } = {};
+      if (body.amount) {
+        refundData.amount = body.amount;
+      }
+
+      console.log('Sending refund request to MercadoPago for payment:', mpPayment.mp_payment_id);
+
+      const refundResponse = await fetch(
+        `https://api.mercadopago.com/v1/payments/${mpPayment.mp_payment_id}/refunds`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(refundData),
+        }
+      );
+
+      const refundResult = await refundResponse.json();
+      console.log('MercadoPago refund response:', JSON.stringify(refundResult));
+
+      if (!refundResponse.ok) {
+        console.error('MercadoPago refund error:', refundResult);
+        return new Response(
+          JSON.stringify({ 
+            error: refundResult.message || 'Error al procesar el reembolso en MercadoPago',
+            details: refundResult
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+
+      // Update order status to refunded
+      await supabase
+        .from('orders')
+        .update({ status: 'refunded' })
+        .eq('id', body.orderId);
+
+      // Update MercadoPago payment record
+      await supabase
+        .from('mercadopago_payments')
+        .update({ status: 'refunded' })
+        .eq('id', mpPayment.id);
+
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          refundId: refundResult.id,
+          amount: refundResult.amount,
+          status: refundResult.status
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Handle webhook/IPN from MercadoPago
     if (action === 'webhook') {
