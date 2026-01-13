@@ -1,10 +1,12 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
-import { Loader2, ShoppingCart, Heart, Menu, Eye, Search } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { Loader2, ShoppingCart, Heart, Menu, Eye, Search, User, Package, LogOut, Store, ChevronRight } from "lucide-react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import ProductFilters, { FilterState } from "@/components/ProductFilters";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { useState, useMemo, useEffect } from "react";
 import { Product } from "@/types/product";
 import { useCart } from "@/context/CartContext";
@@ -12,11 +14,21 @@ import { useWishlist } from "@/context/WishlistContext";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
 import { Minus, Plus, X, Truck } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import ProductGallery from "@/components/ProductGallery";
 import ProductReviews from "@/components/ProductReviews";
+import CategorySection from "@/components/store/CategorySection";
+import { motion } from "framer-motion";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -43,9 +55,12 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { items, addItem, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
   const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // All products mapped
   const allProducts = useMemo(() => {
@@ -179,34 +194,166 @@ const StoreFront = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Announcement Bar */}
+      {(store as any).announcement_active && (store as any).announcement_text && (
+        <div 
+          className="py-2 px-4 text-center text-sm font-medium"
+          style={{ 
+            backgroundColor: store.primary_color,
+            color: 'white'
+          }}
+        >
+          {(store as any).announcement_text}
+        </div>
+      )}
+
       {/* Header */}
       <header 
-        className="sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300 shadow-lg"
+        className="sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300"
         style={{ 
-          backgroundColor: `${store.primary_color}15`,
-          borderColor: `${store.primary_color}30`
+          backgroundColor: `${store.primary_color}08`,
+          borderColor: `${store.primary_color}20`
         }}
       >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo / Store Name */}
+            <div 
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => navigate(`/tienda/${slug}`)}
+            >
               {store.logo_url ? (
-                <img src={store.logo_url} alt={store.name} className="h-10 w-auto" />
+                <img src={store.logo_url} alt={store.name} className="h-10 md:h-12 w-auto" />
               ) : (
-                <h1 
-                  className="font-display text-2xl tracking-wider"
-                  style={{ color: store.primary_color }}
-                >
-                  {store.name}
-                </h1>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className="h-10 w-10 rounded-xl flex items-center justify-center"
+                    style={{ backgroundColor: store.primary_color }}
+                  >
+                    <Store className="h-5 w-5 text-white" />
+                  </div>
+                  <span 
+                    className="font-heading text-xl md:text-2xl font-bold"
+                    style={{ color: store.primary_color }}
+                  >
+                    {store.name}
+                  </span>
+                </div>
               )}
             </div>
 
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-6">
+              <button
+                onClick={() => setFilters(prev => ({ ...prev, collection: "all" }))}
+                className={`text-sm font-medium transition-colors ${filters.collection === "all" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+              >
+                Todos
+              </button>
+              {collections.slice(0, 5).map((collection) => (
+                <button
+                  key={collection}
+                  onClick={() => setFilters(prev => ({ ...prev, collection }))}
+                  className={`text-sm font-medium transition-colors ${filters.collection === collection ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  {collection}
+                </button>
+              ))}
+            </nav>
+
+            {/* Desktop Search */}
+            <div className="hidden md:flex items-center flex-1 max-w-sm mx-6">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar productos..."
+                  value={filters.search}
+                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                  className="pl-10 bg-muted/50 border-transparent focus:border-primary/50"
+                />
+                {filters.search && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                    onClick={() => setFilters(prev => ({ ...prev, search: "" }))}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                )}
+              </div>
+            </div>
+
+            {/* Right Actions */}
             <div className="flex items-center gap-2">
+              {/* Mobile Search Toggle */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden h-10 w-10 rounded-xl"
+                onClick={() => setIsSearchOpen(!isSearchOpen)}
+              >
+                <Search className="h-5 w-5" />
+              </Button>
+
+              {/* Account */}
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback 
+                          style={{ backgroundColor: store.primary_color }}
+                          className="text-white text-xs"
+                        >
+                          {user.email?.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>
+                      <div className="flex flex-col">
+                        <span className="font-medium">Mi cuenta</span>
+                        <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate(`/tienda/${slug}/cuenta`)}>
+                      <Package className="h-4 w-4 mr-2" />
+                      Mis pedidos
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => navigate(`/tienda/${slug}/cuenta`)}>
+                      <Heart className="h-4 w-4 mr-2" />
+                      Lista de deseos
+                      {wishlist.length > 0 && (
+                        <Badge variant="secondary" className="ml-auto">{wishlist.length}</Badge>
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={signOut} className="text-destructive">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Cerrar sesión
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-10 w-10 rounded-xl"
+                  onClick={() => navigate("/auth")}
+                >
+                  <User className="h-5 w-5" />
+                </Button>
+              )}
+
+              {/* Wishlist */}
               <Button
                 variant="ghost"
                 size="icon"
                 className="relative h-10 w-10 rounded-xl"
+                onClick={() => navigate(`/tienda/${slug}/cuenta`)}
               >
                 <Heart className="h-5 w-5" />
                 {wishlist.length > 0 && (
@@ -363,18 +510,6 @@ const StoreFront = () => {
         </div>
       </header>
 
-      {/* Announcement Bar */}
-      {(store as any).announcement_active && (store as any).announcement_text && (
-        <div 
-          className="py-2 px-4 text-center text-sm font-medium"
-          style={{ 
-            backgroundColor: store.primary_color,
-            color: 'white'
-          }}
-        >
-          {(store as any).announcement_text}
-        </div>
-      )}
 
       {/* Banner */}
       {store.banner_url && (

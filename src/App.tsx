@@ -17,6 +17,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import StoreFront from "./pages/StoreFront";
 import StoreCheckout from "./pages/StoreCheckout";
+import CustomerAccount from "./pages/CustomerAccount";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/tienda/:slug" element={<StoreFront />} />
                   <Route path="/tienda/:slug/checkout" element={<StoreCheckout />} />
+                  <Route path="/tienda/:slug/cuenta" element={<CustomerAccount />} />
                   <Route path="/marca/:slug" element={<BrandPage />} />
                   <Route path="/checkout" element={<Checkout />} />
                   <Route path="*" element={<NotFound />} />
