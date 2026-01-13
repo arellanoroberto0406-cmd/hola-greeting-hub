@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import {
   useDeleteCustomTemplate,
   CustomTemplate 
 } from "@/hooks/useCustomTemplates";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Sparkles, 
   Check, 
@@ -29,7 +30,9 @@ import {
   Save,
   Trash2,
   User,
-  Loader2
+  Loader2,
+  Download,
+  Upload
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -114,6 +117,8 @@ export const TemplatesPanel = ({
   const { data: customTemplates = [], isLoading: isLoadingCustom } = useCustomTemplates(store.id);
   const createTemplate = useCreateCustomTemplate();
   const deleteTemplate = useDeleteCustomTemplate();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filteredTemplates = categoryFilter === 'all' 
     ? DESIGN_TEMPLATES 
@@ -204,6 +209,143 @@ export const TemplatesPanel = ({
 
     setIsDeleteDialogOpen(false);
     setTemplateToDelete(null);
+  };
+
+  const handleExportTemplate = (template: CustomTemplate, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    const exportData = {
+      name: template.name,
+      description: template.description,
+      thumbnail: template.thumbnail,
+      global_styles: template.global_styles,
+      section_ids: template.section_ids,
+      exported_at: new Date().toISOString(),
+      version: "1.0",
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `plantilla-${template.name.toLowerCase().replace(/\s+/g, '-')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Plantilla exportada",
+      description: `"${template.name}" se ha descargado como archivo JSON.`,
+    });
+  };
+
+  const handleExportAllTemplates = () => {
+    if (customTemplates.length === 0) {
+      toast({
+        title: "No hay plantillas",
+        description: "No tienes plantillas personalizadas para exportar.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const exportData = {
+      templates: customTemplates.map(t => ({
+        name: t.name,
+        description: t.description,
+        thumbnail: t.thumbnail,
+        global_styles: t.global_styles,
+        section_ids: t.section_ids,
+      })),
+      exported_at: new Date().toISOString(),
+      version: "1.0",
+      count: customTemplates.length,
+    };
+
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mis-plantillas-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Plantillas exportadas",
+      description: `Se exportaron ${customTemplates.length} plantillas.`,
+    });
+  };
+
+  const handleImportTemplates = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      // Validate the JSON structure
+      let templatesToImport: Array<{
+        name: string;
+        description?: string;
+        thumbnail?: string;
+        global_styles: GlobalStyles;
+        section_ids: string[];
+      }> = [];
+
+      if (data.templates && Array.isArray(data.templates)) {
+        // Multiple templates export format
+        templatesToImport = data.templates;
+      } else if (data.name && data.global_styles && data.section_ids) {
+        // Single template export format
+        templatesToImport = [data];
+      } else {
+        throw new Error('Formato de archivo no válido');
+      }
+
+      // Validate each template
+      for (const template of templatesToImport) {
+        if (!template.name || !template.global_styles || !Array.isArray(template.section_ids)) {
+          throw new Error('Una o más plantillas tienen formato inválido');
+        }
+      }
+
+      // Import all templates
+      let imported = 0;
+      for (const template of templatesToImport) {
+        await createTemplate.mutateAsync({
+          storeId: store.id,
+          name: template.name,
+          description: template.description,
+          thumbnail: template.thumbnail || '🎨',
+          globalStyles: template.global_styles,
+          sectionIds: template.section_ids,
+        });
+        imported++;
+      }
+
+      toast({
+        title: "Plantillas importadas",
+        description: `Se importaron ${imported} plantilla${imported !== 1 ? 's' : ''} correctamente.`,
+      });
+
+      setTemplateTab('custom');
+    } catch (error) {
+      console.error('Error importing templates:', error);
+      toast({
+        title: "Error al importar",
+        description: error instanceof Error ? error.message : "El archivo no tiene un formato válido.",
+        variant: "destructive",
+      });
+    }
+
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const getPreviewStyles = (globalStyles: GlobalStyles) => {
@@ -305,17 +447,26 @@ export const TemplatesPanel = ({
                 Aplicar
               </Button>
               {isCustom && (
-                <Button 
-                  variant="destructive" 
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setTemplateToDelete(template as CustomTemplate);
-                    setIsDeleteDialogOpen(true);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                <>
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={(e) => handleExportTemplate(template as CustomTemplate, e)}
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="destructive" 
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTemplateToDelete(template as CustomTemplate);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
               )}
             </motion.div>
 
@@ -437,6 +588,37 @@ export const TemplatesPanel = ({
         </TabsContent>
 
         <TabsContent value="custom" className="space-y-4 mt-4">
+          {/* Import/Export Actions */}
+          <div className="flex items-center gap-2 justify-end">
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept=".json"
+              onChange={handleImportTemplates}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              className="gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              Importar
+            </Button>
+            {customTemplates.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExportAllTemplates}
+                className="gap-2"
+              >
+                <Download className="h-4 w-4" />
+                Exportar todas
+              </Button>
+            )}
+          </div>
+
           {isLoadingCustom ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -452,15 +634,24 @@ export const TemplatesPanel = ({
                 </div>
                 <h4 className="font-semibold mb-2">No tienes plantillas guardadas</h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Personaliza tu tienda y guarda el diseño como plantilla para usarlo después
+                  Personaliza tu tienda y guarda el diseño como plantilla, o importa una existente
                 </p>
-                <Button 
-                  onClick={() => setIsSaveDialogOpen(true)}
-                  style={{ backgroundColor: primaryColor }}
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Guardar diseño actual
-                </Button>
+                <div className="flex items-center justify-center gap-2">
+                  <Button 
+                    onClick={() => setIsSaveDialogOpen(true)}
+                    style={{ backgroundColor: primaryColor }}
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Guardar diseño actual
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Importar plantilla
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ) : (
