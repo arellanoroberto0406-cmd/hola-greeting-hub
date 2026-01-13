@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart, RotateCcw } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart, RotateCcw, MessagesSquare } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -28,6 +28,9 @@ import PaymentSettingsPanel from "@/components/dashboard/PaymentSettingsPanel";
 import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
 import RefundsHistoryPanel from "@/components/dashboard/RefundsHistoryPanel";
 import StoreUrlPanel from "@/components/dashboard/StoreUrlPanel";
+import ChatPanel from "@/components/dashboard/ChatPanel";
+import { useUnreadCount } from "@/hooks/useChat";
+import { Badge } from "@/components/ui/badge";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -36,6 +39,7 @@ const Dashboard = () => {
   
   const { data: store, isLoading: storeLoading, refetch: refetchStore } = useMyStore(user?.id);
   const { data: products, isLoading: productsLoading, refetch: refetchProducts } = useStoreProducts(store?.id);
+  const { data: unreadCount = 0 } = useUnreadCount(store?.id);
   const createStore = useCreateStore();
   const updateStore = useUpdateStore();
   const { uploadImage, uploading } = useImageUpload();
@@ -448,7 +452,7 @@ const Dashboard = () => {
           // Store Dashboard
           <TooltipProvider delayDuration={300}>
           <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full max-w-7xl grid-cols-11">
+            <TabsList className="grid w-full max-w-7xl grid-cols-12">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <TabsTrigger value="orders" className="gap-2">
@@ -579,6 +583,26 @@ const Dashboard = () => {
                 <TooltipContent side="bottom" className="max-w-xs">
                   <p className="font-medium">Configuración</p>
                   <p className="text-xs text-muted-foreground">Ajusta datos de contacto, envíos, colores y redes sociales</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <TabsTrigger value="chat" className="gap-2 relative">
+                    <MessagesSquare className="h-4 w-4" />
+                    <span className="hidden sm:inline">Chat</span>
+                    {unreadCount > 0 && (
+                      <Badge 
+                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                        style={{ backgroundColor: store?.primary_color }}
+                      >
+                        {unreadCount}
+                      </Badge>
+                    )}
+                  </TabsTrigger>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="max-w-xs">
+                  <p className="font-medium">Chat en Vivo</p>
+                  <p className="text-xs text-muted-foreground">Responde a tus clientes en tiempo real</p>
                 </TooltipContent>
               </Tooltip>
             </TabsList>
@@ -1421,6 +1445,26 @@ const Dashboard = () => {
                   }}
                   primaryColor={store.primary_color}
                 />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="chat">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-heading">Chat en Vivo</h2>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-6 w-6">
+                        <Info className="h-4 w-4 text-muted-foreground" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-sm">
+                      <p className="font-medium mb-1">💬 Chat con clientes</p>
+                      <p className="text-xs">Responde a tus clientes en tiempo real. Los mensajes se actualizan automáticamente.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+                <ChatPanel storeId={store.id} primaryColor={store.primary_color} />
               </div>
             </TabsContent>
           </Tabs>
