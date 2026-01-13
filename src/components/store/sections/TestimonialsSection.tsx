@@ -40,26 +40,68 @@ export const TestimonialsSection = ({ section, store }: TestimonialsSectionProps
   const testimonials = section.settings.testimonials || defaultTestimonials;
   const columns = section.settings.columns || 3;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 40, scale: 0.95 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: { duration: 0.6 }
+    }
+  };
+
   return (
     <section className="py-12 md:py-16 bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold mb-3">
+        <motion.div 
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+        >
+          <motion.h2 
+            className="text-2xl md:text-3xl font-bold mb-3"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             {section.settings.headline || "Lo que dicen nuestros clientes"}
-          </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          </motion.h2>
+          <motion.p 
+            className="text-muted-foreground max-w-2xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
             {section.settings.subtitle || "Opiniones reales de clientes satisfechos"}
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
 
-        <div className={`grid gap-6 md:grid-cols-${columns}`}>
+        <motion.div 
+          className={`grid gap-6 md:grid-cols-${columns}`}
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+        >
           {testimonials.map((testimonial: any, index: number) => (
             <motion.div
               key={testimonial.id || index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              variants={itemVariants}
             >
               <Card className="h-full hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
@@ -99,7 +141,7 @@ export const TestimonialsSection = ({ section, store }: TestimonialsSectionProps
               </Card>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

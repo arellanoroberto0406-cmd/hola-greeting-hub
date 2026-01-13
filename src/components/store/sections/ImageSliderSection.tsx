@@ -9,6 +9,7 @@ import {
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Autoplay from "embla-carousel-autoplay";
 import { useRef } from "react";
+import { motion } from "framer-motion";
 
 interface ImageSliderSectionProps {
   section: StoreSection;
@@ -48,52 +49,76 @@ export const ImageSliderSection = ({ section, store }: ImageSliderSectionProps) 
   );
 
   return (
-    <section className="py-8 md:py-12">
+    <motion.section 
+      className="py-8 md:py-12"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+    >
       <div className="container mx-auto px-4">
         {section.settings.headline && (
-          <div className="text-center mb-8">
+          <motion.div 
+            className="text-center mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
             <h2 className="text-2xl md:text-3xl font-bold mb-2">
               {section.settings.headline}
             </h2>
             {section.settings.subtitle && (
               <p className="text-muted-foreground">{section.settings.subtitle}</p>
             )}
-          </div>
+          </motion.div>
         )}
 
-        <Carousel
-          plugins={autoplay ? [plugin.current] : []}
-          className="w-full max-w-5xl mx-auto"
-          opts={{
-            loop: true,
-          }}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
-          <CarouselContent>
-            {images.map((image: any, index: number) => (
-              <CarouselItem key={image.id || index}>
-                <div className="relative overflow-hidden rounded-xl">
-                  <AspectRatio ratio={aspectRatio === "16/9" ? 16/9 : aspectRatio === "4/3" ? 4/3 : 21/9}>
-                    <img
-                      src={image.url}
-                      alt={image.alt || `Imagen ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </AspectRatio>
-                  {showCaptions && image.caption && (
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-                      <p className="text-white text-lg md:text-xl font-medium">
-                        {image.caption}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="left-4" />
-          <CarouselNext className="right-4" />
-        </Carousel>
+          <Carousel
+            plugins={autoplay ? [plugin.current] : []}
+            className="w-full max-w-5xl mx-auto"
+            opts={{
+              loop: true,
+            }}
+          >
+            <CarouselContent>
+              {images.map((image: any, index: number) => (
+                <CarouselItem key={image.id || index}>
+                  <div className="relative overflow-hidden rounded-xl">
+                    <AspectRatio ratio={aspectRatio === "16/9" ? 16/9 : aspectRatio === "4/3" ? 4/3 : 21/9}>
+                      <img
+                        src={image.url}
+                        alt={image.alt || `Imagen ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                    </AspectRatio>
+                    {showCaptions && image.caption && (
+                      <motion.div 
+                        className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.3 }}
+                      >
+                        <p className="text-white text-lg md:text-xl font-medium">
+                          {image.caption}
+                        </p>
+                      </motion.div>
+                    )}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-4" />
+            <CarouselNext className="right-4" />
+          </Carousel>
+        </motion.div>
       </div>
-    </section>
+    </motion.section>
   );
 };
