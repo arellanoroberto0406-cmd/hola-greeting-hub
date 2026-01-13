@@ -44,6 +44,7 @@ import {
   VideoSection,
   FAQSection,
 } from "@/components/store/sections";
+import SectionWrapper from "@/components/store/SectionWrapper";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -599,136 +600,149 @@ const StoreFront = () => {
               switch (section.type) {
                 case 'hero':
                   return (
-                    <HeroSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                      onAction={() => {
-                        const productsSection = document.getElementById('products-section');
-                        productsSection?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <HeroSection
+                        section={section}
+                        store={store}
+                        onAction={() => {
+                          const productsSection = document.getElementById('products-section');
+                          productsSection?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'categories':
                   return collections.length > 0 ? (
-                    <CategoriesSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                      collections={collections}
-                      onCollectionSelect={(collection) => {
-                        setFilters(prev => ({ ...prev, collection }));
-                        const productsSection = document.getElementById('products-section');
-                        productsSection?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <CategoriesSection
+                        section={section}
+                        store={store}
+                        collections={collections}
+                        onCollectionSelect={(collection) => {
+                          setFilters(prev => ({ ...prev, collection }));
+                          const productsSection = document.getElementById('products-section');
+                          productsSection?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                      />
+                    </SectionWrapper>
                   ) : null;
 
                 case 'featured_products':
                   return allProducts.length > 0 ? (
-                    <FeaturedProductsSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                      products={allProducts}
-                      onProductClick={setSelectedProduct}
-                      onAddToCart={addItem}
-                      onToggleWishlist={toggleWishlist}
-                      isInWishlist={isInWishlist}
-                    />
-                  ) : null;
-
-                case 'banner':
-                  return (
-                    <BannerSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
-                  );
-
-                case 'products_grid':
-                  return (
-                    <div key={section.id} id="products-section">
-                      <ProductsGridSection
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <FeaturedProductsSection
                         section={section}
                         store={store}
-                        products={products}
-                        allProducts={allProducts}
-                        filters={filters}
-                        onFiltersChange={setFilters}
-                        collections={collections}
-                        maxPrice={maxPrice}
+                        products={allProducts}
                         onProductClick={setSelectedProduct}
                         onAddToCart={addItem}
                         onToggleWishlist={toggleWishlist}
                         isInWishlist={isInWishlist}
                       />
-                    </div>
+                    </SectionWrapper>
+                  ) : null;
+
+                case 'banner':
+                  return (
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <BannerSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
+                  );
+
+                case 'products_grid':
+                  return (
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <div id="products-section">
+                        <ProductsGridSection
+                          section={section}
+                          store={store}
+                          products={products}
+                          allProducts={allProducts}
+                          filters={filters}
+                          onFiltersChange={setFilters}
+                          collections={collections}
+                          maxPrice={maxPrice}
+                          onProductClick={setSelectedProduct}
+                          onAddToCart={addItem}
+                          onToggleWishlist={toggleWishlist}
+                          isInWishlist={isInWishlist}
+                        />
+                      </div>
+                    </SectionWrapper>
                   );
 
                 case 'newsletter':
                   return (
-                    <NewsletterSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <NewsletterSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'about':
                   return (
-                    <AboutSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <AboutSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'contact':
                   return (
-                    <ContactSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <ContactSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'testimonials':
                   return (
-                    <TestimonialsSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <TestimonialsSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'image_slider':
                   return (
-                    <ImageSliderSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <ImageSliderSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'video':
                   return (
-                    <VideoSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <VideoSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 case 'faq':
                   return (
-                    <FAQSection
-                      key={section.id}
-                      section={section}
-                      store={store}
-                    />
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <FAQSection
+                        section={section}
+                        store={store}
+                      />
+                    </SectionWrapper>
                   );
 
                 default:
