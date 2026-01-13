@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart, RotateCcw, MessagesSquare } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle, Info, Link2, Wallet, PieChart, RotateCcw, MessagesSquare, Sparkles } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
@@ -32,6 +32,9 @@ import StoreUrlPanel from "@/components/dashboard/StoreUrlPanel";
 import ChatPanel from "@/components/dashboard/ChatPanel";
 import { useUnreadCount } from "@/hooks/useChat";
 import { Badge } from "@/components/ui/badge";
+import DashboardStats from "@/components/dashboard/DashboardStats";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -316,52 +319,50 @@ const Dashboard = () => {
 
   if (authLoading || storeLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-4"
+        >
+          <div className="relative">
+            <div className="absolute inset-0 bg-primary/30 blur-xl rounded-full" />
+            <Loader2 className="h-10 w-10 animate-spin text-primary relative" />
+          </div>
+          <p className="text-muted-foreground text-sm">Cargando dashboard...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-secondary/10 to-background">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b bg-background/80 backdrop-blur-xl sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Store className="h-6 w-6 text-primary" />
-            <h1 className="font-heading text-xl">Mi Tienda</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {store && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowTutorial(true)}
-                  title="Ver tutorial"
-                >
-                  <HelpCircle className="h-4 w-4 mr-2" />
-                  <span className="hidden sm:inline">Tutorial</span>
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => window.open(`/tienda/${store.slug}`, "_blank")}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Ver tienda
-                </Button>
-              </>
-            )}
+      {store ? (
+        <DashboardHeader 
+          storeName={store.name}
+          storeSlug={store.slug}
+          primaryColor={store.primary_color}
+          onShowTutorial={() => setShowTutorial(true)}
+          onSignOut={signOut}
+          unreadCount={unreadCount}
+        />
+      ) : (
+        <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-50">
+          <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Store className="h-6 w-6 text-primary" />
+              <h1 className="font-heading text-xl">Mi Tienda</h1>
+            </div>
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4 mr-2" />
               Salir
             </Button>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 md:py-8">
         {!store ? (
           // Create Store Form
           <Card className="max-w-2xl mx-auto">
@@ -452,200 +453,231 @@ const Dashboard = () => {
         ) : (
           // Store Dashboard
           <TooltipProvider delayDuration={300}>
-          <Tabs defaultValue="orders" className="space-y-6">
-            <TabsList className="grid w-full max-w-7xl grid-cols-12">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="orders" className="gap-2">
-                    <ShoppingBag className="h-4 w-4" />
-                    <span className="hidden sm:inline">Pedidos</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Gestión de Pedidos</p>
-                  <p className="text-xs text-muted-foreground">Ve todos los pedidos, actualiza estados y gestiona envíos</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="url" className="gap-2">
-                    <Link2 className="h-4 w-4" />
-                    <span className="hidden sm:inline">URL</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">URL de Tienda</p>
-                  <p className="text-xs text-muted-foreground">Personaliza y comparte el enlace de tu tienda con código QR</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="payments" className="gap-2">
-                    <Wallet className="h-4 w-4" />
-                    <span className="hidden sm:inline">Pagos</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Métodos de Pago</p>
-                  <p className="text-xs text-muted-foreground">Configura tarjetas, transferencias, PayPal y MercadoPago</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="payment-stats" className="gap-2">
-                    <PieChart className="h-4 w-4" />
-                    <span className="hidden sm:inline">Ventas</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Estadísticas de Ventas</p>
-                  <p className="text-xs text-muted-foreground">Gráficas de ingresos y pedidos por método de pago</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="refunds" className="gap-2">
-                    <RotateCcw className="h-4 w-4" />
-                    <span className="hidden sm:inline">Reembolsos</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Historial de Reembolsos</p>
-                  <p className="text-xs text-muted-foreground">Ve todos los reembolsos procesados con fechas y montos</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="analytics" className="gap-2">
-                    <BarChart3 className="h-4 w-4" />
-                    <span className="hidden sm:inline">Analytics</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Estadísticas</p>
-                  <p className="text-xs text-muted-foreground">Analiza ventas, productos más vendidos y tendencias</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="coupons" className="gap-2">
-                    <Tag className="h-4 w-4" />
-                    <span className="hidden sm:inline">Cupones</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Cupones de Descuento</p>
-                  <p className="text-xs text-muted-foreground">Crea códigos promocionales con descuentos fijos o porcentuales</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="products" className="gap-2">
-                    <Package className="h-4 w-4" />
-                    <span className="hidden sm:inline">Productos</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Catálogo de Productos</p>
-                  <p className="text-xs text-muted-foreground">Agrega, edita y organiza tus productos con imágenes y precios</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="editor" className="gap-2">
-                    <Layers className="h-4 w-4" />
-                    <span className="hidden sm:inline">Editor</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Editor Visual</p>
-                  <p className="text-xs text-muted-foreground">Personaliza el diseño de tu tienda con secciones arrastrables y estilos</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="subscription" className="gap-2">
-                    <CreditCard className="h-4 w-4" />
-                    <span className="hidden sm:inline">Plan</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Suscripción</p>
-                  <p className="text-xs text-muted-foreground">Gestiona tu plan, límites de productos y funcionalidades premium</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="settings" className="gap-2">
-                    <Settings className="h-4 w-4" />
-                    <span className="hidden sm:inline">Config</span>
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Configuración</p>
-                  <p className="text-xs text-muted-foreground">Ajusta datos de contacto, envíos, colores y redes sociales</p>
-                </TooltipContent>
-              </Tooltip>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <TabsTrigger value="chat" className="gap-2 relative">
-                    <MessagesSquare className="h-4 w-4" />
-                    <span className="hidden sm:inline">Chat</span>
-                    {unreadCount > 0 && (
-                      <Badge 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                        style={{ backgroundColor: store?.primary_color }}
-                      >
-                        {unreadCount}
-                      </Badge>
-                    )}
-                  </TabsTrigger>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  <p className="font-medium">Chat en Vivo</p>
-                  <p className="text-xs text-muted-foreground">Responde a tus clientes en tiempo real</p>
-                </TooltipContent>
-              </Tooltip>
-            </TabsList>
+          
+          {/* Stats Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+            className="mb-8"
+          >
+            <DashboardStats 
+              storeId={store.id} 
+              primaryColor={store.primary_color}
+              productsCount={products?.length || 0}
+            />
+          </motion.div>
 
+          <Tabs defaultValue="orders" className="space-y-6">
+            {/* Modern Tab Navigation */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <TabsList className="flex flex-wrap gap-1 bg-muted/30 p-1.5 rounded-xl border border-border/50 h-auto">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="orders" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <ShoppingBag className="h-4 w-4" />
+                      <span className="hidden sm:inline">Pedidos</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Gestión de Pedidos</p>
+                    <p className="text-xs text-muted-foreground">Ve todos los pedidos, actualiza estados y gestiona envíos</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="url" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <Link2 className="h-4 w-4" />
+                      <span className="hidden sm:inline">URL</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">URL de Tienda</p>
+                    <p className="text-xs text-muted-foreground">Personaliza y comparte el enlace de tu tienda con código QR</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="payments" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <Wallet className="h-4 w-4" />
+                      <span className="hidden sm:inline">Pagos</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Métodos de Pago</p>
+                    <p className="text-xs text-muted-foreground">Configura tarjetas, transferencias, PayPal y MercadoPago</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="payment-stats" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <PieChart className="h-4 w-4" />
+                      <span className="hidden sm:inline">Ventas</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Estadísticas de Ventas</p>
+                    <p className="text-xs text-muted-foreground">Gráficas de ingresos y pedidos por método de pago</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="refunds" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <RotateCcw className="h-4 w-4" />
+                      <span className="hidden sm:inline">Reembolsos</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Historial de Reembolsos</p>
+                    <p className="text-xs text-muted-foreground">Ve todos los reembolsos procesados con fechas y montos</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="analytics" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <BarChart3 className="h-4 w-4" />
+                      <span className="hidden sm:inline">Analytics</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Estadísticas</p>
+                    <p className="text-xs text-muted-foreground">Analiza ventas, productos más vendidos y tendencias</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="coupons" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <Tag className="h-4 w-4" />
+                      <span className="hidden sm:inline">Cupones</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Cupones de Descuento</p>
+                    <p className="text-xs text-muted-foreground">Crea códigos promocionales con descuentos fijos o porcentuales</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="products" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <Package className="h-4 w-4" />
+                      <span className="hidden sm:inline">Productos</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Catálogo de Productos</p>
+                    <p className="text-xs text-muted-foreground">Agrega, edita y organiza tus productos con imágenes y precios</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="editor" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <Layers className="h-4 w-4" />
+                      <span className="hidden sm:inline">Editor</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Editor Visual</p>
+                    <p className="text-xs text-muted-foreground">Personaliza el diseño de tu tienda con secciones arrastrables y estilos</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="subscription" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <CreditCard className="h-4 w-4" />
+                      <span className="hidden sm:inline">Plan</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Suscripción</p>
+                    <p className="text-xs text-muted-foreground">Gestiona tu plan, límites de productos y funcionalidades premium</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="settings" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                      <Settings className="h-4 w-4" />
+                      <span className="hidden sm:inline">Config</span>
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Configuración</p>
+                    <p className="text-xs text-muted-foreground">Ajusta datos de contacto, envíos, colores y redes sociales</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <TabsTrigger value="chat" className="gap-2 relative rounded-lg data-[state=active]:shadow-sm">
+                      <MessagesSquare className="h-4 w-4" />
+                      <span className="hidden sm:inline">Chat</span>
+                      {unreadCount > 0 && (
+                        <Badge 
+                          className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                          style={{ backgroundColor: store?.primary_color }}
+                        >
+                          {unreadCount}
+                        </Badge>
+                      )}
+                    </TabsTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="max-w-xs">
+                    <p className="font-medium">Chat en Vivo</p>
+                    <p className="text-xs text-muted-foreground">Responde a tus clientes en tiempo real</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TabsList>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+            >
             <TabsContent value="orders">
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-heading">Pedidos</h2>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-6 w-6">
-                        <Info className="h-4 w-4 text-muted-foreground" />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-sm">
-                      <p className="font-medium mb-1">💡 Consejo</p>
-                      <p className="text-xs">Haz clic en un pedido para ver los detalles completos. Puedes cambiar el estado entre: Pendiente, Confirmado, En proceso, Enviado y Entregado.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-                
-                {/* Low Stock Alert */}
-                {products && products.length > 0 && (
-                  <LowStockAlert 
-                    products={products.map(p => ({ id: p.id, name: p.name, stock: p.stock, image: p.image }))}
-                    lowStockThreshold={5}
-                    primaryColor={store.primary_color}
-                  />
-                )}
-                
-                <OrdersPanel 
-                  storeId={store.id} 
-                  store={{
-                    name: store.name,
-                    email: store.email,
-                    phone: store.phone,
-                    address: store.address,
-                    logo_url: store.logo_url,
-                    primary_color: store.primary_color,
-                  }}
-                />
-              </div>
+              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-2xl font-heading">Pedidos</h2>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Info className="h-4 w-4 text-muted-foreground" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-sm">
+                          <p className="font-medium mb-1">💡 Consejo</p>
+                          <p className="text-xs">Haz clic en un pedido para ver los detalles completos. Puedes cambiar el estado entre: Pendiente, Confirmado, En proceso, Enviado y Entregado.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                    
+                    {/* Low Stock Alert */}
+                    {products && products.length > 0 && (
+                      <LowStockAlert 
+                        products={products.map(p => ({ id: p.id, name: p.name, stock: p.stock, image: p.image }))}
+                        lowStockThreshold={5}
+                        primaryColor={store.primary_color}
+                      />
+                    )}
+                    
+                    <OrdersPanel 
+                      storeId={store.id} 
+                      store={{
+                        name: store.name,
+                        email: store.email,
+                        phone: store.phone,
+                        address: store.address,
+                        logo_url: store.logo_url,
+                        primary_color: store.primary_color,
+                      }}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="url">
@@ -1488,6 +1520,7 @@ const Dashboard = () => {
                 <ChatPanel storeId={store.id} primaryColor={store.primary_color} />
               </div>
             </TabsContent>
+            </motion.div>
           </Tabs>
           </TooltipProvider>
         )}
