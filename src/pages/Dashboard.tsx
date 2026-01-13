@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers } from "lucide-react";
+import { Loader2, Store, Package, Settings, ExternalLink, LogOut, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, CreditCard, Layers, HelpCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/types/product";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -22,6 +22,7 @@ import CouponsPanel from "@/components/dashboard/CouponsPanel";
 import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
+import { TutorialOverlay, TutorialHelpButton } from "@/components/dashboard/TutorialOverlay";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -68,6 +69,21 @@ const Dashboard = () => {
   const [productIsNew, setProductIsNew] = useState(false);
   const [productIsOnSale, setProductIsOnSale] = useState(false);
   const [isSavingProduct, setIsSavingProduct] = useState(false);
+  
+  // Tutorial state
+  const [showTutorial, setShowTutorial] = useState(false);
+  
+  // Check if tutorial should be shown on first visit
+  useEffect(() => {
+    if (store) {
+      const tutorialSeen = localStorage.getItem('dashboard_tutorial_seen');
+      if (!tutorialSeen) {
+        // Small delay to let the dashboard render first
+        const timer = setTimeout(() => setShowTutorial(true), 500);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [store]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -304,14 +320,25 @@ const Dashboard = () => {
           </div>
           <div className="flex items-center gap-2">
             {store && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(`/tienda/${store.slug}`, "_blank")}
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Ver tienda
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowTutorial(true)}
+                  title="Ver tutorial"
+                >
+                  <HelpCircle className="h-4 w-4 mr-2" />
+                  <span className="hidden sm:inline">Tutorial</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(`/tienda/${store.slug}`, "_blank")}
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Ver tienda
+                </Button>
+              </>
             )}
             <Button variant="ghost" size="sm" onClick={signOut}>
               <LogOut className="h-4 w-4 mr-2" />
@@ -1070,6 +1097,15 @@ const Dashboard = () => {
           </Tabs>
         )}
       </main>
+
+      {/* Tutorial Overlay */}
+      {store && (
+        <TutorialOverlay
+          isOpen={showTutorial}
+          onClose={() => setShowTutorial(false)}
+          primaryColor={store.primary_color}
+        />
+      )}
     </div>
   );
 };
