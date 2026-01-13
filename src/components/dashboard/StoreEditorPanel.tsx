@@ -20,6 +20,7 @@ import { Store } from "@/types/store";
 import { SortableSection } from "./store-editor/SortableSection";
 import { SectionSettingsDialog } from "./store-editor/SectionSettingsDialog";
 import { StorePreview } from "./store-editor/StorePreview";
+import { LivePreviewPanel } from "./store-editor/LivePreviewPanel";
 import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,7 +35,9 @@ import {
   Monitor,
   Plus,
   Sparkles,
-  Palette
+  Palette,
+  PanelLeftClose,
+  PanelLeft
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -74,8 +77,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
   const [editingSection, setEditingSection] = useState<StoreSection | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
+  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [hasChanges, setHasChanges] = useState(false);
+  const [showLivePreview, setShowLivePreview] = useState(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -309,30 +313,17 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">Vista previa</CardTitle>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        variant={previewDevice === 'desktop' ? 'default' : 'ghost'}
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setPreviewDevice('desktop')}
-                      >
-                        <Monitor className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={previewDevice === 'mobile' ? 'default' : 'ghost'}
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => setPreviewDevice('mobile')}
-                      >
-                        <Smartphone className="h-4 w-4" />
-                      </Button>
-                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className={`${previewDevice === 'mobile' ? 'max-w-[280px] mx-auto' : ''}`}>
-                    <StorePreview sections={sections} store={store} />
-                  </div>
+                  <LivePreviewPanel
+                    sections={sections}
+                    store={store}
+                    globalStyles={globalStyles}
+                    device={previewDevice === 'tablet' ? 'mobile' : previewDevice}
+                    onDeviceChange={(d) => setPreviewDevice(d === 'tablet' ? 'mobile' : d)}
+                    showDeviceControls={false}
+                  />
                 </CardContent>
               </Card>
 
@@ -362,44 +353,86 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         </TabsContent>
 
         <TabsContent value="styles" className="space-y-6">
-          <GlobalStylesPanel
-            styles={globalStyles}
-            onChange={handleGlobalStylesChange}
-            primaryColor={store.primary_color}
-          />
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold">Personaliza el estilo visual</h3>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowLivePreview(!showLivePreview)}
+              className="gap-2"
+            >
+              {showLivePreview ? (
+                <>
+                  <PanelLeftClose className="h-4 w-4" />
+                  Ocultar vista previa
+                </>
+              ) : (
+                <>
+                  <PanelLeft className="h-4 w-4" />
+                  Mostrar vista previa
+                </>
+              )}
+            </Button>
+          </div>
+          
+          <div className={`grid gap-6 ${showLivePreview ? 'lg:grid-cols-2' : ''}`}>
+            <div className="space-y-6">
+              <GlobalStylesPanel
+                styles={globalStyles}
+                onChange={handleGlobalStylesChange}
+                primaryColor={store.primary_color}
+              />
+            </div>
+            
+            {showLivePreview && (
+              <div className="lg:sticky lg:top-4 h-fit">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Eye className="h-4 w-4" style={{ color: store.primary_color }} />
+                      Vista previa en tiempo real
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Los cambios se reflejan instantáneamente
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <LivePreviewPanel
+                      sections={sections}
+                      store={store}
+                      globalStyles={globalStyles}
+                      device={previewDevice}
+                      onDeviceChange={setPreviewDevice}
+                      showDeviceControls={true}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="preview">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <CardTitle>Vista previa de la tienda</CardTitle>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={previewDevice === 'desktop' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setPreviewDevice('desktop')}
-                  >
-                    <Monitor className="h-4 w-4 mr-2" />
-                    Escritorio
-                  </Button>
-                  <Button
-                    variant={previewDevice === 'mobile' ? 'default' : 'outline'}
-                    size="sm"
-                    onClick={() => setPreviewDevice('mobile')}
-                  >
-                    <Smartphone className="h-4 w-4 mr-2" />
-                    Móvil
-                  </Button>
+                <div>
+                  <CardTitle>Vista previa de la tienda</CardTitle>
+                  <CardDescription>
+                    Así se verá tu tienda con los estilos aplicados
+                  </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent>
-              <div className={`mx-auto transition-all duration-300 ${
-                previewDevice === 'mobile' ? 'max-w-sm' : 'max-w-4xl'
-              }`}>
-                <StorePreview sections={sections} store={store} />
-              </div>
+              <LivePreviewPanel
+                sections={sections}
+                store={store}
+                globalStyles={globalStyles}
+                device={previewDevice}
+                onDeviceChange={setPreviewDevice}
+                showDeviceControls={true}
+              />
             </CardContent>
           </Card>
         </TabsContent>
