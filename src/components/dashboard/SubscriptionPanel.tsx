@@ -1,22 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { 
   useSubscriptionPlans, 
-  useStoreSubscription, 
   useCreateSubscription,
-  useUpdateSubscription,
   useSubscriptionStatus,
   SubscriptionPlan 
 } from "@/hooks/useSubscription";
+import { usePayPalPayment } from "@/hooks/usePayPalPayment";
 
 interface SubscriptionPanelProps {
   storeId: string;
@@ -37,16 +35,29 @@ const PlanIcon = ({ slug }: { slug: string }) => {
 };
 
 const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
   const { subscription, isActive, status, daysLeft, plan: currentPlan } = useSubscriptionStatus(storeId);
   const createSubscription = useCreateSubscription();
-  const updateSubscription = useUpdateSubscription();
+  const { createOrder, isProcessing } = usePayPalPayment();
   
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [paymentReference, setPaymentReference] = useState("");
-  const [paymentNotes, setPaymentNotes] = useState("");
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
+
+  // Handle payment redirects
+  useEffect(() => {
+    const paymentStatus = searchParams.get('payment');
+    if (paymentStatus === 'success') {
+      toast.success('¡Pago completado exitosamente! Tu plan ha sido activado.');
+      searchParams.delete('payment');
+      setSearchParams(searchParams);
+    } else if (paymentStatus === 'cancelled') {
+      toast.info('El pago fue cancelado');
+      searchParams.delete('payment');
+      setSearchParams(searchParams);
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleSelectPlan = (plan: SubscriptionPlan) => {
     if (!subscription) {
@@ -69,40 +80,9 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
     }
   };
 
-  const handleSubmitPayment = () => {
-    if (!selectedPlan || !subscription || !paymentMethod) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
-
-    updateSubscription.mutate(
-      {
-        subscriptionId: subscription.id,
-        updates: {
-          plan_id: selectedPlan.id,
-          status: 'active',
-          payment_method: paymentMethod,
-          payment_reference: paymentReference || paymentNotes,
-          subscription_start_date: new Date().toISOString(),
-          subscription_end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          last_payment_date: new Date().toISOString(),
-          next_payment_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success(`¡Plan ${selectedPlan.name} activado exitosamente!`);
-          setShowUpgradeDialog(false);
-          setSelectedPlan(null);
-          setPaymentMethod("");
-          setPaymentReference("");
-          setPaymentNotes("");
-        },
-        onError: (error) => {
-          toast.error("Error al actualizar suscripción: " + error.message);
-        },
-      }
-    );
+  const handlePayWithPayPal = () => {
+    if (!selectedPlan) return;
+    createOrder(storeId, selectedPlan.id, billingCycle);
   };
 
   const getStatusBadge = () => {
@@ -269,27 +249,19 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
         <CardHeader>
           <CardTitle>Información de Pago</CardTitle>
           <CardDescription>
-            Métodos disponibles para activar tu suscripción
+            Pagos automáticos y seguros con PayPal
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium mb-2">🏦 Transferencia Bancaria</h4>
-              <p className="text-sm text-muted-foreground">
-                Realiza una transferencia y envía el comprobante junto con tu referencia de pago.
-              </p>
+        <CardContent>
+          <div className="border rounded-lg p-4 flex items-center gap-4">
+            <div className="bg-[#0070ba] text-white p-3 rounded-lg">
+              <CreditCard className="h-6 w-6" />
             </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium mb-2">💳 PayPal</h4>
+            <div>
+              <h4 className="font-medium">💳 PayPal</h4>
               <p className="text-sm text-muted-foreground">
-                Envía el pago a nuestra cuenta de PayPal y proporciona el ID de transacción.
-              </p>
-            </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium mb-2">📱 Otro método</h4>
-              <p className="text-sm text-muted-foreground">
-                Contáctanos para acordar otros métodos de pago disponibles.
+                Paga de forma segura con tu cuenta de PayPal o tarjeta de crédito/débito. 
+                Tu suscripción se activará automáticamente.
               </p>
             </div>
           </div>
@@ -302,7 +274,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
           <DialogHeader>
             <DialogTitle>Activar Plan {selectedPlan?.name}</DialogTitle>
             <DialogDescription>
-              Completa la información de pago para activar tu suscripción.
+              Selecciona el ciclo de facturación y procede al pago con PayPal.
             </DialogDescription>
           </DialogHeader>
           
@@ -312,60 +284,77 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 <span>Plan seleccionado:</span>
                 <span className="font-bold">{selectedPlan?.name}</span>
               </div>
-              <div className="flex justify-between items-center mt-2">
-                <span>Precio mensual:</span>
-                <span className="font-bold">${selectedPlan?.price_monthly}</span>
+            </div>
+            
+            <div className="space-y-3">
+              <Label>Ciclo de facturación</Label>
+              <RadioGroup 
+                value={billingCycle} 
+                onValueChange={(v) => setBillingCycle(v as 'monthly' | 'yearly')}
+                className="grid grid-cols-2 gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="monthly" id="monthly" />
+                  <Label htmlFor="monthly" className="cursor-pointer">
+                    <div>
+                      <p className="font-medium">Mensual</p>
+                      <p className="text-sm text-muted-foreground">
+                        ${selectedPlan?.price_monthly}/mes
+                      </p>
+                    </div>
+                  </Label>
+                </div>
+                {selectedPlan?.price_yearly && (
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="yearly" id="yearly" />
+                    <Label htmlFor="yearly" className="cursor-pointer">
+                      <div>
+                        <p className="font-medium">Anual</p>
+                        <p className="text-sm text-muted-foreground">
+                          ${selectedPlan.price_yearly}/año
+                          <Badge variant="secondary" className="ml-2 text-xs">
+                            Ahorra {Math.round((1 - selectedPlan.price_yearly / (selectedPlan.price_monthly * 12)) * 100)}%
+                          </Badge>
+                        </p>
+                      </div>
+                    </Label>
+                  </div>
+                )}
+              </RadioGroup>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Total a pagar:</span>
+                <span className="text-xl font-bold">
+                  ${billingCycle === 'yearly' && selectedPlan?.price_yearly 
+                    ? selectedPlan.price_yearly 
+                    : selectedPlan?.price_monthly}
+                </span>
               </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="payment-method">Método de pago *</Label>
-              <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona un método" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="transfer">Transferencia Bancaria</SelectItem>
-                  <SelectItem value="paypal">PayPal</SelectItem>
-                  <SelectItem value="other">Otro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="payment-reference">
-                Referencia de pago / ID de transacción
-              </Label>
-              <Input
-                id="payment-reference"
-                value={paymentReference}
-                onChange={(e) => setPaymentReference(e.target.value)}
-                placeholder="Ej: TXN-123456789"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="payment-notes">Notas adicionales</Label>
-              <Textarea
-                id="payment-notes"
-                value={paymentNotes}
-                onChange={(e) => setPaymentNotes(e.target.value)}
-                placeholder="Información adicional sobre el pago..."
-                rows={3}
-              />
             </div>
           </div>
           
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setShowUpgradeDialog(false)}>
               Cancelar
             </Button>
             <Button 
-              onClick={handleSubmitPayment}
-              disabled={!paymentMethod || updateSubscription.isPending}
-              style={{ backgroundColor: primaryColor || undefined }}
+              onClick={handlePayWithPayPal}
+              disabled={isProcessing}
+              className="bg-[#0070ba] hover:bg-[#005ea6] text-white"
             >
-              {updateSubscription.isPending ? "Procesando..." : "Confirmar Pago"}
+              {isProcessing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Redirigiendo a PayPal...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="mr-2 h-4 w-4" />
+                  Pagar con PayPal
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -189,6 +189,51 @@ export type Database = {
           },
         ]
       }
+      paypal_pending_orders: {
+        Row: {
+          amount: number
+          billing_cycle: string
+          created_at: string
+          id: string
+          paypal_order_id: string
+          plan_id: string
+          store_id: string
+        }
+        Insert: {
+          amount: number
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          paypal_order_id: string
+          plan_id: string
+          store_id: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          paypal_order_id?: string
+          plan_id?: string
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paypal_pending_orders_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "paypal_pending_orders_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       products: {
         Row: {
           brand: string | null
