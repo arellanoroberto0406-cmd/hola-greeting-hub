@@ -414,6 +414,72 @@ export type Database = {
           },
         ]
       }
+      store_subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          last_payment_date: string | null
+          next_payment_date: string | null
+          payment_method: string | null
+          payment_reference: string | null
+          plan_id: string
+          status: string
+          store_id: string
+          subscription_end_date: string | null
+          subscription_start_date: string | null
+          trial_end_date: string | null
+          trial_start_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_payment_date?: string | null
+          next_payment_date?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          plan_id: string
+          status?: string
+          store_id: string
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_payment_date?: string | null
+          next_payment_date?: string | null
+          payment_method?: string | null
+          payment_reference?: string | null
+          plan_id?: string
+          status?: string
+          store_id?: string
+          subscription_end_date?: string | null
+          subscription_start_date?: string | null
+          trial_end_date?: string | null
+          trial_start_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "store_subscriptions_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: true
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stores: {
         Row: {
           accent_color: string | null
@@ -532,6 +598,63 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      subscription_plans: {
+        Row: {
+          can_customize_theme: boolean | null
+          can_use_analytics: boolean | null
+          can_use_coupons: boolean | null
+          can_use_custom_domain: boolean | null
+          created_at: string
+          description: string | null
+          features: Json | null
+          id: string
+          is_active: boolean | null
+          max_orders_per_month: number | null
+          max_products: number | null
+          name: string
+          price_monthly: number
+          price_yearly: number | null
+          slug: string
+          sort_order: number | null
+        }
+        Insert: {
+          can_customize_theme?: boolean | null
+          can_use_analytics?: boolean | null
+          can_use_coupons?: boolean | null
+          can_use_custom_domain?: boolean | null
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_orders_per_month?: number | null
+          max_products?: number | null
+          name: string
+          price_monthly?: number
+          price_yearly?: number | null
+          slug: string
+          sort_order?: number | null
+        }
+        Update: {
+          can_customize_theme?: boolean | null
+          can_use_analytics?: boolean | null
+          can_use_coupons?: boolean | null
+          can_use_custom_domain?: boolean | null
+          created_at?: string
+          description?: string | null
+          features?: Json | null
+          id?: string
+          is_active?: boolean | null
+          max_orders_per_month?: number | null
+          max_products?: number | null
+          name?: string
+          price_monthly?: number
+          price_yearly?: number | null
+          slug?: string
+          sort_order?: number | null
+        }
+        Relationships: []
       }
     }
     Views: {
