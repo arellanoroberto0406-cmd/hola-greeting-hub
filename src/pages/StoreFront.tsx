@@ -363,6 +363,19 @@ const StoreFront = () => {
         </div>
       </header>
 
+      {/* Announcement Bar */}
+      {(store as any).announcement_active && (store as any).announcement_text && (
+        <div 
+          className="py-2 px-4 text-center text-sm font-medium"
+          style={{ 
+            backgroundColor: store.primary_color,
+            color: 'white'
+          }}
+        >
+          {(store as any).announcement_text}
+        </div>
+      )}
+
       {/* Banner */}
       {store.banner_url && (
         <div className="relative h-64 md:h-80 overflow-hidden">
@@ -384,7 +397,11 @@ const StoreFront = () => {
           >
             {store.name}
           </h2>
-          {store.description && (
+          {(store as any).welcome_message ? (
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              {(store as any).welcome_message}
+            </p>
+          ) : store.description && (
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {store.description}
             </p>
@@ -563,11 +580,14 @@ const StoreFront = () => {
                   </div>
                 )}
 
-                <div className="flex items-center gap-2 text-sm">
-                  <span className={selectedProduct.stock > 0 ? "text-green-600" : "text-red-500"}>
-                    {selectedProduct.stock > 0 ? `${selectedProduct.stock} en stock` : "Agotado"}
-                  </span>
-                </div>
+                {/* Stock info - respects show_stock setting */}
+                {((store as any).show_stock !== false) && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className={selectedProduct.stock > 0 ? "text-green-600" : "text-red-500"}>
+                      {selectedProduct.stock > 0 ? `${selectedProduct.stock} en stock` : "Agotado"}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex gap-2 pt-4">
                   <Button
@@ -593,10 +613,12 @@ const StoreFront = () => {
                   </Button>
                 </div>
 
-                {/* Reviews Section */}
-                <div className="border-t pt-6 mt-6">
-                  <ProductReviews productId={selectedProduct.id} />
-                </div>
+                {/* Reviews Section - respects show_reviews setting */}
+                {((store as any).show_reviews !== false) && (
+                  <div className="border-t pt-6 mt-6">
+                    <ProductReviews productId={selectedProduct.id} />
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -614,27 +636,81 @@ const StoreFront = () => {
 
       {/* Footer */}
       <footer 
-        className="border-t py-8 mt-16"
+        className="border-t py-12 mt-16"
         style={{ borderColor: `${store.primary_color}30` }}
       >
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-muted-foreground">
-            © {new Date().getFullYear()} {store.name}. Todos los derechos reservados.
-          </p>
-          {(store.instagram_url || store.facebook_url) && (
-            <div className="flex justify-center gap-4 mt-4">
-              {store.instagram_url && (
-                <a href={store.instagram_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                  Instagram
-                </a>
-              )}
-              {store.facebook_url && (
-                <a href={store.facebook_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground">
-                  Facebook
-                </a>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Store Info */}
+            <div className="text-center md:text-left">
+              <h3 className="font-heading font-bold text-lg mb-3" style={{ color: store.primary_color }}>
+                {store.name}
+              </h3>
+              {store.description && (
+                <p className="text-sm text-muted-foreground">{store.description}</p>
               )}
             </div>
-          )}
+
+            {/* Policies */}
+            <div className="text-center md:text-left">
+              {((store as any).shipping_info || (store as any).return_policy) && (
+                <>
+                  <h4 className="font-medium mb-3">Información</h4>
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    {(store as any).shipping_info && (
+                      <p><strong>Envíos:</strong> {(store as any).shipping_info.substring(0, 100)}{(store as any).shipping_info.length > 100 ? '...' : ''}</p>
+                    )}
+                    {(store as any).return_policy && (
+                      <p><strong>Devoluciones:</strong> {(store as any).return_policy.substring(0, 100)}{(store as any).return_policy.length > 100 ? '...' : ''}</p>
+                    )}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Social Links */}
+            <div className="text-center md:text-right">
+              <h4 className="font-medium mb-3">Síguenos</h4>
+              <div className="flex justify-center md:justify-end gap-4 flex-wrap">
+                {store.instagram_url && (
+                  <a href={store.instagram_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Instagram
+                  </a>
+                )}
+                {store.facebook_url && (
+                  <a href={store.facebook_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Facebook
+                  </a>
+                )}
+                {(store as any).twitter_url && (
+                  <a href={(store as any).twitter_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Twitter
+                  </a>
+                )}
+                {(store as any).tiktok_url && (
+                  <a href={(store as any).tiktok_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    TikTok
+                  </a>
+                )}
+                {(store as any).website_url && (
+                  <a href={(store as any).website_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                    Web
+                  </a>
+                )}
+              </div>
+              {store.email && (
+                <p className="text-sm text-muted-foreground mt-4">
+                  {store.email}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="border-t mt-8 pt-6 text-center" style={{ borderColor: `${store.primary_color}20` }}>
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} {store.name}. Todos los derechos reservados.
+            </p>
+          </div>
         </div>
       </footer>
     </div>

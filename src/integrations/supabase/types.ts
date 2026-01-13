@@ -418,8 +418,11 @@ export type Database = {
         Row: {
           accent_color: string | null
           address: string | null
+          announcement_active: boolean | null
+          announcement_text: string | null
           banner_url: string | null
           created_at: string
+          currency: string | null
           description: string | null
           email: string | null
           facebook_url: string | null
@@ -428,20 +431,34 @@ export type Database = {
           instagram_url: string | null
           is_active: boolean | null
           logo_url: string | null
+          min_order_amount: number | null
           name: string
           owner_id: string
           phone: string | null
           primary_color: string | null
+          return_policy: string | null
           secondary_color: string | null
           shipping_cost: number | null
+          shipping_info: string | null
+          show_reviews: boolean | null
+          show_stock: boolean | null
           slug: string
+          store_timezone: string | null
+          tax_rate: number | null
+          tiktok_url: string | null
+          twitter_url: string | null
           updated_at: string
+          website_url: string | null
+          welcome_message: string | null
         }
         Insert: {
           accent_color?: string | null
           address?: string | null
+          announcement_active?: boolean | null
+          announcement_text?: string | null
           banner_url?: string | null
           created_at?: string
+          currency?: string | null
           description?: string | null
           email?: string | null
           facebook_url?: string | null
@@ -450,20 +467,34 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           logo_url?: string | null
+          min_order_amount?: number | null
           name: string
           owner_id: string
           phone?: string | null
           primary_color?: string | null
+          return_policy?: string | null
           secondary_color?: string | null
           shipping_cost?: number | null
+          shipping_info?: string | null
+          show_reviews?: boolean | null
+          show_stock?: boolean | null
           slug: string
+          store_timezone?: string | null
+          tax_rate?: number | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          welcome_message?: string | null
         }
         Update: {
           accent_color?: string | null
           address?: string | null
+          announcement_active?: boolean | null
+          announcement_text?: string | null
           banner_url?: string | null
           created_at?: string
+          currency?: string | null
           description?: string | null
           email?: string | null
           facebook_url?: string | null
@@ -472,14 +503,25 @@ export type Database = {
           instagram_url?: string | null
           is_active?: boolean | null
           logo_url?: string | null
+          min_order_amount?: number | null
           name?: string
           owner_id?: string
           phone?: string | null
           primary_color?: string | null
+          return_policy?: string | null
           secondary_color?: string | null
           shipping_cost?: number | null
+          shipping_info?: string | null
+          show_reviews?: boolean | null
+          show_stock?: boolean | null
           slug?: string
+          store_timezone?: string | null
+          tax_rate?: number | null
+          tiktok_url?: string | null
+          twitter_url?: string | null
           updated_at?: string
+          website_url?: string | null
+          welcome_message?: string | null
         }
         Relationships: [
           {

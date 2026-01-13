@@ -19,6 +19,7 @@ import { useStoreAssets } from "@/hooks/useStoreAssets";
 import OrdersPanel from "@/components/dashboard/OrdersPanel";
 import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
 import CouponsPanel from "@/components/dashboard/CouponsPanel";
+import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -1023,6 +1024,30 @@ const Dashboard = () => {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* Advanced Settings */}
+              <div className="mt-6">
+                <AdvancedSettingsPanel 
+                  storeId={store.id}
+                  initialSettings={{
+                    accent_color: store.accent_color || "#2F1810",
+                    welcome_message: (store as any).welcome_message || "",
+                    announcement_text: (store as any).announcement_text || "",
+                    announcement_active: (store as any).announcement_active || false,
+                    show_reviews: (store as any).show_reviews ?? true,
+                    show_stock: (store as any).show_stock ?? true,
+                    currency: (store as any).currency || "MXN",
+                    tax_rate: (store as any).tax_rate || 0,
+                    min_order_amount: (store as any).min_order_amount || 0,
+                    twitter_url: (store as any).twitter_url || "",
+                    tiktok_url: (store as any).tiktok_url || "",
+                    website_url: (store as any).website_url || "",
+                    return_policy: (store as any).return_policy || "",
+                    shipping_info: (store as any).shipping_info || "",
+                  }}
+                  primaryColor={store.primary_color}
+                />
+              </div>
             </TabsContent>
           </Tabs>
         )}
