@@ -102,6 +102,148 @@ export const FONT_OPTIONS: { value: FontFamily; label: string; googleFont: strin
   { value: 'nunito', label: 'Nunito', googleFont: 'Nunito:wght@400;500;600;700' },
 ];
 
+// Design Templates
+export interface DesignTemplate {
+  id: string;
+  name: string;
+  description: string;
+  category: 'modern' | 'classic' | 'minimal' | 'bold' | 'elegant';
+  thumbnail: string;
+  globalStyles: GlobalStyles;
+  sectionIds: string[];
+}
+
+export const DESIGN_TEMPLATES: DesignTemplate[] = [
+  {
+    id: 'modern-minimal',
+    name: 'Moderno Minimalista',
+    description: 'Diseño limpio y espacioso con énfasis en el contenido',
+    category: 'minimal',
+    thumbnail: '🎯',
+    globalStyles: {
+      headingFont: 'inter',
+      bodyFont: 'inter',
+      borderRadius: 'lg',
+      sectionSpacing: 'relaxed',
+      buttonStyle: 'solid',
+      cardShadow: 'sm',
+    },
+    sectionIds: ['hero-1', 'featured-1', 'banner-1', 'newsletter-1', 'contact-1'],
+  },
+  {
+    id: 'elegant-boutique',
+    name: 'Boutique Elegante',
+    description: 'Tipografía refinada ideal para moda y lujo',
+    category: 'elegant',
+    thumbnail: '✨',
+    globalStyles: {
+      headingFont: 'playfair',
+      bodyFont: 'lora',
+      borderRadius: 'sm',
+      sectionSpacing: 'spacious',
+      buttonStyle: 'outline',
+      cardShadow: 'none',
+    },
+    sectionIds: ['hero-1', 'categories-1', 'featured-1', 'testimonials-1', 'about-1', 'contact-1'],
+  },
+  {
+    id: 'bold-impact',
+    name: 'Impacto Audaz',
+    description: 'Estilo llamativo con sombras pronunciadas',
+    category: 'bold',
+    thumbnail: '🔥',
+    globalStyles: {
+      headingFont: 'oswald',
+      bodyFont: 'montserrat',
+      borderRadius: 'none',
+      sectionSpacing: 'compact',
+      buttonStyle: 'solid',
+      cardShadow: 'xl',
+    },
+    sectionIds: ['hero-1', 'banner-1', 'featured-1', 'products-1', 'faq-1', 'contact-1'],
+  },
+  {
+    id: 'friendly-casual',
+    name: 'Casual Amigable',
+    description: 'Bordes redondeados y aspecto accesible',
+    category: 'modern',
+    thumbnail: '😊',
+    globalStyles: {
+      headingFont: 'nunito',
+      bodyFont: 'nunito',
+      borderRadius: 'full',
+      sectionSpacing: 'normal',
+      buttonStyle: 'solid',
+      cardShadow: 'md',
+    },
+    sectionIds: ['hero-1', 'categories-1', 'featured-1', 'testimonials-1', 'newsletter-1'],
+  },
+  {
+    id: 'classic-professional',
+    name: 'Clásico Profesional',
+    description: 'Estilo corporativo y confiable',
+    category: 'classic',
+    thumbnail: '💼',
+    globalStyles: {
+      headingFont: 'merriweather',
+      bodyFont: 'roboto',
+      borderRadius: 'md',
+      sectionSpacing: 'normal',
+      buttonStyle: 'solid',
+      cardShadow: 'sm',
+    },
+    sectionIds: ['hero-1', 'about-1', 'featured-1', 'products-1', 'contact-1'],
+  },
+  {
+    id: 'tech-startup',
+    name: 'Tech Startup',
+    description: 'Moderno y tecnológico con gradientes sutiles',
+    category: 'modern',
+    thumbnail: '🚀',
+    globalStyles: {
+      headingFont: 'poppins',
+      bodyFont: 'inter',
+      borderRadius: 'xl',
+      sectionSpacing: 'relaxed',
+      buttonStyle: 'solid',
+      cardShadow: 'lg',
+    },
+    sectionIds: ['hero-1', 'featured-1', 'video-1', 'faq-1', 'newsletter-1', 'contact-1'],
+  },
+  {
+    id: 'artisan-craft',
+    name: 'Artesanal',
+    description: 'Cálido y artesanal para productos hechos a mano',
+    category: 'classic',
+    thumbnail: '🎨',
+    globalStyles: {
+      headingFont: 'lora',
+      bodyFont: 'raleway',
+      borderRadius: 'sm',
+      sectionSpacing: 'spacious',
+      buttonStyle: 'outline',
+      cardShadow: 'sm',
+    },
+    sectionIds: ['hero-1', 'about-1', 'image-slider-1', 'featured-1', 'testimonials-1', 'contact-1'],
+  },
+  {
+    id: 'vibrant-store',
+    name: 'Tienda Vibrante',
+    description: 'Colorido y energético para productos juveniles',
+    category: 'bold',
+    thumbnail: '🌈',
+    globalStyles: {
+      headingFont: 'montserrat',
+      bodyFont: 'poppins',
+      borderRadius: 'lg',
+      sectionSpacing: 'compact',
+      buttonStyle: 'solid',
+      cardShadow: 'md',
+    },
+    sectionIds: ['hero-1', 'categories-1', 'banner-1', 'featured-1', 'products-1', 'newsletter-1'],
+  },
+];
+
 export interface StoreSection {
   id: string;
   type: SectionType;

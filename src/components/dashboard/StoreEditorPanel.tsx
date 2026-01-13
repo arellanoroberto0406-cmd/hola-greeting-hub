@@ -22,6 +22,7 @@ import { SectionSettingsDialog } from "./store-editor/SectionSettingsDialog";
 import { StorePreview } from "./store-editor/StorePreview";
 import { LivePreviewPanel } from "./store-editor/LivePreviewPanel";
 import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
+import TemplatesPanel from "./store-editor/TemplatesPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -37,7 +38,8 @@ import {
   Sparkles,
   Palette,
   PanelLeftClose,
-  PanelLeft
+  PanelLeft,
+  LayoutTemplate
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -232,8 +234,12 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         </div>
       </div>
 
-      <Tabs defaultValue="editor" className="space-y-6">
+      <Tabs defaultValue="templates" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="templates" className="gap-2">
+            <LayoutTemplate className="h-4 w-4" />
+            Plantillas
+          </TabsTrigger>
           <TabsTrigger value="editor" className="gap-2">
             <Layers className="h-4 w-4" />
             Secciones
@@ -247,6 +253,20 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
             Vista previa
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="templates" className="space-y-6">
+          <TemplatesPanel
+            currentStyles={globalStyles}
+            currentSections={sections}
+            onApplyTemplate={(newStyles, newSections) => {
+              setGlobalStyles(newStyles);
+              setSections(newSections);
+              setHasChanges(true);
+            }}
+            primaryColor={store.primary_color}
+            store={store}
+          />
+        </TabsContent>
 
         <TabsContent value="editor" className="space-y-6">
           <div className="grid lg:grid-cols-3 gap-6">
