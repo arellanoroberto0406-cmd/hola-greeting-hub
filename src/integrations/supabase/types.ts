@@ -67,6 +67,50 @@ export type Database = {
           },
         ]
       }
+      custom_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          global_styles: Json
+          id: string
+          name: string
+          section_ids: string[]
+          store_id: string
+          thumbnail: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          global_styles: Json
+          id?: string
+          name: string
+          section_ids: string[]
+          store_id: string
+          thumbnail?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          global_styles?: Json
+          id?: string
+          name?: string
+          section_ids?: string[]
+          store_id?: string
+          thumbnail?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_templates_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       order_items: {
         Row: {
           created_at: string
