@@ -118,7 +118,7 @@ const Dashboard = () => {
       setStoreEmail(store.email || "");
       setStoreInstagram(store.instagram_url || "");
       setStoreFacebook(store.facebook_url || "");
-      setStoreWhatsapp((store as any).whatsapp_number || "");
+      setStoreWhatsapp(store.whatsapp_number || "");
       setStoreLogo(store.logo_url || "");
       setStoreBanner(store.banner_url || "");
     }
