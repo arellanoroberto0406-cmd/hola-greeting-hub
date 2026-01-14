@@ -141,29 +141,57 @@ const Index = () => {
       {!user && (
         <motion.div
           initial={{ y: 100, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 2, duration: 0.5 }}
-          className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md md:max-w-lg"
+          animate={{ 
+            y: 0, 
+            opacity: 1,
+            scale: [1, 1.02, 1],
+            boxShadow: [
+              "0 25px 50px -12px hsl(var(--primary) / 0.15)",
+              "0 25px 50px -12px hsl(var(--primary) / 0.3)",
+              "0 25px 50px -12px hsl(var(--primary) / 0.15)"
+            ]
+          }}
+          transition={{ 
+            y: { delay: 2, duration: 0.5 },
+            opacity: { delay: 2, duration: 0.5 },
+            scale: { delay: 2.5, duration: 2, repeat: Infinity, ease: "easeInOut" },
+            boxShadow: { delay: 2.5, duration: 2, repeat: Infinity, ease: "easeInOut" }
+          }}
+          className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md md:max-w-lg rounded-2xl"
         >
-          <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-background/95 to-gold/10 backdrop-blur-xl shadow-2xl shadow-primary/20 p-4">
+          <motion.div 
+            className="absolute -inset-1 bg-gradient-to-r from-primary/40 via-gold/30 to-primary/40 rounded-2xl blur-lg"
+            animate={{ opacity: [0.5, 0.8, 0.5] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <div className="relative rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-background/95 to-gold/10 backdrop-blur-xl p-4">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-gold flex items-center justify-center shrink-0">
+                <motion.div 
+                  className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-gold flex items-center justify-center shrink-0"
+                  animate={{ rotate: [0, 5, -5, 0] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                >
                   <Sparkles className="h-5 w-5 text-white" />
-                </div>
+                </motion.div>
                 <div>
                   <p className="font-semibold text-sm">¡Crea tu tienda gratis!</p>
                   <p className="text-xs text-muted-foreground">Empieza a vender en minutos</p>
                 </div>
               </div>
-              <Button 
-                size="sm" 
-                onClick={() => navigate("/auth")}
-                className="gap-2 rounded-xl shrink-0"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Rocket className="h-4 w-4" />
-                <span className="hidden sm:inline">Comenzar</span>
-              </Button>
+                <Button 
+                  size="sm" 
+                  onClick={() => navigate("/auth")}
+                  className="gap-2 rounded-xl shrink-0"
+                >
+                  <Rocket className="h-4 w-4" />
+                  <span className="hidden sm:inline">Comenzar</span>
+                </Button>
+              </motion.div>
             </div>
           </div>
         </motion.div>
