@@ -8,9 +8,9 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="space-y-4">
-            <h3 className="font-display text-3xl text-primary">BOUTIQUE AR</h3>
+            <h3 className="font-display text-3xl text-primary">APP TIENDA</h3>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              Tu destino para gorras premium de las mejores marcas. Estilo urbano, calidad garantizada.
+              La plataforma para crear tu tienda online en minutos. Vende, gestiona y crece tu negocio.
             </p>
             <div className="flex gap-4">
               <a
@@ -91,7 +91,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3 text-muted-foreground">
                 <Mail className="h-4 w-4 text-primary" />
-                <span className="text-sm">info@boutiquear.com</span>
+                <span className="text-sm">info@apptienda.com</span>
               </li>
             </ul>
           </div>
@@ -99,7 +99,7 @@ const Footer = () => {
 
         <div className="mt-12 pt-8 border-t border-border/50 text-center">
           <p className="text-sm text-muted-foreground">
-            © 2024 Proveedor Boutique AR. Todos los derechos reservados.
+            © 2024 APP TIENDA. Todos los derechos reservados.
           </p>
         </div>
       </div>
