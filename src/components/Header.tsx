@@ -35,9 +35,9 @@ const Header = () => {
           >
             <div className="relative">
               <h1 className="font-display text-2xl sm:text-3xl tracking-wider text-primary transition-all duration-500 group-hover:scale-105">
-                BOUTIQUE AR
+                APP TIENDA
               </h1>
-              <p className="text-[10px] text-muted-foreground tracking-widest uppercase">Gorras Premium</p>
+              <p className="text-[10px] text-muted-foreground tracking-widest uppercase">Tu Tienda Online</p>
             </div>
           </div>
 
