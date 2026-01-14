@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { 
   Store, 
   ShoppingBag, 
@@ -28,7 +28,8 @@ import {
   Users,
   BarChart3,
   Palette,
-  Smartphone
+  Smartphone,
+  X
 } from "lucide-react";
 
 const fadeInUp = {
@@ -64,6 +65,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: stores, isLoading } = useAllStores();
+  const [showBanner, setShowBanner] = useState(true);
   
   const heroRef = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -138,7 +140,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Floating CTA Banner for non-authenticated users */}
-      {!user && (
+      {!user && showBanner && (
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           animate={{ 
@@ -151,6 +153,7 @@ const Index = () => {
               "0 25px 50px -12px hsl(var(--primary) / 0.15)"
             ]
           }}
+          exit={{ y: 100, opacity: 0 }}
           transition={{ 
             y: { delay: 2, duration: 0.5 },
             opacity: { delay: 2, duration: 0.5 },
@@ -165,6 +168,14 @@ const Index = () => {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           />
           <div className="relative rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-background/95 to-gold/10 backdrop-blur-xl p-4">
+            {/* Close button */}
+            <button
+              onClick={() => setShowBanner(false)}
+              className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-muted/90 border border-border flex items-center justify-center hover:bg-muted transition-colors"
+            >
+              <X className="h-3 w-3 text-muted-foreground" />
+            </button>
+            
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <motion.div 
