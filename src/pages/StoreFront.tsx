@@ -884,11 +884,28 @@ const StoreFront = () => {
                   </a>
                 )}
               </div>
-              {store.email && (
-                <p className="text-sm text-muted-foreground mt-4">
-                  {store.email}
-                </p>
-              )}
+              <div className="mt-4 space-y-2 text-sm text-muted-foreground">
+                {store.email && (
+                  <p>
+                    📧 {store.email}
+                  </p>
+                )}
+                {(store as any).whatsapp_number && (
+                  <a 
+                    href={`https://wa.me/${(store as any).whatsapp_number.replace(/[\s\-\(\)]/g, "").replace(/^\+/, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center md:justify-end gap-2 text-green-600 hover:text-green-700 transition-colors font-medium"
+                  >
+                    💬 WhatsApp: {(store as any).whatsapp_number}
+                  </a>
+                )}
+                {store.phone && (
+                  <p>
+                    📞 {store.phone}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
