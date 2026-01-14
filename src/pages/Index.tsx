@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useAllStores } from "@/hooks/useAllStores";
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import {
   Sparkles, 
   Package,
   TrendingUp,
-  Loader2,
   Plus,
   LayoutDashboard,
   MessageCircle,
@@ -64,7 +62,6 @@ const scaleIn = {
 const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: stores, isLoading } = useAllStores();
   const [showBanner, setShowBanner] = useState(true);
   
   const heroRef = useRef(null);
@@ -507,7 +504,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Stores Section */}
+      {/* Store Template Preview Section */}
       <section id="tiendas" className="py-24 md:py-32 relative" ref={storesRef}>
         <div className="container mx-auto px-4 md:px-8">
           <motion.div 
@@ -518,138 +515,118 @@ const Index = () => {
           >
             <motion.div variants={fadeInUp}>
               <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full">
-                <Store className="h-3.5 w-3.5 mr-2" />
-                Tiendas Destacadas
+                <Palette className="h-3.5 w-3.5 mr-2" />
+                Vista Previa
               </Badge>
             </motion.div>
             <motion.h2 
               variants={fadeInUp}
               className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-4"
             >
-              Conoce nuestras tiendas
+              Así lucirá tu tienda
             </motion.h2>
             <motion.p 
               variants={fadeInUp}
               className="text-xl text-muted-foreground max-w-2xl mx-auto"
             >
-              Explora las tiendas que ya están vendiendo en nuestra plataforma
+              Una vista previa de cómo se verá tu tienda con productos de ejemplo
             </motion.p>
           </motion.div>
           
-          {isLoading ? (
-            <div className="flex justify-center py-20">
-              <div className="relative">
-                <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full" />
-                <Loader2 className="h-10 w-10 animate-spin text-primary relative" />
+          {/* Demo Store Preview */}
+          <motion.div 
+            className="max-w-5xl mx-auto"
+            initial="hidden"
+            animate={storesInView ? "visible" : "hidden"}
+            variants={fadeInUp}
+          >
+            {/* Store Header Preview */}
+            <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm mb-8">
+              <div className="relative h-48 md:h-64 bg-gradient-to-br from-primary/30 via-orange-400/20 to-gold/30">
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-6 flex items-end gap-4">
+                  <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center border-4 border-card shadow-xl">
+                    <Store className="h-10 w-10 text-white" />
+                  </div>
+                  <div className="pb-2">
+                    <h3 className="text-2xl font-heading font-bold text-foreground">Tu Tienda Online</h3>
+                    <p className="text-muted-foreground">Los mejores productos al mejor precio</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          ) : stores && stores.length > 0 ? (
+            </Card>
+
+            {/* Demo Products Grid */}
             <motion.div 
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-              initial="hidden"
-              animate={storesInView ? "visible" : "hidden"}
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
               variants={staggerContainer}
             >
-              {stores.slice(0, 6).map((store) => (
+              {[
+                { name: "Producto Estrella", price: "$299.00", originalPrice: "$399.00", badge: "Oferta", image: "📱" },
+                { name: "Nuevo Lanzamiento", price: "$149.00", badge: "Nuevo", image: "👟" },
+                { name: "Más Vendido", price: "$89.00", badge: "Popular", image: "🎧" },
+                { name: "Edición Limitada", price: "$599.00", badge: "Exclusivo", image: "⌚" },
+              ].map((product, index) => (
                 <motion.div
-                  key={store.id}
+                  key={index}
                   variants={fadeInUp}
-                  whileHover={{ y: -5 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <Card 
-                    className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 transition-all duration-300 cursor-pointer"
-                    onClick={() => navigate(`/tienda/${store.slug}`)}
-                  >
-                    {/* Banner */}
-                    <div className="relative h-40 overflow-hidden">
-                      {store.banner_url ? (
-                        <img 
-                          src={store.banner_url} 
-                          alt={store.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div 
-                          className="w-full h-full"
-                          style={{ 
-                            background: `linear-gradient(135deg, ${store.primary_color || '#f97316'}50, ${store.secondary_color || '#fb923c'}30)` 
-                          }}
-                        />
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
-                      
-                      {/* Logo */}
-                      {store.logo_url && (
-                        <div className="absolute bottom-3 left-4">
-                          <img 
-                            src={store.logo_url} 
-                            alt={store.name}
-                            className="h-14 w-14 rounded-xl object-cover bg-card border-2 border-border/50 shadow-lg"
-                          />
-                        </div>
-                      )}
+                  <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+                    <div className="relative aspect-square bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center">
+                      <span className="text-5xl md:text-6xl">{product.image}</span>
+                      <Badge className="absolute top-2 left-2 rounded-full text-xs" variant="secondary">
+                        {product.badge}
+                      </Badge>
+                      <motion.div 
+                        className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                        initial={false}
+                      />
                     </div>
-                    
-                    <CardContent className="p-5 space-y-4">
-                      <div>
-                        <h3 className="font-heading font-semibold text-lg group-hover:text-primary transition-colors">
-                          {store.name}
-                        </h3>
-                        {store.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1.5">
-                            {store.description}
-                          </p>
+                    <CardContent className="p-4">
+                      <h4 className="font-medium text-sm md:text-base line-clamp-1 group-hover:text-primary transition-colors">
+                        {product.name}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-lg font-bold text-primary">{product.price}</span>
+                        {product.originalPrice && (
+                          <span className="text-sm text-muted-foreground line-through">{product.originalPrice}</span>
                         )}
                       </div>
-                      
-                      <div className="flex items-center gap-2">
-                        {store.phone && (
-                          <Badge variant="secondary" className="gap-1.5 rounded-full text-xs">
-                            <MessageCircle className="h-3 w-3" />
-                            WhatsApp
-                          </Badge>
-                        )}
-                        <Badge variant="outline" className="gap-1.5 rounded-full text-xs">
-                          <Package className="h-3 w-3" />
-                          Productos
-                        </Badge>
+                      <div className="flex items-center gap-1 mt-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        ))}
+                        <span className="text-xs text-muted-foreground ml-1">(4.9)</span>
                       </div>
-                      
-                      <Button 
-                        variant="ghost" 
-                        className="w-full rounded-xl group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                        size="sm"
-                      >
-                        Visitar Tienda
-                        <ChevronRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
-                      </Button>
                     </CardContent>
                   </Card>
                 </motion.div>
               ))}
             </motion.div>
-          ) : (
+
+            {/* Call to Action */}
             <motion.div 
-              className="text-center py-16 space-y-6"
-              initial="hidden"
-              animate={storesInView ? "visible" : "hidden"}
+              className="text-center mt-12 space-y-6"
               variants={fadeInUp}
             >
-              <div className="h-20 w-20 rounded-2xl bg-muted/50 flex items-center justify-center mx-auto">
-                <Store className="h-10 w-10 text-muted-foreground" />
+              <div className="flex flex-wrap justify-center gap-3">
+                {["Personaliza colores", "Agrega tus productos", "Recibe pagos", "Conecta WhatsApp"].map((item, i) => (
+                  <Badge key={i} variant="outline" className="px-4 py-2 rounded-full gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                    {item}
+                  </Badge>
+                ))}
               </div>
-              <div className="space-y-2">
-                <h3 className="text-2xl font-heading font-semibold">Aún no hay tiendas</h3>
-                <p className="text-muted-foreground max-w-md mx-auto">
-                  ¡Sé el primero en crear tu tienda online y empieza a vender hoy!
-                </p>
-              </div>
-              <Button onClick={() => navigate("/auth")} size="lg" className="gap-2 rounded-xl">
-                <Plus className="h-5 w-5" />
-                Crear Mi Tienda
+              <Button onClick={() => navigate("/auth")} size="lg" className="gap-2 rounded-xl shadow-lg shadow-primary/20">
+                <Rocket className="h-5 w-5" />
+                Crear Mi Tienda Ahora
+                <ArrowRight className="h-5 w-5" />
               </Button>
             </motion.div>
-          )}
+          </motion.div>
         </div>
       </section>
 
