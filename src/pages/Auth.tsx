@@ -25,7 +25,7 @@ const Auth = () => {
   const [fullName, setFullName] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   
-  const redirectTo = searchParams.get("redirect") || "/";
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   useEffect(() => {
     if (!loading && user) {
@@ -116,7 +116,7 @@ const Auth = () => {
           </div>
           <CardTitle className="text-2xl font-heading">Bienvenido</CardTitle>
           <CardDescription>
-            Inicia sesión o crea una cuenta para continuar
+            Inicia sesión o crea una cuenta para crear tu propia tienda
           </CardDescription>
         </CardHeader>
         <CardContent>
