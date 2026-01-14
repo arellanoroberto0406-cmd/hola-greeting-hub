@@ -137,6 +137,38 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
+      {/* Floating CTA Banner for non-authenticated users */}
+      {!user && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 2, duration: 0.5 }}
+          className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md md:max-w-lg"
+        >
+          <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-background/95 to-gold/10 backdrop-blur-xl shadow-2xl shadow-primary/20 p-4">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-gold flex items-center justify-center shrink-0">
+                  <Sparkles className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-sm">¡Crea tu tienda gratis!</p>
+                  <p className="text-xs text-muted-foreground">Empieza a vender en minutos</p>
+                </div>
+              </div>
+              <Button 
+                size="sm" 
+                onClick={() => navigate("/auth")}
+                className="gap-2 rounded-xl shrink-0"
+              >
+                <Rocket className="h-4 w-4" />
+                <span className="hidden sm:inline">Comenzar</span>
+              </Button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Floating Header */}
       <motion.header 
         initial={{ y: -100, opacity: 0 }}
