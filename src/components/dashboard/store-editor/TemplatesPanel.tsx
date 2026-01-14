@@ -20,6 +20,7 @@ import {
   useDeleteCustomTemplate,
   CustomTemplate 
 } from "@/hooks/useCustomTemplates";
+import { useStorePlanTier, PlanTier } from "@/hooks/useStorePlanTier";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Sparkles, 
@@ -35,7 +36,9 @@ import {
   Upload,
   Columns,
   ArrowLeftRight,
-  X
+  X,
+  Lock,
+  Crown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -108,6 +111,26 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 const EMOJI_OPTIONS = ['🎨', '✨', '🚀', '💎', '🌟', '🎯', '💼', '🔥', '🌈', '❤️', '🛍️', '✅'];
 
+const PLAN_LABELS: Record<string, string> = {
+  professional: 'Profesional',
+  enterprise: 'Empresarial',
+};
+
+const PLAN_COLORS: Record<string, string> = {
+  professional: 'bg-blue-500/10 text-blue-700 border-blue-500/30',
+  enterprise: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
+};
+
+const canUsePlan = (userPlan: PlanTier, requiredPlan?: string): boolean => {
+  if (!requiredPlan) return true;
+  const planHierarchy: Record<string, number> = {
+    basic: 0,
+    professional: 1,
+    enterprise: 2,
+  };
+  return planHierarchy[userPlan] >= planHierarchy[requiredPlan];
+};
+
 export const TemplatesPanel = ({
   currentStyles,
   currentSections,
@@ -135,6 +158,7 @@ export const TemplatesPanel = ({
 
   // Custom templates hooks
   const { data: customTemplates = [], isLoading: isLoadingCustom } = useCustomTemplates(store.id);
+  const { planTier } = useStorePlanTier(store.id);
   const createTemplate = useCreateCustomTemplate();
   const deleteTemplate = useDeleteCustomTemplate();
   const { toast } = useToast();
@@ -145,9 +169,19 @@ export const TemplatesPanel = ({
     : DESIGN_TEMPLATES.filter(t => t.category === categoryFilter);
 
   const handleSelectTemplate = (template: DesignTemplate) => {
+    // Check if plan allows this template
+    if (template.requiredPlan && !canUsePlan(planTier, template.requiredPlan)) {
+      toast({
+        title: "Plantilla bloqueada",
+        description: `Esta plantilla requiere el plan ${PLAN_LABELS[template.requiredPlan] || template.requiredPlan}. Actualiza tu suscripción para desbloquearla.`,
+        variant: "destructive",
+      });
+      return;
+    }
     setSelectedTemplate(template);
     setIsConfirmOpen(true);
   };
+
 
   const handleSelectCustomTemplate = (template: CustomTemplate) => {
     setSelectedCustomTemplate(template);
@@ -430,6 +464,9 @@ export const TemplatesPanel = ({
       ? (template as CustomTemplate).section_ids 
       : (template as DesignTemplate).sectionIds;
     const category = isCustom ? 'custom' : (template as DesignTemplate).category;
+    const requiredPlan = isCustom ? undefined : (template as DesignTemplate).requiredPlan;
+    const isPremium = isCustom ? false : (template as DesignTemplate).isPremium;
+    const isLocked = requiredPlan ? !canUsePlan(planTier, requiredPlan) : false;
     
     const previewStyles = getPreviewStyles(globalStyles);
     const isHovered = previewTemplate === id;
@@ -446,7 +483,7 @@ export const TemplatesPanel = ({
         <Card 
           className={`cursor-pointer transition-all duration-200 hover:shadow-lg group overflow-hidden ${
             isHovered ? 'ring-2 ring-primary scale-[1.02]' : ''
-          }`}
+          } ${isLocked ? 'opacity-75' : ''}`}
           onMouseEnter={() => handlePreviewEnter(template, isCustom)}
           onMouseLeave={handlePreviewLeave}
           onClick={() => isCustom 
@@ -497,58 +534,83 @@ export const TemplatesPanel = ({
               </div>
             </div>
 
-            <motion.div 
-              className="absolute inset-0 bg-primary/80 flex items-center justify-center gap-2 flex-wrap p-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: isHovered ? 1 : 0 }}
-              transition={{ duration: 0.2 }}
-            >
-              <Button variant="secondary" size="sm" className="gap-1.5">
-                <Check className="h-4 w-4" />
-                Aplicar
-              </Button>
-              {onCompareTemplate && (
-                <Button 
-                  variant="secondary" 
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={(e) => handleCompareTemplate(template, isCustom, e)}
-                >
-                  <Columns className="h-4 w-4" />
-                  Comparar
+            {/* Locked Overlay */}
+            {isLocked && (
+              <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center gap-2 z-10">
+                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center">
+                  <Lock className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <Badge className={`text-[10px] ${PLAN_COLORS[requiredPlan || 'professional']}`}>
+                  <Crown className="h-3 w-3 mr-1" />
+                  Plan {PLAN_LABELS[requiredPlan || 'professional']}
+                </Badge>
+              </div>
+            )}
+
+            {!isLocked && (
+              <motion.div 
+                className="absolute inset-0 bg-primary/80 flex items-center justify-center gap-2 flex-wrap p-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isHovered ? 1 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Button variant="secondary" size="sm" className="gap-1.5">
+                  <Check className="h-4 w-4" />
+                  Aplicar
                 </Button>
-              )}
-              {isCustom && (
-                <>
+                {onCompareTemplate && (
                   <Button 
                     variant="secondary" 
                     size="sm"
-                    onClick={(e) => handleExportTemplate(template as CustomTemplate, e)}
+                    className="gap-1.5"
+                    onClick={(e) => handleCompareTemplate(template, isCustom, e)}
                   >
-                    <Download className="h-4 w-4" />
+                    <Columns className="h-4 w-4" />
+                    Comparar
                   </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setTemplateToDelete(template as CustomTemplate);
-                      setIsDeleteDialogOpen(true);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
-            </motion.div>
+                )}
+                {isCustom && (
+                  <>
+                    <Button 
+                      variant="secondary" 
+                      size="sm"
+                      onClick={(e) => handleExportTemplate(template as CustomTemplate, e)}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTemplateToDelete(template as CustomTemplate);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
+              </motion.div>
+            )}
 
             <div className="absolute top-1 right-1 text-2xl">{thumbnail}</div>
-            {isCustom && (
-              <Badge className="absolute top-1 left-1 text-[10px] px-1.5 py-0 bg-green-500">
-                <User className="h-3 w-3 mr-1" />
-                Mía
-              </Badge>
-            )}
+            
+            {/* Badges */}
+            <div className="absolute top-1 left-1 flex flex-col gap-1">
+              {isCustom && (
+                <Badge className="text-[10px] px-1.5 py-0 bg-green-500">
+                  <User className="h-3 w-3 mr-1" />
+                  Mía
+                </Badge>
+              )}
+              {isPremium && !isLocked && (
+                <Badge className="text-[10px] px-1.5 py-0 bg-gradient-to-r from-amber-500 to-orange-500">
+                  <Crown className="h-3 w-3 mr-1" />
+                  Premium
+                </Badge>
+              )}
+            </div>
           </div>
 
           <CardContent className="p-3">
@@ -577,6 +639,14 @@ export const TemplatesPanel = ({
                 <span>{sectionIds.length} secciones</span>
                 <span>•</span>
                 <span>{previewStyles.headingFont}</span>
+                {requiredPlan && (
+                  <>
+                    <span>•</span>
+                    <span className={isLocked ? 'text-amber-600 font-medium' : 'text-green-600'}>
+                      {isLocked ? `Requiere ${PLAN_LABELS[requiredPlan]}` : '✓ Desbloqueada'}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>
