@@ -557,16 +557,46 @@ const Index = () => {
               </div>
             </Card>
 
+            {/* Category Tabs */}
+            <div className="flex flex-wrap justify-center gap-2 mb-8">
+              {[
+                { name: "Electrónicos", icon: "⚡" },
+                { name: "Ropa", icon: "👕" },
+                { name: "Accesorios", icon: "💎" },
+                { name: "Calzado", icon: "👟" },
+              ].map((cat, i) => (
+                <Badge 
+                  key={i} 
+                  variant={i === 0 ? "default" : "outline"} 
+                  className="px-4 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                >
+                  <span className="mr-2">{cat.icon}</span>
+                  {cat.name}
+                </Badge>
+              ))}
+            </div>
+
             {/* Demo Products Grid */}
             <motion.div 
               className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
               variants={staggerContainer}
             >
               {[
-                { name: "Producto Estrella", price: "$299.00", originalPrice: "$399.00", badge: "Oferta", image: "📱" },
-                { name: "Nuevo Lanzamiento", price: "$149.00", badge: "Nuevo", image: "👟" },
-                { name: "Más Vendido", price: "$89.00", badge: "Popular", image: "🎧" },
-                { name: "Edición Limitada", price: "$599.00", badge: "Exclusivo", image: "⌚" },
+                // Electrónicos
+                { name: "Smartphone Pro Max", price: "$899.00", originalPrice: "$1,099.00", badge: "Oferta", image: "📱", category: "Electrónicos" },
+                { name: "Audífonos Wireless", price: "$149.00", badge: "Popular", image: "🎧", category: "Electrónicos" },
+                { name: "Smartwatch Elite", price: "$349.00", badge: "Nuevo", image: "⌚", category: "Electrónicos" },
+                { name: "Tablet Ultra", price: "$599.00", originalPrice: "$749.00", badge: "Oferta", image: "📲", category: "Electrónicos" },
+                // Ropa
+                { name: "Camiseta Premium", price: "$45.00", badge: "Nuevo", image: "👕", category: "Ropa" },
+                { name: "Hoodie Urbano", price: "$89.00", originalPrice: "$120.00", badge: "Oferta", image: "🧥", category: "Ropa" },
+                { name: "Jeans Classic Fit", price: "$75.00", badge: "Popular", image: "👖", category: "Ropa" },
+                { name: "Vestido Elegante", price: "$129.00", badge: "Exclusivo", image: "👗", category: "Ropa" },
+                // Accesorios
+                { name: "Gafas de Sol", price: "$159.00", badge: "Trending", image: "🕶️", category: "Accesorios" },
+                { name: "Bolso de Cuero", price: "$199.00", originalPrice: "$259.00", badge: "Oferta", image: "👜", category: "Accesorios" },
+                { name: "Collar Dorado", price: "$79.00", badge: "Nuevo", image: "📿", category: "Accesorios" },
+                { name: "Reloj Clásico", price: "$249.00", badge: "Exclusivo", image: "🕰️", category: "Accesorios" },
               ].map((product, index) => (
                 <motion.div
                   key={index}
@@ -579,6 +609,9 @@ const Index = () => {
                       <span className="text-5xl md:text-6xl">{product.image}</span>
                       <Badge className="absolute top-2 left-2 rounded-full text-xs" variant="secondary">
                         {product.badge}
+                      </Badge>
+                      <Badge className="absolute top-2 right-2 rounded-full text-xs bg-background/80 text-foreground" variant="outline">
+                        {product.category}
                       </Badge>
                       <motion.div 
                         className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -597,9 +630,9 @@ const Index = () => {
                       </div>
                       <div className="flex items-center gap-1 mt-2">
                         {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <Star key={i} className={`h-3 w-3 ${i < 4 + (index % 2) ? 'fill-yellow-400 text-yellow-400' : 'fill-muted text-muted'}`} />
                         ))}
-                        <span className="text-xs text-muted-foreground ml-1">(4.9)</span>
+                        <span className="text-xs text-muted-foreground ml-1">({(4.5 + Math.random() * 0.5).toFixed(1)})</span>
                       </div>
                     </CardContent>
                   </Card>
