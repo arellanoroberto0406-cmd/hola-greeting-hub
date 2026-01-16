@@ -35,6 +35,7 @@ import { Badge } from "@/components/ui/badge";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import PlanLimitsCard from "@/components/dashboard/PlanLimitsCard";
+import SubscriptionExpiryBanner from "@/components/dashboard/SubscriptionExpiryBanner";
 import { useStoreOrdersStats } from "@/hooks/useStoreOrders";
 import { motion } from "framer-motion";
 
@@ -338,8 +339,30 @@ const Dashboard = () => {
     );
   }
 
+  const handleNavigateToSubscription = () => {
+    const subscriptionTab = document.querySelector('[value="subscription"]') as HTMLElement;
+    if (subscriptionTab) {
+      subscriptionTab.click();
+      setTimeout(() => {
+        const plansSection = document.querySelector('[data-plans-section]');
+        if (plansSection) {
+          plansSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Subscription Expiry Banner */}
+      {store && (
+        <SubscriptionExpiryBanner
+          storeId={store.id}
+          primaryColor={store.primary_color}
+          onUpgrade={handleNavigateToSubscription}
+        />
+      )}
+      
       {/* Header */}
       {store ? (
         <DashboardHeader 
