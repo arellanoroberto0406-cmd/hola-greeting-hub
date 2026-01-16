@@ -90,14 +90,15 @@ export const useStoreOrdersStats = (storeId?: string) => {
       const thisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
       const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
+      const thisMonthOrders = orders.filter((o) => new Date(o.created_at) >= thisMonth);
+
       const stats = {
         totalOrders: orders.length,
         totalRevenue: orders.reduce((sum, o) => sum + o.total, 0),
         pendingOrders: orders.filter((o) => o.status === "pending").length,
         completedOrders: orders.filter((o) => o.status === "delivered").length,
-        thisMonthRevenue: orders
-          .filter((o) => new Date(o.created_at) >= thisMonth)
-          .reduce((sum, o) => sum + o.total, 0),
+        thisMonthRevenue: thisMonthOrders.reduce((sum, o) => sum + o.total, 0),
+        thisMonthOrders: thisMonthOrders.length,
         lastMonthRevenue: orders
           .filter((o) => {
             const date = new Date(o.created_at);
