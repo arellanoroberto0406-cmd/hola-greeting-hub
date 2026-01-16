@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, ShoppingCart, Menu, X, ChevronDown } from "lucide-react";
+import { Heart, ShoppingCart, Menu, X, ChevronDown, Store } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
@@ -33,8 +33,16 @@ const Header = () => {
             className="flex items-center gap-3 cursor-pointer group"
             onClick={() => navigate("/")}
           >
+            {/* Icon */}
             <div className="relative">
-              <h1 className="font-display text-2xl sm:text-3xl tracking-wider text-primary transition-all duration-500 group-hover:scale-105">
+              <div className="absolute inset-0 bg-primary/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="relative h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/25 group-hover:shadow-primary/40 transition-all duration-300 group-hover:scale-105">
+                <Store className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+              </div>
+            </div>
+            {/* Text */}
+            <div className="relative">
+              <h1 className="font-display text-xl sm:text-2xl tracking-wider text-primary transition-all duration-500 group-hover:scale-105">
                 APP TIENDA
               </h1>
               <p className="text-[10px] text-muted-foreground tracking-widest uppercase">Tu Tienda Online</p>
