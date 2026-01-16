@@ -34,6 +34,8 @@ import { useUnreadCount } from "@/hooks/useChat";
 import { Badge } from "@/components/ui/badge";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import PlanLimitsCard from "@/components/dashboard/PlanLimitsCard";
+import { useStoreOrdersStats } from "@/hooks/useStoreOrders";
 import { motion } from "framer-motion";
 
 const Dashboard = () => {
@@ -44,6 +46,7 @@ const Dashboard = () => {
   const { data: store, isLoading: storeLoading, refetch: refetchStore } = useMyStore(user?.id);
   const { data: products, isLoading: productsLoading, refetch: refetchProducts } = useStoreProducts(store?.id);
   const { data: unreadCount = 0 } = useUnreadCount(store?.id);
+  const { data: orderStats } = useStoreOrdersStats(store?.id);
   const createStore = useCreateStore();
   const updateStore = useUpdateStore();
   const { uploadImage, uploading } = useImageUpload();
@@ -829,7 +832,7 @@ const Dashboard = () => {
             </TabsContent>
 
             <TabsContent value="subscription">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div className="flex items-center gap-2">
                   <h2 className="text-2xl font-heading">Mi Suscripción</h2>
                   <Tooltip>
@@ -844,7 +847,26 @@ const Dashboard = () => {
                     </TooltipContent>
                   </Tooltip>
                 </div>
-                <SubscriptionPanel storeId={store.id} primaryColor={store.primary_color} />
+                
+                {/* Plan Limits Card */}
+                <PlanLimitsCard
+                  storeId={store.id}
+                  productCount={products?.length || 0}
+                  orderCount={orderStats?.thisMonthOrders || 0}
+                  primaryColor={store.primary_color}
+                  onUpgrade={() => {
+                    // Scroll to plans section
+                    const plansSection = document.querySelector('[data-plans-section]');
+                    if (plansSection) {
+                      plansSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
+                />
+                
+                {/* Plans Section */}
+                <div data-plans-section>
+                  <SubscriptionPanel storeId={store.id} primaryColor={store.primary_color} />
+                </div>
               </div>
             </TabsContent>
 
