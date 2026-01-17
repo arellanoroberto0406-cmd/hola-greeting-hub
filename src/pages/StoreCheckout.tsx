@@ -80,6 +80,11 @@ const StoreCheckout = () => {
   const [orderComplete, setOrderComplete] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failure' | 'pending' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [completedOrder, setCompletedOrder] = useState<{
+    id: string;
+    paymentMethod: string;
+    total: number;
+  } | null>(null);
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
   const { createPreference, isProcessing: isMPProcessing } = useMercadoPagoPayment();
@@ -195,6 +200,17 @@ const StoreCheckout = () => {
 
       // Handle MercadoPago payment
       if (data.paymentMethod === 'mercadopago') {
+        // Check if store has MercadoPago configured
+        if (!store.mercadopago_access_token) {
+          toast({
+            title: "MercadoPago no configurado",
+            description: "Esta tienda no tiene MercadoPago configurado. Por favor selecciona otro método de pago.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
         const mpItems = items.map(item => ({
           title: item.name,
           quantity: item.quantity,
@@ -225,14 +241,21 @@ const StoreCheckout = () => {
         return;
       }
 
+      // For card, transfer, cash, paypal - show order confirmation with payment instructions
+      setCompletedOrder({
+        id: order.id,
+        paymentMethod: data.paymentMethod,
+        total: finalTotal,
+      });
       setOrderComplete(true);
       clearCart();
 
       toast({
         title: "¡Pedido realizado!",
-        description: "Recibirás un correo con los detalles de tu pedido.",
+        description: "Tu pedido ha sido registrado correctamente.",
       });
     } catch (error: any) {
+      console.error('Order error:', error);
       toast({
         title: "Error al procesar pedido",
         description: error.message || "Por favor intenta de nuevo.",
@@ -370,6 +393,8 @@ const StoreCheckout = () => {
   }
 
   if (orderComplete) {
+    const bankInfo = store.bank_info as BankInfo | null;
+    
     return (
       <div className="min-h-screen bg-background">
         <header 
@@ -385,28 +410,150 @@ const StoreCheckout = () => {
             <span className="font-heading text-lg" style={{ color: primaryColor }}>{store.name}</span>
           </div>
         </header>
-        <div className="container mx-auto px-4 py-20">
-          <div className="max-w-lg mx-auto text-center animate-fade-in">
-            <div 
-              className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
-              style={{ backgroundColor: `${primaryColor}20` }}
-            >
-              <CheckCircle2 className="w-10 h-10" style={{ color: primaryColor }} />
-            </div>
-            <h1 className="text-4xl font-heading mb-4">¡Gracias por tu compra!</h1>
-            <p className="text-muted-foreground mb-8">
-              Tu pedido ha sido recibido. Te enviaremos un correo con los detalles y seguimiento de tu envío.
-            </p>
-            {store.phone && (
-              <p className="text-sm text-muted-foreground mb-4">
-                ¿Dudas? Contáctanos: {store.phone}
+        <div className="container mx-auto px-4 py-12">
+          <div className="max-w-2xl mx-auto animate-fade-in">
+            <div className="text-center mb-8">
+              <div 
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+                style={{ backgroundColor: `${primaryColor}20` }}
+              >
+                <CheckCircle2 className="w-10 h-10" style={{ color: primaryColor }} />
+              </div>
+              <h1 className="text-4xl font-heading mb-4">¡Gracias por tu compra!</h1>
+              <p className="text-muted-foreground">
+                Tu pedido ha sido registrado correctamente.
               </p>
+              {completedOrder && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  Número de pedido: <span className="font-mono font-semibold">{completedOrder.id.slice(0, 8).toUpperCase()}</span>
+                </p>
+              )}
+            </div>
+
+            {/* Payment Instructions based on method */}
+            {completedOrder && (
+              <div className="bg-card rounded-xl p-6 border border-border/50 mb-8">
+                {completedOrder.paymentMethod === 'transfer' && (
+                  <>
+                    <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
+                      <Building2 className="w-5 h-5" style={{ color: primaryColor }} />
+                      Instrucciones de Pago - Transferencia
+                    </h2>
+                    <p className="text-muted-foreground mb-4">
+                      Realiza tu pago por transferencia bancaria con los siguientes datos:
+                    </p>
+                    {bankInfo ? (
+                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                        {bankInfo.bank_name && (
+                          <p><span className="text-muted-foreground">Banco:</span> <span className="font-semibold">{bankInfo.bank_name}</span></p>
+                        )}
+                        {bankInfo.account_holder && (
+                          <p><span className="text-muted-foreground">Titular:</span> <span className="font-semibold">{bankInfo.account_holder}</span></p>
+                        )}
+                        {bankInfo.clabe && (
+                          <p><span className="text-muted-foreground">CLABE:</span> <span className="font-mono font-semibold">{bankInfo.clabe}</span></p>
+                        )}
+                        {bankInfo.account_number && (
+                          <p><span className="text-muted-foreground">Número de cuenta:</span> <span className="font-mono font-semibold">{bankInfo.account_number}</span></p>
+                        )}
+                        <Separator className="my-3" />
+                        <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                        <p><span className="text-muted-foreground">Referencia:</span> <span className="font-mono font-semibold">{completedOrder.id.slice(0, 8).toUpperCase()}</span></p>
+                      </div>
+                    ) : (
+                      <div className="bg-muted/50 rounded-lg p-4">
+                        <p className="text-muted-foreground">
+                          El vendedor te contactará con los datos bancarios para realizar el pago.
+                        </p>
+                        <Separator className="my-3" />
+                        <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                      </div>
+                    )}
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Una vez realizado el pago, envía tu comprobante para agilizar el proceso.
+                    </p>
+                  </>
+                )}
+
+                {completedOrder.paymentMethod === 'cash' && (
+                  <>
+                    <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
+                      <Banknote className="w-5 h-5" style={{ color: primaryColor }} />
+                      Pago en Efectivo
+                    </h2>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-muted-foreground mb-4">
+                        {store.cash_instructions || "Realizarás el pago en efectivo al momento de recibir tu pedido."}
+                      </p>
+                      <Separator className="my-3" />
+                      <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-4">
+                      Te contactaremos para coordinar la entrega.
+                    </p>
+                  </>
+                )}
+
+                {completedOrder.paymentMethod === 'card' && (
+                  <>
+                    <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
+                      <CreditCard className="w-5 h-5" style={{ color: primaryColor }} />
+                      Pago con Tarjeta
+                    </h2>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-muted-foreground mb-4">
+                        Tu pedido ha sido registrado. El vendedor te contactará para coordinar el pago con tarjeta.
+                      </p>
+                      <Separator className="my-3" />
+                      <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                    </div>
+                  </>
+                )}
+
+                {completedOrder.paymentMethod === 'paypal' && (
+                  <>
+                    <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
+                      <Wallet className="w-5 h-5" style={{ color: primaryColor }} />
+                      Pago con PayPal
+                    </h2>
+                    <div className="bg-muted/50 rounded-lg p-4">
+                      <p className="text-muted-foreground mb-4">
+                        Tu pedido ha sido registrado. El vendedor te contactará con el link de pago de PayPal.
+                      </p>
+                      <Separator className="my-3" />
+                      <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                    </div>
+                  </>
+                )}
+              </div>
             )}
-            <Link to={`/tienda/${slug}`}>
-              <Button size="lg" style={{ backgroundColor: primaryColor }}>
-                Seguir comprando
-              </Button>
-            </Link>
+
+            {/* Contact info */}
+            <div className="text-center">
+              {store.phone && (
+                <p className="text-sm text-muted-foreground mb-2">
+                  ¿Dudas? Contáctanos: <a href={`tel:${store.phone}`} className="font-semibold hover:underline" style={{ color: primaryColor }}>{store.phone}</a>
+                </p>
+              )}
+              {store.whatsapp_number && (
+                <a 
+                  href={`https://wa.me/${store.whatsapp_number.replace(/\D/g, '')}?text=Hola! Acabo de realizar el pedido ${completedOrder?.id.slice(0, 8).toUpperCase() || ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white mb-4"
+                  style={{ backgroundColor: '#25D366' }}
+                >
+                  Contactar por WhatsApp
+                </a>
+              )}
+              <div className="mt-4">
+                <Link to={`/tienda/${slug}`}>
+                  <Button size="lg" style={{ backgroundColor: primaryColor }}>
+                    Seguir comprando
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
       </div>
