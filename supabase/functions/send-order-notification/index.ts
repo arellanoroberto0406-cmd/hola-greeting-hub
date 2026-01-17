@@ -19,7 +19,6 @@ interface OrderNotificationRequest {
   store_email: string;
   store_logo?: string;
   primary_color?: string;
-  whatsapp_number?: string;
   customer: {
     first_name: string;
     last_name: string;
@@ -37,7 +36,6 @@ interface OrderNotificationRequest {
   payment_method: string;
   notify_store?: boolean;
   notify_customer?: boolean;
-  notify_whatsapp?: boolean;
 }
 
 const getPaymentMethodLabel = (method: string) => {
@@ -45,8 +43,6 @@ const getPaymentMethodLabel = (method: string) => {
     case 'cash': return 'Efectivo';
     case 'card': return 'Tarjeta';
     case 'transfer': return 'Transferencia';
-    case 'paypal': return 'PayPal';
-    case 'mercadopago': return 'MercadoPago';
     default: return method.startsWith('mercadopago') ? 'MercadoPago' : method;
   }
 };
@@ -64,93 +60,6 @@ const generateOrderItemsHTML = (items: OrderItem[], primaryColor: string) => {
     </tr>
   `).join('');
 };
-
-// Generate WhatsApp message for store owner
-const generateWhatsAppMessage = (data: OrderNotificationRequest): string => {
-  const orderNumber = data.order_id.slice(0, 8).toUpperCase();
-  const itemsList = data.items.map(item => 
-    `• ${item.product_name}${item.selected_color ? ` (${item.selected_color})` : ''} x${item.quantity} - $${(item.quantity * item.price).toFixed(2)}`
-  ).join('\n');
-
-  return `🛒 *NUEVO PEDIDO #${orderNumber}*
-
-👤 *Cliente:*
-${data.customer.first_name} ${data.customer.last_name}
-📱 ${data.customer.phone}
-📧 ${data.customer.email}
-
-📍 *Dirección de envío:*
-${data.customer.address}
-${data.customer.city}, ${data.customer.state}
-CP: ${data.customer.zip_code}
-
-📦 *Productos:*
-${itemsList}
-
-💰 *Resumen:*
-Subtotal: $${data.subtotal.toFixed(2)}
-Envío: $${data.shipping_cost.toFixed(2)}
-*TOTAL: $${data.total.toFixed(2)}*
-
-💳 Método de pago: ${getPaymentMethodLabel(data.payment_method)}
-
-⏰ ${new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' })}`;
-};
-
-// Send WhatsApp notification using CallMeBot API (free service for WhatsApp notifications)
-async function sendWhatsAppNotification(phoneNumber: string, message: string, apiKey?: string): Promise<{ success: boolean; error?: string }> {
-  try {
-    // Clean phone number - remove spaces, dashes, and ensure it starts with country code
-    let cleanPhone = phoneNumber.replace(/[\s\-\(\)]/g, '');
-    
-    // If starts with +, remove it
-    if (cleanPhone.startsWith('+')) {
-      cleanPhone = cleanPhone.substring(1);
-    }
-    
-    // If doesn't start with country code (assuming Mexico 52), add it
-    if (cleanPhone.length === 10) {
-      cleanPhone = '52' + cleanPhone;
-    }
-
-    // Use CallMeBot API if no custom API key provided
-    // Note: CallMeBot requires prior registration - we'll log a message about this
-    if (!apiKey) {
-      console.log('WhatsApp API key not configured. To enable automatic WhatsApp notifications:');
-      console.log('1. Visit https://www.callmebot.com/blog/free-api-whatsapp-messages/');
-      console.log('2. Follow the registration process');
-      console.log('3. Add your CALLMEBOT_API_KEY as a secret');
-      
-      // Return success but indicate it wasn't actually sent
-      return { 
-        success: false, 
-        error: 'WhatsApp API not configured. Notification logged but not sent.' 
-      };
-    }
-
-    // Encode message for URL
-    const encodedMessage = encodeURIComponent(message);
-    
-    // CallMeBot API endpoint
-    const url = `https://api.callmebot.com/whatsapp.php?phone=${cleanPhone}&text=${encodedMessage}&apikey=${apiKey}`;
-    
-    console.log('Sending WhatsApp notification to:', cleanPhone);
-    
-    const response = await fetch(url);
-    const responseText = await response.text();
-    
-    console.log('CallMeBot response:', responseText);
-    
-    if (response.ok && !responseText.toLowerCase().includes('error')) {
-      return { success: true };
-    } else {
-      return { success: false, error: responseText };
-    }
-  } catch (error: any) {
-    console.error('WhatsApp notification error:', error);
-    return { success: false, error: error.message };
-  }
-}
 
 const generateStoreEmailHTML = (data: OrderNotificationRequest) => {
   const primaryColor = data.primary_color || '#8B4513';
@@ -350,69 +259,48 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
-  const callMeBotApiKey = Deno.env.get("CALLMEBOT_API_KEY");
   
+  if (!resendApiKey) {
+    console.log("RESEND_API_KEY not configured, skipping email notification");
+    return new Response(
+      JSON.stringify({ success: false, message: "Email notifications not configured" }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
+  }
+
   try {
     const data: OrderNotificationRequest = await req.json();
     console.log("Processing order notification for order:", data.order_id);
     
-    const results: { 
-      store?: any; 
-      customer?: any; 
-      whatsapp?: { success: boolean; error?: string } 
-    } = {};
-
-    // Send WhatsApp notification to store owner (if whatsapp number is provided)
-    if (data.notify_whatsapp !== false && data.whatsapp_number) {
-      console.log("Sending WhatsApp notification to store owner:", data.whatsapp_number);
-      const whatsappMessage = generateWhatsAppMessage(data);
-      const whatsappResult = await sendWhatsAppNotification(
-        data.whatsapp_number, 
-        whatsappMessage,
-        callMeBotApiKey
-      );
-      console.log("WhatsApp notification result:", whatsappResult);
-      results.whatsapp = whatsappResult;
-    }
+    const results: { store?: any; customer?: any } = {};
 
     // Send email to store owner
-    if (resendApiKey) {
-      if (data.notify_store !== false && data.store_email) {
-        console.log("Sending notification to store:", data.store_email);
-        try {
-          const storeEmailResponse = await sendEmail(resendApiKey, {
-            from: `${data.store_name} <onboarding@resend.dev>`,
-            to: [data.store_email],
-            subject: `🎉 Nuevo pedido #${data.order_id.slice(0, 8).toUpperCase()} - $${data.total.toFixed(2)}`,
-            html: generateStoreEmailHTML(data),
-          });
-          console.log("Store email sent:", storeEmailResponse);
-          results.store = storeEmailResponse;
-        } catch (emailError: any) {
-          console.error("Failed to send store email:", emailError);
-          results.store = { error: emailError.message };
-        }
-      }
+    if (data.notify_store !== false && data.store_email) {
+      console.log("Sending notification to store:", data.store_email);
+      const storeEmailResponse = await sendEmail(resendApiKey, {
+        from: `${data.store_name} <onboarding@resend.dev>`,
+        to: [data.store_email],
+        subject: `🎉 Nuevo pedido #${data.order_id.slice(0, 8).toUpperCase()} - $${data.total.toFixed(2)}`,
+        html: generateStoreEmailHTML(data),
+      });
+      console.log("Store email sent:", storeEmailResponse);
+      results.store = storeEmailResponse;
+    }
 
-      // Send confirmation email to customer
-      if (data.notify_customer !== false && data.customer.email) {
-        console.log("Sending confirmation to customer:", data.customer.email);
-        try {
-          const customerEmailResponse = await sendEmail(resendApiKey, {
-            from: `${data.store_name} <onboarding@resend.dev>`,
-            to: [data.customer.email],
-            subject: `¡Gracias por tu pedido! #${data.order_id.slice(0, 8).toUpperCase()}`,
-            html: generateCustomerEmailHTML(data),
-          });
-          console.log("Customer email sent:", customerEmailResponse);
-          results.customer = customerEmailResponse;
-        } catch (emailError: any) {
-          console.error("Failed to send customer email:", emailError);
-          results.customer = { error: emailError.message };
-        }
-      }
-    } else {
-      console.log("RESEND_API_KEY not configured, skipping email notifications");
+    // Send confirmation email to customer
+    if (data.notify_customer !== false && data.customer.email) {
+      console.log("Sending confirmation to customer:", data.customer.email);
+      const customerEmailResponse = await sendEmail(resendApiKey, {
+        from: `${data.store_name} <onboarding@resend.dev>`,
+        to: [data.customer.email],
+        subject: `¡Gracias por tu pedido! #${data.order_id.slice(0, 8).toUpperCase()}`,
+        html: generateCustomerEmailHTML(data),
+      });
+      console.log("Customer email sent:", customerEmailResponse);
+      results.customer = customerEmailResponse;
     }
 
     return new Response(JSON.stringify({ success: true, results }), {
