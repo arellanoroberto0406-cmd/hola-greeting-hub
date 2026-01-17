@@ -241,6 +241,46 @@ const StoreCheckout = () => {
         return;
       }
 
+      // Send order notification (email + WhatsApp) to store owner
+      // Do this in background - don't block the UI
+      supabase.functions.invoke('send-order-notification', {
+        body: {
+          order_id: order.id,
+          store_name: store.name,
+          store_email: store.email,
+          store_logo: store.logo_url,
+          primary_color: store.primary_color,
+          whatsapp_number: store.whatsapp_number,
+          customer: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            email: data.email,
+            phone: data.phone,
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zip_code: data.zipCode,
+          },
+          items: items.map(item => ({
+            product_name: item.name,
+            quantity: item.quantity,
+            price: item.price,
+            selected_color: item.selectedColor,
+          })),
+          subtotal: totalPrice,
+          shipping_cost: shippingCost,
+          total: finalTotal,
+          payment_method: data.paymentMethod,
+          notify_store: true,
+          notify_customer: true,
+          notify_whatsapp: true,
+        },
+      }).then(response => {
+        console.log('Notification sent:', response);
+      }).catch(err => {
+        console.error('Failed to send notification:', err);
+      });
+
       // For card, transfer, cash, paypal - show order confirmation with payment instructions
       setCompletedOrder({
         id: order.id,
