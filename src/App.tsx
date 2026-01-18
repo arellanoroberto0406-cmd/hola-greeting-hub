@@ -34,8 +34,9 @@ const App = () => (
               <PWAInstallPrompt />
               <BrowserRouter>
                 <Routes>
-                  <Route path="/" element={<Index />} />
+                  <Route path="/" element={<Auth />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/inicio" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/tienda/:slug" element={<StoreFront />} />
                   <Route path="/tienda/:slug/checkout" element={<StoreCheckout />} />
