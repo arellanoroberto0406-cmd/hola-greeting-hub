@@ -19,6 +19,7 @@ interface OrderNotificationRequest {
   store_email: string;
   store_logo?: string;
   primary_color?: string;
+  whatsapp_number?: string;
   customer: {
     first_name: string;
     last_name: string;
@@ -36,6 +37,7 @@ interface OrderNotificationRequest {
   payment_method: string;
   notify_store?: boolean;
   notify_customer?: boolean;
+  notify_whatsapp?: boolean;
 }
 
 const getPaymentMethodLabel = (method: string) => {
@@ -229,6 +231,60 @@ const generateCustomerEmailHTML = (data: OrderNotificationRequest) => {
   `;
 };
 
+// Generate WhatsApp message for store notification
+const generateWhatsAppMessage = (data: OrderNotificationRequest) => {
+  const orderId = data.order_id.slice(0, 8).toUpperCase();
+  const itemsList = data.items.map(item => 
+    `• ${item.product_name} x${item.quantity} - $${(item.quantity * item.price).toFixed(2)}${item.selected_color ? ` (${item.selected_color})` : ''}`
+  ).join('\n');
+  
+  const message = `🎉 *¡NUEVO PEDIDO!*
+
+📦 *Pedido #${orderId}*
+
+👤 *Cliente:*
+${data.customer.first_name} ${data.customer.last_name}
+📱 ${data.customer.phone}
+📧 ${data.customer.email}
+
+📍 *Dirección de envío:*
+${data.customer.address}
+${data.customer.city}, ${data.customer.state}
+CP: ${data.customer.zip_code}
+
+🛒 *Productos:*
+${itemsList}
+
+💰 *Resumen:*
+Subtotal: $${data.subtotal.toFixed(2)}
+Envío: $${data.shipping_cost.toFixed(2)}
+*TOTAL: $${data.total.toFixed(2)}*
+
+💳 *Método de pago:* ${getPaymentMethodLabel(data.payment_method)}
+
+¡Revisa tu panel de control para gestionar este pedido!`;
+
+  return message;
+};
+
+// Clean phone number for WhatsApp
+const cleanPhoneNumber = (phone: string): string => {
+  // Remove all non-numeric characters
+  let cleaned = phone.replace(/\D/g, '');
+  
+  // If starts with 0, remove it
+  if (cleaned.startsWith('0')) {
+    cleaned = cleaned.substring(1);
+  }
+  
+  // If doesn't start with country code, assume Mexico (+52)
+  if (cleaned.length === 10) {
+    cleaned = '52' + cleaned;
+  }
+  
+  return cleaned;
+};
+
 async function sendEmail(apiKey: string, params: {
   from: string;
   to: string[];
@@ -260,47 +316,62 @@ const handler = async (req: Request): Promise<Response> => {
 
   const resendApiKey = Deno.env.get("RESEND_API_KEY");
   
-  if (!resendApiKey) {
-    console.log("RESEND_API_KEY not configured, skipping email notification");
-    return new Response(
-      JSON.stringify({ success: false, message: "Email notifications not configured" }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
-  }
-
   try {
     const data: OrderNotificationRequest = await req.json();
     console.log("Processing order notification for order:", data.order_id);
     
-    const results: { store?: any; customer?: any } = {};
+    const results: { store?: any; customer?: any; whatsapp?: any } = {};
 
-    // Send email to store owner
-    if (data.notify_store !== false && data.store_email) {
+    // Send email to store owner (if Resend API key is configured)
+    if (resendApiKey && data.notify_store !== false && data.store_email) {
       console.log("Sending notification to store:", data.store_email);
-      const storeEmailResponse = await sendEmail(resendApiKey, {
-        from: `${data.store_name} <onboarding@resend.dev>`,
-        to: [data.store_email],
-        subject: `🎉 Nuevo pedido #${data.order_id.slice(0, 8).toUpperCase()} - $${data.total.toFixed(2)}`,
-        html: generateStoreEmailHTML(data),
-      });
-      console.log("Store email sent:", storeEmailResponse);
-      results.store = storeEmailResponse;
+      try {
+        const storeEmailResponse = await sendEmail(resendApiKey, {
+          from: `${data.store_name} <onboarding@resend.dev>`,
+          to: [data.store_email],
+          subject: `🎉 Nuevo pedido #${data.order_id.slice(0, 8).toUpperCase()} - $${data.total.toFixed(2)}`,
+          html: generateStoreEmailHTML(data),
+        });
+        console.log("Store email sent:", storeEmailResponse);
+        results.store = storeEmailResponse;
+      } catch (emailError: unknown) {
+        console.error("Error sending store email:", emailError);
+        results.store = { error: emailError instanceof Error ? emailError.message : String(emailError) };
+      }
     }
 
-    // Send confirmation email to customer
-    if (data.notify_customer !== false && data.customer.email) {
+    // Send confirmation email to customer (if Resend API key is configured)
+    if (resendApiKey && data.notify_customer !== false && data.customer.email) {
       console.log("Sending confirmation to customer:", data.customer.email);
-      const customerEmailResponse = await sendEmail(resendApiKey, {
-        from: `${data.store_name} <onboarding@resend.dev>`,
-        to: [data.customer.email],
-        subject: `¡Gracias por tu pedido! #${data.order_id.slice(0, 8).toUpperCase()}`,
-        html: generateCustomerEmailHTML(data),
-      });
-      console.log("Customer email sent:", customerEmailResponse);
-      results.customer = customerEmailResponse;
+      try {
+        const customerEmailResponse = await sendEmail(resendApiKey, {
+          from: `${data.store_name} <onboarding@resend.dev>`,
+          to: [data.customer.email],
+          subject: `¡Gracias por tu pedido! #${data.order_id.slice(0, 8).toUpperCase()}`,
+          html: generateCustomerEmailHTML(data),
+        });
+        console.log("Customer email sent:", customerEmailResponse);
+        results.customer = customerEmailResponse;
+      } catch (emailError: unknown) {
+        console.error("Error sending customer email:", emailError);
+        results.customer = { error: emailError instanceof Error ? emailError.message : String(emailError) };
+      }
+    }
+
+    // Generate WhatsApp notification URL for the store owner
+    if (data.notify_whatsapp !== false && data.whatsapp_number) {
+      console.log("Generating WhatsApp notification for:", data.whatsapp_number);
+      const cleanedPhone = cleanPhoneNumber(data.whatsapp_number);
+      const message = generateWhatsAppMessage(data);
+      const whatsappUrl = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
+      
+      results.whatsapp = {
+        success: true,
+        phone: cleanedPhone,
+        url: whatsappUrl,
+        message: message,
+      };
+      console.log("WhatsApp URL generated:", whatsappUrl);
     }
 
     return new Response(JSON.stringify({ success: true, results }), {
