@@ -75,7 +75,17 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
   const { planTier } = useStorePlanTier(store?.id);
-  const { items, addItem, removeItem, updateQuantity, totalItems, totalPrice, clearCart } = useCart();
+  const {
+    items,
+    addItem,
+    removeItem,
+    updateQuantity,
+    totalItems,
+    totalPrice,
+    clearCart,
+    storeId,
+    setStoreId,
+  } = useCart();
   const { wishlist, toggleWishlist, isInWishlist } = useWishlist();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -83,6 +93,17 @@ const StoreFront = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const handleAddToCart = (product: Product, color?: string, variant?: any) => {
+    if (!store?.id) return;
+
+    // Asociar el carrito a la tienda actual (si venía de otra tienda, reiniciamos)
+    if (storeId && storeId !== store.id) {
+      clearCart();
+    }
+    setStoreId(store.id);
+    addItem(product, color, variant);
+  };
 
   // Get sections and global styles from layout or use defaults
   const sections = useMemo(() => {
@@ -641,7 +662,7 @@ const StoreFront = () => {
                         store={store}
                         products={allProducts}
                         onProductClick={setSelectedProduct}
-                        onAddToCart={addItem}
+                        onAddToCart={handleAddToCart}
                         onToggleWishlist={toggleWishlist}
                         isInWishlist={isInWishlist}
                       />
@@ -672,7 +693,7 @@ const StoreFront = () => {
                           collections={collections}
                           maxPrice={maxPrice}
                           onProductClick={setSelectedProduct}
-                          onAddToCart={addItem}
+                          onAddToCart={handleAddToCart}
                           onToggleWishlist={toggleWishlist}
                           isInWishlist={isInWishlist}
                           planTier={planTier}
@@ -775,7 +796,7 @@ const StoreFront = () => {
                   collections={collections}
                   maxPrice={maxPrice}
                   onProductClick={setSelectedProduct}
-                  onAddToCart={addItem}
+                  onAddToCart={handleAddToCart}
                   onToggleWishlist={toggleWishlist}
                   isInWishlist={isInWishlist}
                 />
@@ -799,7 +820,7 @@ const StoreFront = () => {
         planTier={planTier}
         isOpen={!!selectedProduct}
         onClose={() => setSelectedProduct(null)}
-        onAddToCart={addItem}
+        onAddToCart={handleAddToCart}
         onToggleWishlist={toggleWishlist}
         isInWishlist={selectedProduct ? isInWishlist(selectedProduct.id) : false}
       />
