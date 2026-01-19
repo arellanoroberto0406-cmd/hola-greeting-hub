@@ -52,9 +52,6 @@ export const useCreateOrder = () => {
         .select()
         .single();
 
-        .select()
-        .single();
-
       if (orderError) throw orderError;
 
       // Create order items
