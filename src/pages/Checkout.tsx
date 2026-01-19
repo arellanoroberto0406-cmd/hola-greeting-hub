@@ -54,7 +54,7 @@ const mexicanStates = [
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, totalPrice, clearCart } = useCart();
+  const { items, totalPrice, clearCart, storeId } = useCart();
   const { toast } = useToast();
   const [orderComplete, setOrderComplete] = useState(false);
   const createOrder = useCreateOrder();
@@ -79,7 +79,17 @@ const Checkout = () => {
 
   const onSubmit = async (data: ShippingForm) => {
     try {
+      if (!storeId) {
+        toast({
+          title: "No se detectó la tienda",
+          description: "Vuelve a la tienda y agrega el producto al carrito nuevamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await createOrder.mutateAsync({
+        storeId,
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,

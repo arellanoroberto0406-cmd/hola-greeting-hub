@@ -118,6 +118,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const clearCart = () => {
     setItems([]);
+    setStoreId(null);
     toast({
       title: "Carrito vacío",
       description: "Se eliminaron todos los productos del carrito",

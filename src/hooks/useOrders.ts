@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/types/product";
 
 interface OrderData {
+  storeId: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -21,6 +22,10 @@ interface OrderData {
 export const useCreateOrder = () => {
   return useMutation({
     mutationFn: async (orderData: OrderData) => {
+      if (!orderData.storeId) {
+        throw new Error("No se detectó la tienda para este pedido.");
+      }
+
       // Get current user if logged in
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -28,6 +33,7 @@ export const useCreateOrder = () => {
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
+          store_id: orderData.storeId,
           user_id: user?.id || null,
           first_name: orderData.firstName,
           last_name: orderData.lastName,
@@ -43,6 +49,9 @@ export const useCreateOrder = () => {
           total: orderData.total,
           status: "pending",
         })
+        .select()
+        .single();
+
         .select()
         .single();
 
