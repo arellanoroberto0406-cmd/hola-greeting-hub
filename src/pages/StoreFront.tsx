@@ -49,6 +49,7 @@ import {
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
 import { PremiumProductModal } from "@/components/store/PremiumProductModal";
 import SectionWrapper from "@/components/store/SectionWrapper";
+import SEOHead from "@/components/SEOHead";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -287,6 +288,9 @@ const StoreFront = () => {
   const shippingCost = store.shipping_cost || 99;
   const freeShippingThreshold = store.free_shipping_threshold || 999;
 
+  // Generate store URL for sharing
+  const storeUrl = `${window.location.origin}/tienda/${slug}`;
+
   return (
     <div 
       className="min-h-screen bg-background"
@@ -294,6 +298,14 @@ const StoreFront = () => {
         fontFamily: 'var(--store-body-font, inherit)',
       }}
     >
+      {/* Dynamic SEO for store */}
+      <SEOHead
+        title={`${store.name} - Tienda Online`}
+        description={store.description || `Visita ${store.name} y descubre nuestros productos exclusivos.`}
+        image={store.logo_url || store.banner_url || "/og-image.png"}
+        url={storeUrl}
+        type="website"
+      />
       {/* Announcement Bar */}
       {(store as any).announcement_active && (store as any).announcement_text && (
         <div 

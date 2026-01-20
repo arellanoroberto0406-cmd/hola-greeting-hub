@@ -49,10 +49,24 @@ const SEOHead = ({
     // Open Graph
     updateMeta("og:title", title);
     updateMeta("og:type", type);
-    if (url) updateMeta("og:url", url);
+    if (url) {
+      updateMeta("og:url", url);
+      // Also update canonical link
+      let canonical = document.querySelector('link[rel="canonical"]');
+      if (!canonical) {
+        canonical = document.createElement("link");
+        canonical.setAttribute("rel", "canonical");
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute("href", url);
+    }
     if (image) {
-      updateMeta("og:image", image);
-      updateMeta("twitter:image", image);
+      // Use absolute URL for images
+      const absoluteImage = image.startsWith('http') ? image : `${window.location.origin}${image}`;
+      updateMeta("og:image", absoluteImage);
+      updateMeta("og:image:width", "1200");
+      updateMeta("og:image:height", "630");
+      updateMeta("twitter:image", absoluteImage);
     }
 
     // Twitter Card
