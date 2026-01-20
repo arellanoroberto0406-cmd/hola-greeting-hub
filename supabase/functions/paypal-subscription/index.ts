@@ -230,7 +230,7 @@ Deno.serve(async (req) => {
         console.log(`Subscription activated for store ${pendingOrder.store_id} until ${subscriptionEnd.toISOString()}`);
 
         // Get the return URL from pending order or use default
-        const baseUrl = (pendingOrder as Record<string, unknown>).return_url as string || 'https://id-preview--c7315b1a-bd1e-43c7-828d-f0b066b72a1c.lovable.app';
+        const baseUrl = (pendingOrder as Record<string, unknown>).return_url as string || Deno.env.get('SITE_URL') || 'https://apptienda.lovable.app';
         const redirectUrl = `${baseUrl}/dashboard?payment=success`;
         
         return new Response(null, {
@@ -248,7 +248,7 @@ Deno.serve(async (req) => {
     if (action === 'cancel') {
       // Get the order ID to find the return URL
       const orderId = url.searchParams.get('token');
-      let redirectUrl = 'https://id-preview--c7315b1a-bd1e-43c7-828d-f0b066b72a1c.lovable.app/dashboard?payment=cancelled';
+      let redirectUrl = `${Deno.env.get('SITE_URL') || 'https://apptienda.lovable.app'}/dashboard?payment=cancelled`;
       
       if (orderId) {
         const { data: pendingOrder } = await supabase
