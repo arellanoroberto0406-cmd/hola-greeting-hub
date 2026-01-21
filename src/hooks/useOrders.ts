@@ -26,6 +26,14 @@ export const useCreateOrder = () => {
         throw new Error("No se detectó la tienda para este pedido.");
       }
 
+      const subtotal = Number(orderData.subtotal);
+      const shippingCost = Number(orderData.shippingCost);
+      const total = Number(orderData.total);
+
+      if (!Number.isFinite(subtotal) || !Number.isFinite(shippingCost) || !Number.isFinite(total)) {
+        throw new Error("Totales inválidos. Por favor recarga e intenta de nuevo.");
+      }
+
       // Get current user if logged in
       const { data: { user } } = await supabase.auth.getUser();
 
@@ -44,9 +52,9 @@ export const useCreateOrder = () => {
           state: orderData.state,
           zip_code: orderData.zipCode,
           payment_method: orderData.paymentMethod,
-          subtotal: orderData.subtotal,
-          shipping_cost: orderData.shippingCost,
-          total: orderData.total,
+          subtotal,
+          shipping_cost: shippingCost,
+          total,
           status: "pending",
         })
         .select()
