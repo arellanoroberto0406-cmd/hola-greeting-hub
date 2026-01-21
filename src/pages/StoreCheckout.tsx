@@ -182,39 +182,46 @@ const StoreCheckout = () => {
         status: data.paymentMethod === 'mercadopago' ? 'awaiting_payment' : 'pending',
       };
 
-      // Create order via backend function (bypasses client-side RLS issues)
-      const { data: created, error: createError } = await supabase.functions.invoke("create-order", {
-        body: {
-          store_id: store.id,
-          customer: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            city: data.city,
-            state: data.state,
-            zip_code: data.zipCode,
-          },
-          payment_method: data.paymentMethod,
-          subtotal,
-          shipping_cost: shipping,
-          total,
-          status: data.paymentMethod === "mercadopago" ? "awaiting_payment" : "pending",
-          items: items.map((item) => ({
-            product_id: item.id.includes("-") ? null : item.id,
-            product_name: item.name,
-            product_image: item.image,
-            selected_color: item.selectedColor || null,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-        },
+      // Create the order with store_id
+      console.log('[checkout] inserting order', {
+        store_id: orderPayload.store_id,
+        user_id: orderPayload.user_id,
+        email: orderPayload.email,
+        first_name: orderPayload.first_name,
+        last_name: orderPayload.last_name,
+        total: orderPayload.total,
+        subtotal: orderPayload.subtotal,
+        shipping_cost: orderPayload.shipping_cost,
+        payment_method: orderPayload.payment_method,
       });
 
-      if (createError) throw createError;
-      const order = created?.order;
-      if (!order?.id) throw new Error("No se pudo crear el pedido");
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert(orderPayload)
+        .select()
+        .single();
+
+      if (orderError) {
+        console.error('[checkout] orders insert error', { orderError, orderPayload });
+        throw orderError;
+      }
+
+      // Create order items
+      const orderItems = items.map((item) => ({
+        order_id: order.id,
+        product_id: item.id.includes("-") ? null : item.id,
+        product_name: item.name,
+        product_image: item.image,
+        selected_color: item.selectedColor || null,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
 
       // Handle MercadoPago payment
       if (data.paymentMethod === 'mercadopago') {
@@ -246,7 +253,7 @@ const StoreCheckout = () => {
 
         await createPreference(
           store.id,
-           order.id,
+          order.id,
           mpItems,
           {
             email: data.email,

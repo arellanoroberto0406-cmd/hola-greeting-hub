@@ -38,38 +38,62 @@ export const useCreateOrder = () => {
       const { data: { user } } = await supabase.auth.getUser();
 
       // Create the order
-      const { data: created, error: createError } = await supabase.functions.invoke("create-order", {
-        body: {
+      console.log('[checkout] inserting order (useOrders)', {
+        store_id: orderData.storeId,
+        user_id: user?.id || null,
+        email: orderData.email,
+        first_name: orderData.firstName,
+        last_name: orderData.lastName,
+        total,
+        subtotal,
+        shipping_cost: shippingCost,
+        payment_method: orderData.paymentMethod,
+      });
+
+      const { data: order, error: orderError } = await supabase
+        .from("orders")
+        .insert({
           store_id: orderData.storeId,
-          customer: {
-            first_name: orderData.firstName,
-            last_name: orderData.lastName,
-            email: orderData.email,
-            phone: orderData.phone,
-            address: orderData.address,
-            city: orderData.city,
-            state: orderData.state,
-            zip_code: orderData.zipCode,
-          },
+          user_id: user?.id || null,
+          first_name: orderData.firstName,
+          last_name: orderData.lastName,
+          email: orderData.email,
+          phone: orderData.phone,
+          address: orderData.address,
+          city: orderData.city,
+          state: orderData.state,
+          zip_code: orderData.zipCode,
           payment_method: orderData.paymentMethod,
           subtotal,
           shipping_cost: shippingCost,
           total,
           status: "pending",
-          items: orderData.items.map((item) => ({
-            product_id: item.id.includes("-") ? null : item.id,
-            product_name: item.name,
-            product_image: item.image,
-            selected_color: item.selectedColor || null,
-            quantity: item.quantity,
-            price: item.price,
-          })),
-        },
-      });
+        })
+        .select()
+        .single();
 
-      if (createError) throw createError;
-      const order = created?.order;
-      if (!order?.id) throw new Error("No se pudo crear el pedido");
+      if (orderError) {
+        console.error('[checkout] orders insert error (useOrders)', { orderError, storeId: orderData.storeId });
+        throw orderError;
+      }
+
+      // Create order items
+      const orderItems = orderData.items.map((item) => ({
+        order_id: order.id,
+        product_id: item.id.includes("-") ? null : item.id, // UUID check
+        product_name: item.name,
+        product_image: item.image,
+        selected_color: item.selectedColor || null,
+        quantity: item.quantity,
+        price: item.price,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from("order_items")
+        .insert(orderItems);
+
+      if (itemsError) throw itemsError;
+
       return order;
     },
   });
