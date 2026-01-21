@@ -156,26 +156,36 @@ const StoreCheckout = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
 
+      const subtotal = Number(totalPrice);
+      const shipping = Number(shippingCost);
+      const total = Number(finalTotal);
+
+      if (!Number.isFinite(subtotal) || !Number.isFinite(shipping) || !Number.isFinite(total)) {
+        throw new Error("Totales inválidos. Por favor recarga e intenta de nuevo.");
+      }
+
+      const orderPayload = {
+        store_id: store.id,
+        user_id: user?.id || null,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        address: data.address,
+        city: data.city,
+        state: data.state,
+        zip_code: data.zipCode,
+        payment_method: data.paymentMethod,
+        subtotal,
+        shipping_cost: shipping,
+        total,
+        status: data.paymentMethod === 'mercadopago' ? 'awaiting_payment' : 'pending',
+      };
+
       // Create the order with store_id
       const { data: order, error: orderError } = await supabase
         .from("orders")
-        .insert({
-          store_id: store.id,
-          user_id: user?.id || null,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          zip_code: data.zipCode,
-          payment_method: data.paymentMethod,
-          subtotal: totalPrice,
-          shipping_cost: shippingCost,
-          total: finalTotal,
-          status: data.paymentMethod === 'mercadopago' ? 'awaiting_payment' : 'pending',
-        })
+        .insert(orderPayload)
         .select()
         .single();
 
@@ -306,7 +316,7 @@ const StoreCheckout = () => {
       console.error('Order error:', error);
       toast({
         title: "Error al procesar pedido",
-        description: error.message || "Por favor intenta de nuevo.",
+        description: error?.message || error?.details || "Por favor intenta de nuevo.",
         variant: "destructive",
       });
     } finally {
