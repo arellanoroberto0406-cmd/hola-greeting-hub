@@ -38,6 +38,18 @@ export const useCreateOrder = () => {
       const { data: { user } } = await supabase.auth.getUser();
 
       // Create the order
+      console.log('[checkout] inserting order (useOrders)', {
+        store_id: orderData.storeId,
+        user_id: user?.id || null,
+        email: orderData.email,
+        first_name: orderData.firstName,
+        last_name: orderData.lastName,
+        total,
+        subtotal,
+        shipping_cost: shippingCost,
+        payment_method: orderData.paymentMethod,
+      });
+
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert({
@@ -60,7 +72,10 @@ export const useCreateOrder = () => {
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error('[checkout] orders insert error (useOrders)', { orderError, storeId: orderData.storeId });
+        throw orderError;
+      }
 
       // Create order items
       const orderItems = orderData.items.map((item) => ({

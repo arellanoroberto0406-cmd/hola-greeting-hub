@@ -183,13 +183,28 @@ const StoreCheckout = () => {
       };
 
       // Create the order with store_id
+      console.log('[checkout] inserting order', {
+        store_id: orderPayload.store_id,
+        user_id: orderPayload.user_id,
+        email: orderPayload.email,
+        first_name: orderPayload.first_name,
+        last_name: orderPayload.last_name,
+        total: orderPayload.total,
+        subtotal: orderPayload.subtotal,
+        shipping_cost: orderPayload.shipping_cost,
+        payment_method: orderPayload.payment_method,
+      });
+
       const { data: order, error: orderError } = await supabase
         .from("orders")
         .insert(orderPayload)
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error('[checkout] orders insert error', { orderError, orderPayload });
+        throw orderError;
+      }
 
       // Create order items
       const orderItems = items.map((item) => ({
@@ -316,7 +331,11 @@ const StoreCheckout = () => {
       console.error('Order error:', error);
       toast({
         title: "Error al procesar pedido",
-        description: error?.message || error?.details || "Por favor intenta de nuevo.",
+        description:
+          error?.message ||
+          error?.details ||
+          error?.hint ||
+          (typeof error === 'string' ? error : "Por favor intenta de nuevo."),
         variant: "destructive",
       });
     } finally {
