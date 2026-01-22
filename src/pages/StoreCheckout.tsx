@@ -195,33 +195,34 @@ const StoreCheckout = () => {
         payment_method: orderPayload.payment_method,
       });
 
-      const { data: order, error: orderError } = await supabase
-        .from("orders")
-        .insert(orderPayload)
-        .select()
-        .single();
+       const { data: createOrderRes, error: createOrderInvokeError } = await supabase.functions.invoke(
+         "create-order",
+         {
+           body: {
+             ...orderPayload,
+             items: items.map((item) => ({
+               product_id: item.id.includes("-") ? null : item.id,
+               product_name: item.name,
+               product_image: item.image,
+               selected_color: item.selectedColor || null,
+               quantity: item.quantity,
+               price: item.price,
+             })),
+           },
+         },
+       );
 
-      if (orderError) {
-        console.error('[checkout] orders insert error', { orderError, orderPayload });
-        throw orderError;
-      }
+       if (createOrderInvokeError) {
+         console.error("[checkout] create-order invoke error", { createOrderInvokeError, orderPayload });
+         throw createOrderInvokeError;
+       }
 
-      // Create order items
-      const orderItems = items.map((item) => ({
-        order_id: order.id,
-        product_id: item.id.includes("-") ? null : item.id,
-        product_name: item.name,
-        product_image: item.image,
-        selected_color: item.selectedColor || null,
-        quantity: item.quantity,
-        price: item.price,
-      }));
+       if (!createOrderRes?.success || !createOrderRes?.order?.id) {
+         console.error("[checkout] create-order unexpected response", createOrderRes);
+         throw new Error(createOrderRes?.error || "No se pudo crear el pedido");
+       }
 
-      const { error: itemsError } = await supabase
-        .from("order_items")
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
+       const order = createOrderRes.order as { id: string };
 
       // Handle MercadoPago payment
       if (data.paymentMethod === 'mercadopago') {
@@ -315,11 +316,11 @@ const StoreCheckout = () => {
       }
 
       // For card, transfer, cash, paypal - show order confirmation with payment instructions
-      setCompletedOrder({
-        id: order.id,
-        paymentMethod: data.paymentMethod,
-        total: finalTotal,
-      });
+       setCompletedOrder({
+         id: order.id,
+         paymentMethod: data.paymentMethod,
+         total: finalTotal,
+       });
       setOrderComplete(true);
       clearCart();
 
