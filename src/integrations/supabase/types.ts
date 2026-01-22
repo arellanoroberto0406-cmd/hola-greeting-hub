@@ -1167,7 +1167,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      order_exists: { Args: { _order_id: string }; Returns: boolean }
+      order_exists:
+        | {
+            Args: { _order_id: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.order_exists(_order_id => text), public.order_exists(_order_id => uuid). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
+        | {
+            Args: { _order_id: string }
+            Returns: {
+              error: true
+            } & "Could not choose the best candidate function between: public.order_exists(_order_id => text), public.order_exists(_order_id => uuid). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
+          }
     }
     Enums: {
       [_ in never]: never
