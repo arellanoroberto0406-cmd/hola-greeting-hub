@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { useStoreLayout, useSaveStoreLayout } from "@/hooks/useStoreLayout";
-import { StoreSection, GlobalStyles, DEFAULT_SECTIONS, DEFAULT_GLOBAL_STYLES } from "@/types/storeLayout";
+import { StoreSection, GlobalStyles, DEFAULT_SECTIONS, DEFAULT_GLOBAL_STYLES, SECTION_CONFIGS, getSectionsWithAvailability, canUseSectionType } from "@/types/storeLayout";
 import { Store } from "@/types/store";
 import { SortableSection } from "./store-editor/SortableSection";
 import { SectionSettingsDialog } from "./store-editor/SectionSettingsDialog";
@@ -26,6 +26,9 @@ import TemplatesPanel from "./store-editor/TemplatesPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useStorePlanTier } from "@/hooks/useStorePlanTier";
+import { useToast } from "@/hooks/use-toast";
 import { 
   Loader2, 
   Save, 
@@ -42,7 +45,9 @@ import {
   LayoutTemplate,
   ArrowLeftRight,
   X,
-  Check
+  Check,
+  Lock,
+  Crown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -58,25 +63,11 @@ interface StoreEditorPanelProps {
   store: Store;
 }
 
-const availableSectionTypes: { type: SectionType; label: string }[] = [
-  { type: 'hero', label: 'Banner Principal' },
-  { type: 'featured_products', label: 'Productos Destacados' },
-  { type: 'categories', label: 'Categorías' },
-  { type: 'banner', label: 'Banner Promocional' },
-  { type: 'products_grid', label: 'Grilla de Productos' },
-  { type: 'newsletter', label: 'Newsletter' },
-  { type: 'about', label: 'Sobre Nosotros' },
-  { type: 'contact', label: 'Contacto' },
-  { type: 'testimonials', label: 'Testimonios' },
-  { type: 'image_slider', label: 'Slider de Imágenes' },
-  { type: 'video', label: 'Video de Presentación' },
-  { type: 'faq', label: 'Preguntas Frecuentes' },
-  { type: 'custom_text', label: 'Texto Personalizado' },
-];
-
 const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const { data: layout, isLoading } = useStoreLayout(store.id);
   const saveLayout = useSaveStoreLayout();
+  const { planTier } = useStorePlanTier(store.id);
+  const { toast } = useToast();
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
@@ -84,6 +75,8 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [hasChanges, setHasChanges] = useState(false);
+  
+  const sectionsWithAvailability = getSectionsWithAvailability(planTier);
   const [showLivePreview, setShowLivePreview] = useState(true);
   const [templatePreview, setTemplatePreview] = useState<{
     globalStyles: GlobalStyles;
@@ -406,15 +399,37 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                         Activa, desactiva y reordena las secciones de tu tienda
                       </CardDescription>
                     </div>
-                    <Select onValueChange={(value) => handleAddSection(value as SectionType)}>
-                      <SelectTrigger className="w-[180px]">
+                    <Select onValueChange={(value) => {
+                      const section = sectionsWithAvailability.find(s => s.type === value);
+                      if (section && !section.available) {
+                        toast({
+                          title: "Sección bloqueada",
+                          description: `Esta sección requiere el plan ${section.requiredPlan === 'professional' ? 'Profesional' : 'Empresarial'}. Actualiza tu suscripción para desbloquearla.`,
+                          variant: "destructive",
+                        });
+                        return;
+                      }
+                      handleAddSection(value as SectionType);
+                    }}>
+                      <SelectTrigger className="w-[220px]">
                         <Plus className="h-4 w-4 mr-2" />
                         <SelectValue placeholder="Agregar sección" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {availableSectionTypes.map((item) => (
-                          <SelectItem key={item.type} value={item.type}>
-                            {item.label}
+                      <SelectContent className="max-h-[400px]">
+                        {sectionsWithAvailability.map((item) => (
+                          <SelectItem 
+                            key={item.type} 
+                            value={item.type}
+                            className={!item.available ? 'opacity-60' : ''}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span>{item.icon}</span>
+                              <span>{item.label}</span>
+                              {!item.available && <Lock className="h-3 w-3 text-muted-foreground" />}
+                              {item.isNew && item.available && (
+                                <Badge variant="secondary" className="text-[10px] px-1 py-0">Nuevo</Badge>
+                              )}
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
