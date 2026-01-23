@@ -390,50 +390,105 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Sections List */}
             <div className="lg:col-span-2 space-y-4">
+              {/* Active Sections */}
               <Card>
                 <CardHeader className="pb-4">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
-                      <CardTitle className="text-lg">Secciones</CardTitle>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Layers className="h-5 w-5" style={{ color: store.primary_color }} />
+                        Secciones Activas
+                      </CardTitle>
                       <CardDescription>
-                        Activa, desactiva y reordena las secciones de tu tienda
+                        Arrastra para reordenar • {sections.filter(s => s.enabled).length} de {sections.length} activas
                       </CardDescription>
                     </div>
-                    <Select onValueChange={(value) => {
-                      const section = sectionsWithAvailability.find(s => s.type === value);
-                      if (section && !section.available) {
-                        toast({
-                          title: "Sección bloqueada",
-                          description: `Esta sección requiere el plan ${section.requiredPlan === 'professional' ? 'Profesional' : 'Empresarial'}. Actualiza tu suscripción para desbloquearla.`,
-                          variant: "destructive",
-                        });
-                        return;
-                      }
-                      handleAddSection(value as SectionType);
-                    }}>
-                      <SelectTrigger className="w-[220px]">
-                        <Plus className="h-4 w-4 mr-2" />
-                        <SelectValue placeholder="Agregar sección" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[400px]">
-                        {sectionsWithAvailability.map((item) => (
-                          <SelectItem 
-                            key={item.type} 
-                            value={item.type}
-                            className={!item.available ? 'opacity-60' : ''}
-                          >
-                            <div className="flex items-center gap-2">
-                              <span>{item.icon}</span>
-                              <span>{item.label}</span>
-                              {!item.available && <Lock className="h-3 w-3 text-muted-foreground" />}
-                              {item.isNew && item.available && (
-                                <Badge variant="secondary" className="text-[10px] px-1 py-0">Nuevo</Badge>
-                              )}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center gap-2">
+                      <Select onValueChange={(value) => {
+                        const section = sectionsWithAvailability.find(s => s.type === value);
+                        if (section && !section.available) {
+                          toast({
+                            title: "Sección bloqueada",
+                            description: `Esta sección requiere el plan ${section.requiredPlan === 'professional' ? 'Profesional' : 'Empresarial'}. Actualiza tu suscripción para desbloquearla.`,
+                            variant: "destructive",
+                          });
+                          return;
+                        }
+                        handleAddSection(value as SectionType);
+                      }}>
+                        <SelectTrigger className="w-[240px]">
+                          <Plus className="h-4 w-4 mr-2" />
+                          <SelectValue placeholder="Agregar sección" />
+                        </SelectTrigger>
+                        <SelectContent className="max-h-[400px]">
+                          {/* Basic Sections */}
+                          <div className="px-2 py-1.5 text-xs font-semibold text-muted-foreground">
+                            Básico
+                          </div>
+                          {sectionsWithAvailability
+                            .filter(s => s.requiredPlan === 'basic')
+                            .map((item) => (
+                              <SelectItem 
+                                key={item.type} 
+                                value={item.type}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base">{item.icon}</span>
+                                  <span>{item.label}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          
+                          {/* Professional Sections */}
+                          <div className="px-2 py-1.5 text-xs font-semibold text-blue-600 flex items-center gap-1 mt-2 border-t pt-2">
+                            <Crown className="h-3 w-3" />
+                            Profesional
+                          </div>
+                          {sectionsWithAvailability
+                            .filter(s => s.requiredPlan === 'professional')
+                            .map((item) => (
+                              <SelectItem 
+                                key={item.type} 
+                                value={item.type}
+                                className={!item.available ? 'opacity-50' : ''}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base">{item.icon}</span>
+                                  <span>{item.label}</span>
+                                  {!item.available && <Lock className="h-3 w-3 text-muted-foreground ml-auto" />}
+                                  {item.isNew && item.available && (
+                                    <Badge variant="secondary" className="text-[9px] px-1 py-0 bg-green-100 text-green-700">Nuevo</Badge>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                          
+                          {/* Enterprise Sections */}
+                          <div className="px-2 py-1.5 text-xs font-semibold text-amber-600 flex items-center gap-1 mt-2 border-t pt-2">
+                            <Crown className="h-3 w-3" />
+                            Empresarial
+                          </div>
+                          {sectionsWithAvailability
+                            .filter(s => s.requiredPlan === 'enterprise')
+                            .map((item) => (
+                              <SelectItem 
+                                key={item.type} 
+                                value={item.type}
+                                className={!item.available ? 'opacity-50' : ''}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-base">{item.icon}</span>
+                                  <span>{item.label}</span>
+                                  {!item.available && <Lock className="h-3 w-3 text-muted-foreground ml-auto" />}
+                                  {item.isNew && item.available && (
+                                    <Badge variant="secondary" className="text-[9px] px-1 py-0 bg-green-100 text-green-700">Nuevo</Badge>
+                                  )}
+                                </div>
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -463,16 +518,52 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                       </div>
                     </SortableContext>
                   </DndContext>
+                  
+                  {sections.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <Layers className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                      <p>No hay secciones configuradas</p>
+                      <p className="text-sm">Usa el botón "Agregar sección" para comenzar</p>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
+              
+              {/* Plan Upgrade Card - Show if user is on basic */}
+              {planTier === 'basic' && (
+                <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <CardContent className="pt-6">
+                    <div className="flex items-start gap-4">
+                      <div className="h-12 w-12 rounded-xl bg-blue-500 flex items-center justify-center flex-shrink-0">
+                        <Crown className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-blue-900">Desbloquea más secciones</h4>
+                        <p className="text-sm text-blue-700 mt-1">
+                          Actualiza a Profesional para acceder a temporizadores, feeds de Instagram, tablas comparativas y más.
+                        </p>
+                        <Button 
+                          size="sm" 
+                          className="mt-3 bg-blue-600 hover:bg-blue-700"
+                        >
+                          Ver planes
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
-            {/* Mini Preview */}
+            {/* Mini Preview & Tips */}
             <div className="space-y-4">
               <Card>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Vista previa</CardTitle>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Eye className="h-5 w-5" style={{ color: store.primary_color }} />
+                      Vista previa
+                    </CardTitle>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -487,6 +578,26 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                 </CardContent>
               </Card>
 
+              {/* Stats Card */}
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-center p-3 rounded-lg bg-muted/50">
+                      <div className="text-2xl font-bold" style={{ color: store.primary_color }}>
+                        {sections.filter(s => s.enabled).length}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Secciones activas</div>
+                    </div>
+                    <div className="text-center p-3 rounded-lg bg-muted/50">
+                      <div className="text-2xl font-bold text-muted-foreground">
+                        {sections.filter(s => !s.enabled).length}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Secciones ocultas</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Tips Card */}
               <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
                 <CardContent className="pt-6">
@@ -498,11 +609,20 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                       <Sparkles className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-medium mb-1">Consejos</h4>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• Arrastra las secciones para reordenarlas</li>
-                        <li>• Usa el interruptor para mostrar/ocultar</li>
-                        <li>• Haz clic en ⚙️ para configurar cada sección</li>
+                      <h4 className="font-medium mb-2">Consejos</h4>
+                      <ul className="text-sm text-muted-foreground space-y-1.5">
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          Arrastra las secciones para reordenarlas
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          Usa el interruptor para mostrar/ocultar
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="text-primary">•</span>
+                          Haz clic en ⋮ para más opciones
+                        </li>
                       </ul>
                     </div>
                   </div>
