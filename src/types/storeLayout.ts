@@ -26,7 +26,8 @@ export type SectionType =
   | 'customer_reviews_carousel'
   | 'product_showcase_3d'
   | 'loyalty_program'
-  | 'live_chat_widget';
+  | 'live_chat_widget'
+  | 'premium_video';
 
 export type FontFamily = 
   | 'inter'
@@ -186,6 +187,7 @@ export const SECTION_CONFIGS: SectionConfig[] = [
   { type: 'product_showcase_3d', label: 'Showcase 3D', description: 'Presentación de producto con efectos 3D', icon: '🎮', requiredPlan: 'enterprise', isPremium: true, isNew: true },
   { type: 'loyalty_program', label: 'Programa de Lealtad', description: 'Widget de puntos y recompensas', icon: '🎁', requiredPlan: 'enterprise', isPremium: true, isNew: true },
   { type: 'live_chat_widget', label: 'Chat en Vivo', description: 'Widget de atención en tiempo real', icon: '💬', requiredPlan: 'enterprise', isPremium: true, isNew: true },
+  { type: 'premium_video', label: 'Video Premium', description: 'Sección de video cinematográfico con múltiples estilos', icon: '🎬', requiredPlan: 'enterprise', isPremium: true, isNew: true },
 ];
 
 // Design Templates

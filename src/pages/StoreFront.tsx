@@ -45,6 +45,7 @@ import {
   ImageSliderSection,
   VideoSection,
   FAQSection,
+  PremiumVideoSection,
 } from "@/components/store/sections";
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
 import { PremiumProductModal } from "@/components/store/PremiumProductModal";
@@ -780,6 +781,17 @@ const StoreFront = () => {
                       <FAQSection
                         section={section}
                         store={store}
+                      />
+                    </SectionWrapper>
+                  );
+
+                case 'premium_video':
+                  return (
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <PremiumVideoSection
+                        section={section}
+                        store={store}
+                        planTier={planTier}
                       />
                     </SectionWrapper>
                   );
