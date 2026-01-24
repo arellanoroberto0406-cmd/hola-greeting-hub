@@ -11,3 +11,6 @@ export { ImageSliderSection } from './ImageSliderSection';
 export { VideoSection } from './VideoSection';
 export { FAQSection } from './FAQSection';
 export { PremiumVideoSection } from './PremiumVideoSection';
+export { ParallaxHeroSection } from './ParallaxHeroSection';
+export { AnimatedStatsSection } from './AnimatedStatsSection';
+export { InteractiveGallerySection } from './InteractiveGallerySection';

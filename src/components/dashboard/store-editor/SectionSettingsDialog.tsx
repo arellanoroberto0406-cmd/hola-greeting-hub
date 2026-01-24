@@ -556,6 +556,207 @@ export const SectionSettingsDialog = ({
           </>
         );
 
+      case 'parallax_hero':
+        return (
+          <>
+            <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <div className="flex items-center gap-2 text-primary">
+                <Crown className="h-4 w-4" />
+                <span className="text-sm font-medium">Hero Parallax Premium</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Título principal</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Experiencia Premium"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtítulo</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Descubre una nueva forma de comprar"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Badge/Etiqueta</Label>
+              <Input
+                value={editedSection.settings.badge || ''}
+                onChange={(e) => updateSetting('badge', e.target.value)}
+                placeholder="ej: Nueva Colección, Exclusivo"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Imagen de fondo (URL)</Label>
+              <Input
+                value={editedSection.settings.backgroundImage || ''}
+                onChange={(e) => updateSetting('backgroundImage', e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Imagen frontal (URL, opcional)</Label>
+              <Input
+                value={editedSection.settings.foregroundImage || ''}
+                onChange={(e) => updateSetting('foregroundImage', e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Mostrar botón</Label>
+              <Switch
+                checked={editedSection.settings.showButton}
+                onCheckedChange={(checked) => updateSetting('showButton', checked)}
+              />
+            </div>
+            {editedSection.settings.showButton && (
+              <>
+                <div className="space-y-2">
+                  <Label>Texto del botón</Label>
+                  <Input
+                    value={editedSection.settings.buttonText || ''}
+                    onChange={(e) => updateSetting('buttonText', e.target.value)}
+                    placeholder="Explorar"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Botón secundario (opcional)</Label>
+                  <Input
+                    value={editedSection.settings.secondaryButtonText || ''}
+                    onChange={(e) => updateSetting('secondaryButtonText', e.target.value)}
+                    placeholder="Ver más"
+                  />
+                </div>
+              </>
+            )}
+            <div className="flex items-center justify-between">
+              <Label>Mostrar badges de confianza</Label>
+              <Switch
+                checked={editedSection.settings.showTrustBadges}
+                onCheckedChange={(checked) => updateSetting('showTrustBadges', checked)}
+              />
+            </div>
+          </>
+        );
+
+      case 'animated_stats':
+        return (
+          <>
+            <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <div className="flex items-center gap-2 text-primary">
+                <Crown className="h-4 w-4" />
+                <span className="text-sm font-medium">Estadísticas Animadas</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Nuestros Números"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtítulo</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Los resultados hablan por sí solos"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Badge/Etiqueta</Label>
+              <Input
+                value={editedSection.settings.badge || ''}
+                onChange={(e) => updateSetting('badge', e.target.value)}
+                placeholder="ej: Estadísticas"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Estilo de diseño</Label>
+              <Select
+                value={editedSection.settings.layoutStyle || 'cards'}
+                onValueChange={(value) => updateSetting('layoutStyle', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="cards">🎴 Tarjetas (con iconos)</SelectItem>
+                  <SelectItem value="minimal">✨ Minimalista (solo números)</SelectItem>
+                  <SelectItem value="banner">🎨 Banner (con fondo de color)</SelectItem>
+                  <SelectItem value="circular">⭕ Circular (con progreso)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Las estadísticas se configuran en la sección avanzada del editor.
+            </p>
+          </>
+        );
+
+      case 'interactive_gallery':
+        return (
+          <>
+            <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <div className="flex items-center gap-2 text-primary">
+                <Crown className="h-4 w-4" />
+                <span className="text-sm font-medium">Galería Interactiva</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Título</Label>
+              <Input
+                value={editedSection.settings.headline || ''}
+                onChange={(e) => updateSetting('headline', e.target.value)}
+                placeholder="Nuestra Galería"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Subtítulo</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Explora nuestras mejores imágenes"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Badge/Etiqueta</Label>
+              <Input
+                value={editedSection.settings.badge || ''}
+                onChange={(e) => updateSetting('badge', e.target.value)}
+                placeholder="ej: Galería"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Estilo de diseño</Label>
+              <Select
+                value={editedSection.settings.layoutStyle || 'masonry'}
+                onValueChange={(value) => updateSetting('layoutStyle', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="masonry">🧱 Masonry (alturas variables)</SelectItem>
+                  <SelectItem value="grid">📐 Grid (tamaños iguales)</SelectItem>
+                  <SelectItem value="carousel">🎠 Carrusel (deslizable)</SelectItem>
+                  <SelectItem value="featured">⭐ Destacado (una grande + pequeñas)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Las imágenes de la galería se configuran en la sección avanzada.
+            </p>
+          </>
+        );
+
       default:
         return null;
     }
