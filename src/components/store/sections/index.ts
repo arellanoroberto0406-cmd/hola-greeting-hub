@@ -10,3 +10,4 @@ export { TestimonialsSection } from './TestimonialsSection';
 export { ImageSliderSection } from './ImageSliderSection';
 export { VideoSection } from './VideoSection';
 export { FAQSection } from './FAQSection';
+export { PremiumVideoSection } from './PremiumVideoSection';

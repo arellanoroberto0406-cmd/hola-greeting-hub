@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Palette, Sparkles, Settings2 } from "lucide-react";
+import { Palette, Sparkles, Settings2, Crown } from "lucide-react";
 
 interface SectionSettingsDialogProps {
   section: StoreSection | null;
@@ -387,8 +387,39 @@ export const SectionSettingsDialog = ({
         );
 
       case 'video':
+      case 'premium_video':
         return (
           <>
+            {editedSection.type === 'premium_video' && (
+              <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+                <div className="flex items-center gap-2 text-primary">
+                  <Crown className="h-4 w-4" />
+                  <span className="text-sm font-medium">Sección Premium Enterprise</span>
+                </div>
+              </div>
+            )}
+            
+            {editedSection.type === 'premium_video' && (
+              <div className="space-y-2">
+                <Label>Estilo de diseño</Label>
+                <Select
+                  value={editedSection.settings.layoutStyle || 'fullwidth'}
+                  onValueChange={(value) => updateSetting('layoutStyle', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="cinematic">🎬 Cinematográfico (Pantalla completa)</SelectItem>
+                    <SelectItem value="split">📐 Dividido (Video + Contenido)</SelectItem>
+                    <SelectItem value="floating">✨ Flotante (Con tarjetas animadas)</SelectItem>
+                    <SelectItem value="fullwidth">📺 Ancho completo (Elegante)</SelectItem>
+                    <SelectItem value="grid">🎞️ Galería (Múltiples videos)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label>Título (opcional)</Label>
               <Input
@@ -405,6 +436,18 @@ export const SectionSettingsDialog = ({
                 placeholder="Conoce nuestra historia"
               />
             </div>
+            
+            {editedSection.type === 'premium_video' && (
+              <div className="space-y-2">
+                <Label>Etiqueta/Badge (opcional)</Label>
+                <Input
+                  value={editedSection.settings.badge || ''}
+                  onChange={(e) => updateSetting('badge', e.target.value)}
+                  placeholder="ej: Nuevo, Exclusivo, Destacado"
+                />
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label>ID de YouTube</Label>
               <Input
@@ -424,6 +467,46 @@ export const SectionSettingsDialog = ({
                 placeholder="https://ejemplo.com/video.mp4"
               />
             </div>
+            
+            {editedSection.type === 'premium_video' && (
+              <>
+                <div className="flex items-center justify-between">
+                  <Label>Mostrar overlay con gradiente</Label>
+                  <Switch
+                    checked={editedSection.settings.showGradientOverlay !== false}
+                    onCheckedChange={(checked) => updateSetting('showGradientOverlay', checked)}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Label>Mostrar tarjetas flotantes</Label>
+                  <Switch
+                    checked={editedSection.settings.floatingCards}
+                    onCheckedChange={(checked) => updateSetting('floatingCards', checked)}
+                  />
+                </div>
+                
+                <div className="flex items-center justify-between">
+                  <Label>Mostrar botón de acción</Label>
+                  <Switch
+                    checked={editedSection.settings.showButton}
+                    onCheckedChange={(checked) => updateSetting('showButton', checked)}
+                  />
+                </div>
+                
+                {editedSection.settings.showButton && (
+                  <div className="space-y-2">
+                    <Label>Texto del botón</Label>
+                    <Input
+                      value={editedSection.settings.buttonText || ''}
+                      onChange={(e) => updateSetting('buttonText', e.target.value)}
+                      placeholder="Ver Colección"
+                    />
+                  </div>
+                )}
+              </>
+            )}
+            
             <div className="flex items-center justify-between">
               <Label>Reproducción automática</Label>
               <Switch
