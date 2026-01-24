@@ -46,6 +46,9 @@ import {
   VideoSection,
   FAQSection,
   PremiumVideoSection,
+  ParallaxHeroSection,
+  AnimatedStatsSection,
+  InteractiveGallerySection,
 } from "@/components/store/sections";
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
 import { PremiumProductModal } from "@/components/store/PremiumProductModal";
@@ -789,6 +792,38 @@ const StoreFront = () => {
                   return (
                     <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
                       <PremiumVideoSection
+                        section={section}
+                        store={store}
+                        planTier={planTier}
+                      />
+                    </SectionWrapper>
+                  );
+
+                case 'parallax_hero':
+                  return (
+                    <ParallaxHeroSection
+                      key={section.id}
+                      section={section}
+                      store={store}
+                      planTier={planTier}
+                    />
+                  );
+
+                case 'animated_stats':
+                  return (
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <AnimatedStatsSection
+                        section={section}
+                        store={store}
+                        planTier={planTier}
+                      />
+                    </SectionWrapper>
+                  );
+
+                case 'interactive_gallery':
+                  return (
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <InteractiveGallerySection
                         section={section}
                         store={store}
                         planTier={planTier}
