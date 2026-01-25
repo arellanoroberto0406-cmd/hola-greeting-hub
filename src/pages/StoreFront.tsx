@@ -681,6 +681,7 @@ const StoreFront = () => {
                         onAddToCart={handleAddToCart}
                         onToggleWishlist={toggleWishlist}
                         isInWishlist={isInWishlist}
+                        planTier={planTier}
                       />
                     </SectionWrapper>
                   ) : null;
