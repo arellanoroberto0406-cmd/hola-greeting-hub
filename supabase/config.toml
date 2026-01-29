@@ -2,3 +2,15 @@ project_id = "njvqehuhhrgabuofnbup"
 
 [functions.mercadopago-payment]
 verify_jwt = false
+
+[functions.paypal-subscription]
+verify_jwt = false
+
+[functions.create-order]
+verify_jwt = false
+
+[functions.send-order-notification]
+verify_jwt = false
+
+[functions.subscription-renewal]
+verify_jwt = false
