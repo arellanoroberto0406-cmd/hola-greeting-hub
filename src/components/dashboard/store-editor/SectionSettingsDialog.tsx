@@ -121,6 +121,76 @@ export const SectionSettingsDialog = ({
         );
 
       case 'featured_products':
+        return (
+          <>
+            <div className="space-y-2">
+              <Label>Subtítulo</Label>
+              <Input
+                value={editedSection.settings.subtitle || ''}
+                onChange={(e) => updateSetting('subtitle', e.target.value)}
+                placeholder="Descubre nuestros productos más populares"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Diseño</Label>
+              <Select
+                value={editedSection.settings.layout || 'grid'}
+                onValueChange={(value) => updateSetting('layout', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="grid">🔲 Cuadrícula</SelectItem>
+                  <SelectItem value="carousel">🎠 Carrusel</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Cantidad de productos ({editedSection.settings.limit || 8})</Label>
+              <Slider
+                value={[editedSection.settings.limit || 8]}
+                onValueChange={([value]) => updateSetting('limit', value)}
+                min={4}
+                max={24}
+                step={4}
+              />
+            </div>
+            {editedSection.settings.layout !== 'carousel' && (
+              <div className="space-y-2">
+                <Label>Columnas</Label>
+                <Select
+                  value={String(editedSection.settings.columns || 4)}
+                  onValueChange={(value) => updateSetting('columns', parseInt(value))}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="2">2 columnas</SelectItem>
+                    <SelectItem value="3">3 columnas</SelectItem>
+                    <SelectItem value="4">4 columnas</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className="flex items-center justify-between">
+              <Label>Mostrar precios</Label>
+              <Switch
+                checked={editedSection.settings.showPrice !== false}
+                onCheckedChange={(checked) => updateSetting('showPrice', checked)}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <Label>Mostrar badges (Nuevo, Oferta)</Label>
+              <Switch
+                checked={editedSection.settings.showBadges !== false}
+                onCheckedChange={(checked) => updateSetting('showBadges', checked)}
+              />
+            </div>
+          </>
+        );
+
       case 'products_grid':
         return (
           <>
@@ -164,15 +234,13 @@ export const SectionSettingsDialog = ({
                 onCheckedChange={(checked) => updateSetting('showBadges', checked)}
               />
             </div>
-            {editedSection.type === 'products_grid' && (
-              <div className="flex items-center justify-between">
-                <Label>Mostrar filtros</Label>
-                <Switch
-                  checked={editedSection.settings.showFilters !== false}
-                  onCheckedChange={(checked) => updateSetting('showFilters', checked)}
-                />
-              </div>
-            )}
+            <div className="flex items-center justify-between">
+              <Label>Mostrar filtros</Label>
+              <Switch
+                checked={editedSection.settings.showFilters !== false}
+                onCheckedChange={(checked) => updateSetting('showFilters', checked)}
+              />
+            </div>
           </>
         );
 
