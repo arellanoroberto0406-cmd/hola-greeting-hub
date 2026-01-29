@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Palette, Sparkles, Settings2, Crown } from "lucide-react";
+import { Palette, Sparkles, Settings2, Crown, Eye } from "lucide-react";
+import { SectionPreview } from "./SectionPreview";
 
 interface SectionSettingsDialogProps {
   section: StoreSection | null;
@@ -1074,7 +1075,7 @@ export const SectionSettingsDialog = ({
             </div>
             
             <Tabs defaultValue="content" className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="content" className="gap-1 text-xs">
                   <Settings2 className="h-3 w-3" />
                   Contenido
@@ -1086,6 +1087,10 @@ export const SectionSettingsDialog = ({
                 <TabsTrigger value="animation" className="gap-1 text-xs">
                   <Sparkles className="h-3 w-3" />
                   Animación
+                </TabsTrigger>
+                <TabsTrigger value="preview" className="gap-1 text-xs">
+                  <Eye className="h-3 w-3" />
+                  Preview
                 </TabsTrigger>
               </TabsList>
               
@@ -1103,6 +1108,13 @@ export const SectionSettingsDialog = ({
               
               <TabsContent value="animation" className="mt-4">
                 {renderAnimationFields()}
+              </TabsContent>
+              
+              <TabsContent value="preview" className="mt-4">
+                <SectionPreview 
+                  section={editedSection} 
+                  primaryColor={primaryColor}
+                />
               </TabsContent>
             </Tabs>
           </div>
