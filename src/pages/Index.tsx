@@ -267,131 +267,190 @@ const Index = () => {
         </div>
       </motion.header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Premium Redesign */}
       <motion.section 
         ref={heroRef}
-        className="relative min-h-screen flex items-center pt-24 pb-20"
+        className="relative min-h-screen flex items-center pt-24 pb-20 overflow-hidden"
         style={{ opacity: heroOpacity, scale: heroScale }}
       >
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,hsl(var(--primary)/0.15),transparent)]" />
+        {/* Animated Background - Enhanced */}
+        <div className="absolute inset-0">
+          {/* Main Gradient */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-30%,hsl(var(--primary)/0.2),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_80%_100%,hsl(var(--gold)/0.15),transparent_50%)]" />
+          
+          {/* Animated Orbs */}
           <motion.div 
-            className="absolute top-1/3 -left-48 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]"
+            className="absolute top-1/4 -left-32 w-[600px] h-[600px] bg-gradient-to-br from-primary/25 to-primary/5 rounded-full blur-[100px]"
             animate={{ 
-              x: [0, 50, 0],
-              y: [0, 30, 0],
+              x: [0, 80, 0],
+              y: [0, 40, 0],
+              scale: [1, 1.1, 1],
             }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div 
-            className="absolute bottom-1/4 -right-48 w-[600px] h-[600px] bg-gold/10 rounded-full blur-[150px]"
+            className="absolute bottom-1/3 -right-48 w-[700px] h-[700px] bg-gradient-to-br from-gold/15 to-orange-500/5 rounded-full blur-[120px]"
             animate={{ 
-              x: [0, -50, 0],
-              y: [0, -30, 0],
+              x: [0, -60, 0],
+              y: [0, -40, 0],
+              scale: [1, 1.15, 1],
             }}
-            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          />
+          <motion.div 
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-br from-primary/10 to-transparent rounded-full blur-[150px]"
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.5, 0.8, 0.5],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           />
           
           {/* Grid Pattern */}
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:80px_80px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:80px_80px]" />
           
-          {/* Floating Elements */}
-          <motion.div 
-            className="absolute top-1/4 right-1/4 w-4 h-4 rounded-full bg-primary/40"
-            animate={{ y: [0, -20, 0], opacity: [0.4, 0.8, 0.4] }}
-            transition={{ duration: 4, repeat: Infinity }}
-          />
-          <motion.div 
-            className="absolute top-1/3 left-1/4 w-3 h-3 rounded-full bg-gold/40"
-            animate={{ y: [0, 20, 0], opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 5, repeat: Infinity, delay: 1 }}
-          />
-          <motion.div 
-            className="absolute bottom-1/3 right-1/3 w-2 h-2 rounded-full bg-primary/30"
-            animate={{ y: [0, -15, 0], opacity: [0.2, 0.5, 0.2] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 2 }}
-          />
+          {/* Floating Particles */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div 
+              key={i}
+              className="absolute w-2 h-2 rounded-full bg-primary/40"
+              style={{
+                top: `${20 + i * 15}%`,
+                left: `${10 + i * 15}%`,
+              }}
+              animate={{ 
+                y: [0, -30, 0], 
+                opacity: [0.3, 0.7, 0.3],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{ duration: 4 + i, repeat: Infinity, delay: i * 0.5 }}
+            />
+          ))}
         </div>
         
-        <div className="container mx-auto px-4 md:px-8 relative">
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
           <motion.div 
-            className="max-w-5xl mx-auto text-center space-y-10"
+            className="max-w-6xl mx-auto text-center space-y-8"
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
           >
-            {/* Badge */}
+            {/* Badge - Enhanced */}
             <motion.div variants={fadeInUp}>
-              <Badge 
-                variant="outline" 
-                className="px-6 py-2.5 rounded-full border-primary/30 bg-primary/5 backdrop-blur-sm text-sm font-medium"
+              <motion.div
+                className="inline-flex items-center gap-3 px-6 py-3 rounded-full border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-gold/10 backdrop-blur-md shadow-lg shadow-primary/10"
+                animate={{ 
+                  boxShadow: [
+                    "0 10px 40px -10px hsl(var(--primary) / 0.2)",
+                    "0 10px 40px -10px hsl(var(--primary) / 0.4)",
+                    "0 10px 40px -10px hsl(var(--primary) / 0.2)",
+                  ]
+                }}
+                transition={{ duration: 3, repeat: Infinity }}
               >
-                <Sparkles className="h-4 w-4 mr-2 text-primary" />
-                Plataforma #1 de E-commerce en LATAM
-              </Badge>
+                <motion.div
+                  animate={{ rotate: [0, 15, -15, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  <Sparkles className="h-5 w-5 text-primary" />
+                </motion.div>
+                <span className="text-sm md:text-base font-semibold bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">
+                  Plataforma #1 de E-commerce en LATAM
+                </span>
+                <span className="flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+              </motion.div>
             </motion.div>
             
-            {/* Title */}
-            <motion.div variants={fadeInUp} className="space-y-4">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-heading leading-[0.95] tracking-tight">
-                Crea tu tienda
-                <span className="block mt-2 bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">
+            {/* Title - Massive & Impactful */}
+            <motion.div variants={fadeInUp} className="space-y-2">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold font-heading leading-[0.9] tracking-tight">
+                <motion.span 
+                  className="block"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                >
+                  Crea tu tienda
+                </motion.span>
+                <motion.span 
+                  className="block bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent relative"
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, duration: 0.6 }}
+                >
                   en minutos
-                </span>
+                  <motion.span
+                    className="absolute -right-4 top-0 text-4xl md:text-5xl"
+                    animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.2, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                  >
+                    ⚡
+                  </motion.span>
+                </motion.span>
               </h1>
             </motion.div>
             
-            {/* Description */}
+            {/* Description - Cleaner */}
             <motion.p 
               variants={fadeInUp}
-              className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed"
+              className="text-lg md:text-xl lg:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
             >
-              Todo lo que necesitas para vender online. Gestiona productos, pedidos, pagos 
-              y conecta con clientes por WhatsApp. 
-              <span className="text-foreground font-medium"> Sin código, sin complicaciones.</span>
+              Todo lo que necesitas para 
+              <span className="text-foreground font-semibold"> vender online</span>. 
+              Gestiona productos, pedidos, pagos y conecta con clientes por WhatsApp.
             </motion.p>
             
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Enhanced */}
             <motion.div 
               variants={fadeInUp}
-              className="flex flex-col sm:flex-row gap-4 justify-center"
+              className="flex flex-col sm:flex-row gap-4 justify-center pt-4"
             >
-              <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
+              <motion.div 
+                whileHover={{ scale: 1.05, y: -2 }} 
+                whileTap={{ scale: 0.98 }}
+                className="relative group"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary via-orange-400 to-gold rounded-2xl blur-lg opacity-60 group-hover:opacity-100 transition-opacity" />
                 <Button 
                   size="lg" 
-                  className="text-base px-8 py-6 gap-3 rounded-xl shadow-lg shadow-primary/20 group"
+                  className="relative text-lg px-10 py-7 gap-3 rounded-xl shadow-2xl shadow-primary/30 group font-semibold"
                   onClick={() => navigate("/auth")}
                 >
-                  <Zap className="h-5 w-5" />
+                  <Zap className="h-6 w-6 group-hover:animate-pulse" />
                   Crear Tienda Gratis
-                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-2" />
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="text-base px-8 py-6 rounded-xl border-2 hover:bg-muted/30"
+                  className="text-lg px-10 py-7 rounded-xl border-2 hover:bg-primary/5 hover:border-primary/50 transition-all"
                   onClick={() => document.getElementById('tiendas')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   Ver Tiendas Activas
+                  <ChevronRight className="h-5 w-5 ml-2" />
                 </Button>
               </motion.div>
             </motion.div>
 
-            {/* Benefits Pills */}
+            {/* Benefits Pills - Enhanced */}
             <motion.div 
               variants={fadeInUp}
-              className="flex flex-wrap justify-center gap-3"
+              className="flex flex-wrap justify-center gap-3 pt-2"
             >
               {benefits.map((benefit, index) => (
                 <motion.span 
                   key={index}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-muted/50 text-sm text-muted-foreground"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.8 + index * 0.1 }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-card/50 border border-border/50 backdrop-blur-sm text-sm font-medium"
+                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 1 + index * 0.1 }}
+                  whileHover={{ scale: 1.05, borderColor: "hsl(var(--primary) / 0.5)" }}
                 >
                   <CheckCircle2 className="h-4 w-4 text-green-500" />
                   {benefit}
@@ -399,25 +458,42 @@ const Index = () => {
               ))}
             </motion.div>
 
-            {/* Stats */}
+            {/* Stats - Redesigned Cards */}
             <motion.div 
               variants={staggerContainer}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 pt-8"
+              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 pt-12"
             >
               {stats.map((stat, index) => (
                 <motion.div 
                   key={index} 
-                  className="relative group"
+                  className="relative group cursor-pointer"
                   variants={scaleIn}
-                  whileHover={{ y: -5 }}
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="relative p-6 rounded-2xl bg-card/50 border border-border/50 backdrop-blur-sm">
-                    <stat.icon className="h-5 w-5 text-primary mb-3" />
-                    <p className="text-3xl md:text-4xl font-bold font-heading text-foreground">
+                  {/* Glow Effect */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  />
+                  
+                  <div className="relative p-6 md:p-8 rounded-2xl bg-gradient-to-br from-card/80 to-card/40 border border-border/50 backdrop-blur-sm group-hover:border-primary/30 transition-all duration-300">
+                    <motion.div
+                      className="absolute top-4 right-4 w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      initial={{ rotate: -45 }}
+                      whileHover={{ rotate: 0 }}
+                    >
+                      <stat.icon className="h-5 w-5 text-primary" />
+                    </motion.div>
+                    
+                    <stat.icon className="h-6 w-6 text-primary mb-4 group-hover:scale-110 transition-transform" />
+                    <motion.p 
+                      className="text-4xl md:text-5xl font-bold font-heading bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text"
+                      initial={{ scale: 1 }}
+                      whileHover={{ scale: 1.1 }}
+                    >
                       {stat.value}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+                    </motion.p>
+                    <p className="text-sm text-muted-foreground mt-2 font-medium">{stat.label}</p>
                   </div>
                 </motion.div>
               ))}
@@ -425,7 +501,7 @@ const Index = () => {
           </motion.div>
         </div>
 
-        {/* Scroll Indicator */}
+        {/* Scroll Indicator - Enhanced */}
         <motion.div 
           className="absolute bottom-8 left-1/2 -translate-x-1/2"
           initial={{ opacity: 0, y: 20 }}
@@ -433,11 +509,19 @@ const Index = () => {
           transition={{ delay: 1.5 }}
         >
           <motion.div 
-            className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            className="flex flex-col items-center gap-2 cursor-pointer"
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <div className="w-1 h-2 rounded-full bg-muted-foreground/50" />
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Explorar</span>
+            <div className="w-6 h-10 rounded-full border-2 border-primary/30 flex justify-center pt-2">
+              <motion.div 
+                className="w-1.5 h-3 rounded-full bg-primary/50"
+                animate={{ y: [0, 8, 0], opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            </div>
           </motion.div>
         </motion.div>
       </motion.section>
