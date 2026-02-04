@@ -112,12 +112,13 @@ const DashboardHeader = ({
             </Button>
 
             <Button 
-              variant="ghost" 
-              size="icon"
-              className="h-9 w-9 rounded-xl"
+              variant="outline" 
+              size="sm"
+              className="gap-2 rounded-xl text-destructive border-destructive/30 hover:bg-destructive/10 hover:text-destructive"
               onClick={onSignOut}
             >
               <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Cerrar sesión</span>
             </Button>
           </div>
         </div>
