@@ -34,6 +34,7 @@ import { motion } from "framer-motion";
 import { StoreSection, GlobalStyles, DEFAULT_SECTIONS, DEFAULT_GLOBAL_STYLES, FONT_OPTIONS } from "@/types/storeLayout";
 import {
   HeroSection,
+  PremiumHeroSection,
   FeaturedProductsSection,
   BannerSection,
   NewsletterSection,
@@ -50,6 +51,7 @@ import {
   AnimatedStatsSection,
   InteractiveGallerySection,
 } from "@/components/store/sections";
+import PremiumStoreHeader from "@/components/store/PremiumStoreHeader";
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
 import { PremiumProductModal } from "@/components/store/PremiumProductModal";
 import SectionWrapper from "@/components/store/SectionWrapper";
@@ -310,321 +312,21 @@ const StoreFront = () => {
         url={storeUrl}
         type="website"
       />
-      {/* Announcement Bar */}
-      {(store as any).announcement_active && (store as any).announcement_text && (
-        <div 
-          className="py-2 px-4 text-center text-sm font-medium"
-          style={{ 
-            backgroundColor: store.primary_color,
-            color: 'white'
-          }}
-        >
-          {(store as any).announcement_text}
-        </div>
-      )}
+      {/* Premium Store Header */}
+      <PremiumStoreHeader
+        store={store}
+        slug={slug || ""}
+        planTier={planTier}
+        onSearchChange={(search) => setFilters(prev => ({ ...prev, search }))}
+        searchValue={filters.search}
+        showSearch={true}
+        collections={collections}
+        onCollectionSelect={(collection) => setFilters(prev => ({ ...prev, collection }))}
+        selectedCollection={filters.collection}
+      />
 
-      {/* Header */}
-      <header 
-        className="sticky top-0 z-50 backdrop-blur-xl border-b transition-all duration-300"
-        style={{ 
-          backgroundColor: `${store.primary_color}08`,
-          borderColor: `${store.primary_color}20`
-        }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo / Store Name */}
-            <div 
-              className="flex items-center gap-3 cursor-pointer"
-              onClick={() => navigate(`/tienda/${slug}`)}
-            >
-              {store.logo_url ? (
-                <img src={store.logo_url} alt={store.name} className="h-10 md:h-12 w-auto" />
-              ) : (
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="h-10 w-10 rounded-xl flex items-center justify-center"
-                    style={{ backgroundColor: store.primary_color }}
-                  >
-                    <Store className="h-5 w-5 text-white" />
-                  </div>
-                  <span 
-                    className="font-heading text-xl md:text-2xl font-bold"
-                    style={{ color: store.primary_color }}
-                  >
-                    {store.name}
-                  </span>
-                </div>
-              )}
-            </div>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-6">
-              <button
-                onClick={() => setFilters(prev => ({ ...prev, collection: "all" }))}
-                className={`text-sm font-medium transition-colors ${filters.collection === "all" ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-              >
-                Todos
-              </button>
-              {collections.slice(0, 5).map((collection) => (
-                <button
-                  key={collection}
-                  onClick={() => setFilters(prev => ({ ...prev, collection }))}
-                  className={`text-sm font-medium transition-colors ${filters.collection === collection ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}
-                >
-                  {collection}
-                </button>
-              ))}
-            </nav>
 
-            {/* Desktop Search */}
-            <div className="hidden md:flex items-center flex-1 max-w-sm mx-6">
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar productos..."
-                  value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  className="pl-10 bg-muted/50 border-transparent focus:border-primary/50"
-                />
-                {filters.search && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-                    onClick={() => setFilters(prev => ({ ...prev, search: "" }))}
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Right Actions */}
-            <div className="flex items-center gap-2">
-              {/* Mobile Search Toggle */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="md:hidden h-10 w-10 rounded-xl"
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-              >
-                <Search className="h-5 w-5" />
-              </Button>
-
-              {/* Account */}
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl">
-                      <Avatar className="h-8 w-8">
-                        <AvatarFallback 
-                          style={{ backgroundColor: store.primary_color }}
-                          className="text-white text-xs"
-                        >
-                          {user.email?.charAt(0).toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>
-                      <div className="flex flex-col">
-                        <span className="font-medium">Mi cuenta</span>
-                        <span className="text-xs text-muted-foreground truncate">{user.email}</span>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate(`/tienda/${slug}/cuenta`)}>
-                      <Package className="h-4 w-4 mr-2" />
-                      Mis pedidos
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate(`/tienda/${slug}/cuenta`)}>
-                      <Heart className="h-4 w-4 mr-2" />
-                      Lista de deseos
-                      {wishlist.length > 0 && (
-                        <Badge variant="secondary" className="ml-auto">{wishlist.length}</Badge>
-                      )}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut} className="text-destructive">
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Cerrar sesión
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-10 w-10 rounded-xl"
-                  onClick={() => navigate("/auth")}
-                >
-                  <User className="h-5 w-5" />
-                </Button>
-              )}
-
-              {/* Wishlist */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative h-10 w-10 rounded-xl"
-                onClick={() => navigate(`/tienda/${slug}/cuenta`)}
-              >
-                <Heart className="h-5 w-5" />
-                {wishlist.length > 0 && (
-                  <span 
-                    className="absolute -top-1 -right-1 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
-                    style={{ backgroundColor: store.primary_color }}
-                  >
-                    {wishlist.length}
-                  </span>
-                )}
-              </Button>
-
-              <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
-                <SheetTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {totalItems > 0 && (
-                      <Badge 
-                        className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                        style={{ backgroundColor: store.primary_color }}
-                      >
-                        {totalItems}
-                      </Badge>
-                    )}
-                  </Button>
-                </SheetTrigger>
-                <SheetContent className="w-full sm:max-w-lg flex flex-col">
-                  <SheetHeader>
-                    <SheetTitle className="flex items-center justify-between">
-                      <span>Carrito ({totalItems})</span>
-                      {items.length > 0 && (
-                        <Button variant="ghost" size="sm" onClick={clearCart}>
-                          Vaciar
-                        </Button>
-                      )}
-                    </SheetTitle>
-                  </SheetHeader>
-
-                  {items.length === 0 ? (
-                    <div className="flex-1 flex items-center justify-center">
-                      <div className="text-center space-y-4">
-                        <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground" />
-                        <p className="text-muted-foreground">Tu carrito está vacío</p>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <ScrollArea className="flex-1 -mx-6 px-6">
-                        <div className="space-y-4 py-4">
-                          {items.map((item) => (
-                            <div
-                              key={`${item.id}-${item.selectedColor}`}
-                              className="flex gap-4 border rounded-lg p-3"
-                            >
-                              <img
-                                src={item.image}
-                                alt={item.name}
-                                className="w-20 h-20 object-cover rounded-md"
-                              />
-                              <div className="flex-1 space-y-1">
-                                <div className="flex items-start justify-between">
-                                  <div>
-                                    <h4 className="font-medium text-sm">{item.name}</h4>
-                                    {item.selectedColor && (
-                                      <p className="text-xs text-muted-foreground">
-                                        Color: {item.selectedColor}
-                                      </p>
-                                    )}
-                                  </div>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-6 w-6"
-                                    onClick={() => removeItem(item.id)}
-                                  >
-                                    <X className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="icon"
-                                      className="h-7 w-7"
-                                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                    >
-                                      <Minus className="h-3 w-3" />
-                                    </Button>
-                                    <span className="text-sm font-medium w-8 text-center">
-                                      {item.quantity}
-                                    </span>
-                                    <Button
-                                      variant="outline"
-                                      size="icon"
-                                      className="h-7 w-7"
-                                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                      disabled={item.quantity >= item.stock}
-                                    >
-                                      <Plus className="h-3 w-3" />
-                                    </Button>
-                                  </div>
-                                  <p className="font-bold" style={{ color: store.primary_color }}>
-                                    ${(item.price * item.quantity).toLocaleString()}
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </ScrollArea>
-
-                      <div className="space-y-4 pt-4">
-                        <Separator />
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between text-sm text-muted-foreground">
-                            <span>Subtotal:</span>
-                            <span>${totalPrice.toLocaleString()}</span>
-                          </div>
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="flex items-center gap-1">
-                              <Truck className="h-4 w-4" />
-                              Envío:
-                            </span>
-                            <span className={totalPrice >= freeShippingThreshold ? "text-green-500 font-semibold" : ""}>
-                              {totalPrice >= freeShippingThreshold ? "GRATIS" : `$${shippingCost}`}
-                            </span>
-                          </div>
-                          <Separator />
-                          <div className="flex items-center justify-between text-lg font-bold">
-                            <span>Total:</span>
-                            <span style={{ color: store.primary_color }} className="text-2xl">
-                              ${(totalPrice + (totalPrice >= freeShippingThreshold ? 0 : shippingCost)).toLocaleString()}
-                            </span>
-                          </div>
-                        </div>
-                        <Button
-                          className="w-full"
-                          size="lg"
-                          style={{ backgroundColor: store.primary_color }}
-                          onClick={() => {
-                            setIsCartOpen(false);
-                            navigate(`/tienda/${slug}/checkout`);
-                          }}
-                        >
-                          Proceder al Pago
-                        </Button>
-                      </div>
-                    </>
-                  )}
-                </SheetContent>
-              </Sheet>
-            </div>
-          </div>
-        </div>
-      </header>
 
 
       {/* Dynamic Sections */}
@@ -643,9 +345,10 @@ const StoreFront = () => {
                 case 'hero':
                   return (
                     <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
-                      <HeroSection
+                      <PremiumHeroSection
                         section={section}
                         store={store}
+                        planTier={planTier}
                         onAction={() => {
                           const productsSection = document.getElementById('products-section');
                           productsSection?.scrollIntoView({ behavior: 'smooth' });
