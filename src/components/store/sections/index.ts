@@ -15,3 +15,10 @@ export { PremiumVideoSection } from './PremiumVideoSection';
 export { ParallaxHeroSection } from './ParallaxHeroSection';
 export { AnimatedStatsSection } from './AnimatedStatsSection';
 export { InteractiveGallerySection } from './InteractiveGallerySection';
+
+// Premium tier-based sections
+export { PremiumTestimonialsSection } from './PremiumTestimonialsSection';
+export { PremiumBannerSection } from './PremiumBannerSection';
+export { PremiumCategoriesSection } from './PremiumCategoriesSection';
+export { PremiumFooterSection } from './PremiumFooterSection';
+export { PremiumProductsGridSection } from './PremiumProductsGridSection';
