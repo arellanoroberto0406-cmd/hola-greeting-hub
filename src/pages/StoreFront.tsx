@@ -50,6 +50,10 @@ import {
   ParallaxHeroSection,
   AnimatedStatsSection,
   InteractiveGallerySection,
+  PremiumTestimonialsSection,
+  PremiumBannerSection,
+  PremiumCategoriesSection,
+  PremiumFooterSection,
 } from "@/components/store/sections";
 import PremiumStoreHeader from "@/components/store/PremiumStoreHeader";
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
@@ -392,9 +396,10 @@ const StoreFront = () => {
                 case 'banner':
                   return (
                     <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
-                      <BannerSection
+                      <PremiumBannerSection
                         section={section}
                         store={store}
+                        planTier={planTier}
                       />
                     </SectionWrapper>
                   );
@@ -455,9 +460,10 @@ const StoreFront = () => {
                 case 'testimonials':
                   return (
                     <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
-                      <TestimonialsSection
+                      <PremiumTestimonialsSection
                         section={section}
                         store={store}
+                        planTier={planTier}
                       />
                     </SectionWrapper>
                   );
@@ -604,102 +610,8 @@ const StoreFront = () => {
         />
       )}
 
-      {/* Footer */}
-      <footer 
-        className="border-t py-12 mt-16"
-        style={{ borderColor: `${store.primary_color}30` }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Store Info */}
-            <div className="text-center md:text-left">
-              <h3 className="font-heading font-bold text-lg mb-3" style={{ color: store.primary_color }}>
-                {store.name}
-              </h3>
-              {store.description && (
-                <p className="text-sm text-muted-foreground">{store.description}</p>
-              )}
-            </div>
-
-            {/* Policies */}
-            <div className="text-center md:text-left">
-              {((store as any).shipping_info || (store as any).return_policy) && (
-                <>
-                  <h4 className="font-medium mb-3">Información</h4>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    {(store as any).shipping_info && (
-                      <p><strong>Envíos:</strong> {(store as any).shipping_info.substring(0, 100)}{(store as any).shipping_info.length > 100 ? '...' : ''}</p>
-                    )}
-                    {(store as any).return_policy && (
-                      <p><strong>Devoluciones:</strong> {(store as any).return_policy.substring(0, 100)}{(store as any).return_policy.length > 100 ? '...' : ''}</p>
-                    )}
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Social Links */}
-            <div className="text-center md:text-right">
-              <h4 className="font-medium mb-3">Síguenos</h4>
-              <div className="flex justify-center md:justify-end gap-4 flex-wrap">
-                {store.instagram_url && (
-                  <a href={store.instagram_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Instagram
-                  </a>
-                )}
-                {store.facebook_url && (
-                  <a href={store.facebook_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Facebook
-                  </a>
-                )}
-                {store.twitter_url && (
-                  <a href={store.twitter_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Twitter
-                  </a>
-                )}
-                {store.tiktok_url && (
-                  <a href={store.tiktok_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                    TikTok
-                  </a>
-                )}
-                {(store as any).website_url && (
-                  <a href={(store as any).website_url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
-                    Web
-                  </a>
-                )}
-              </div>
-              <div className="mt-4 space-y-2 text-sm text-muted-foreground">
-                {store.email && (
-                  <p>
-                    📧 {store.email}
-                  </p>
-                )}
-                {(store as any).whatsapp_number && (
-                  <a 
-                    href={`https://wa.me/${(store as any).whatsapp_number.replace(/[\s\-\(\)]/g, "").replace(/^\+/, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center md:justify-end gap-2 text-green-600 hover:text-green-700 transition-colors font-medium"
-                  >
-                    💬 WhatsApp: {(store as any).whatsapp_number}
-                  </a>
-                )}
-                {store.phone && (
-                  <p>
-                    📞 {store.phone}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t mt-8 pt-6 text-center" style={{ borderColor: `${store.primary_color}20` }}>
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} {store.name}. Todos los derechos reservados.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Premium Footer */}
+      <PremiumFooterSection store={store} planTier={planTier} />
     </div>
   );
 };
