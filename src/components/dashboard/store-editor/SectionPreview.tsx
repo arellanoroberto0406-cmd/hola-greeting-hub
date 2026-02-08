@@ -476,6 +476,64 @@ export const SectionPreview = ({ section, primaryColor = "#8B4513" }: SectionPre
           </div>
         );
 
+      case 'brand_logos':
+        return (
+          <div className="space-y-3">
+            <div className="text-center space-y-1">
+              <div className="h-3 bg-foreground/70 rounded w-28 mx-auto" />
+              <div className="h-2 bg-muted-foreground/40 rounded w-36 mx-auto" />
+            </div>
+            {/* Marquee simulation */}
+            <div className="relative overflow-hidden">
+              <motion.div 
+                className="flex gap-3"
+                animate={{ x: [0, -100, 0] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              >
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="flex-shrink-0 w-16 h-10 rounded-lg border flex items-center justify-center"
+                    style={{ backgroundColor: `${primaryColor}${10 + (i * 5)}` }}
+                  >
+                    <span className="text-lg">
+                      {['🍎', '🔍', '💻', '📦', '🌐', '🎬', '🎵', '⚡'][i % 8]}
+                    </span>
+                  </div>
+                ))}
+              </motion.div>
+              <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            </div>
+            {/* Second row - opposite direction */}
+            <div className="relative overflow-hidden">
+              <motion.div 
+                className="flex gap-3"
+                animate={{ x: [-100, 0, -100] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+              >
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div 
+                    key={i} 
+                    className="flex-shrink-0 w-16 h-10 rounded-lg border flex items-center justify-center"
+                    style={{ backgroundColor: `${primaryColor}${15 + (i * 4)}` }}
+                  >
+                    <span className="text-lg">
+                      {['✓', '🏃', '📱', '🎮', '🚗', '☕', '🎯', '💎'][i % 8]}
+                    </span>
+                  </div>
+                ))}
+              </motion.div>
+              <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent pointer-events-none" />
+            </div>
+            <div className="flex items-center justify-center gap-1 pt-1">
+              <ShoppingBag className="h-3 w-3" style={{ color: primaryColor }} />
+              <span className="text-xs text-muted-foreground">Marquee infinito</span>
+            </div>
+          </div>
+        );
+
       default:
         return (
           <div className="rounded-lg border p-8 flex flex-col items-center justify-center text-center">
