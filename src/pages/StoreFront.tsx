@@ -54,6 +54,7 @@ import {
   PremiumBannerSection,
   PremiumCategoriesSection,
   PremiumFooterSection,
+  BrandLogosSection,
 } from "@/components/store/sections";
 import PremiumStoreHeader from "@/components/store/PremiumStoreHeader";
 import { PremiumProductsGridSection } from "@/components/store/sections/PremiumProductsGridSection";
@@ -537,6 +538,17 @@ const StoreFront = () => {
                         section={section}
                         store={store}
                         planTier={planTier}
+                      />
+                    </SectionWrapper>
+                  );
+
+                case 'brand_logos':
+                  return (
+                    <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
+                      <BrandLogosSection
+                        planTier={planTier}
+                        title={section.settings?.title || "Marcas que confían en nosotros"}
+                        subtitle={section.settings?.subtitle || "Colaboramos con las mejores marcas del mercado"}
                       />
                     </SectionWrapper>
                   );
