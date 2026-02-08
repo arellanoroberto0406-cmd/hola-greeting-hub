@@ -22,3 +22,4 @@ export { PremiumBannerSection } from './PremiumBannerSection';
 export { PremiumCategoriesSection } from './PremiumCategoriesSection';
 export { PremiumFooterSection } from './PremiumFooterSection';
 export { PremiumProductsGridSection } from './PremiumProductsGridSection';
+export { BrandLogosSection } from './BrandLogosSection';
