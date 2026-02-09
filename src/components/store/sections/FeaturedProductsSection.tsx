@@ -4,8 +4,8 @@ import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Eye, ShoppingCart, ArrowRight, Sparkles, Star, ChevronLeft, ChevronRight } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useRef } from "react";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { useState, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
 
 interface FeaturedProductsSectionProps {
@@ -67,39 +67,83 @@ export const FeaturedProductsSection = ({
   // Enhanced product card component
   const ProductCard = ({ product, index }: { product: Product; index: number }) => {
     const discount = getDiscount(product);
+    const cardRef = useRef<HTMLDivElement>(null);
     
+    // 3D tilt for Enterprise
+    const mx = useMotionValue(0.5);
+    const my = useMotionValue(0.5);
+    const rx = useSpring(useTransform(my, [0, 1], [8, -8]), { stiffness: 300, damping: 30 });
+    const ry = useSpring(useTransform(mx, [0, 1], [-8, 8]), { stiffness: 300, damping: 30 });
+    const sx = useTransform(mx, [0, 1], [0, 100]);
+    const sy = useTransform(my, [0, 1], [0, 100]);
+    const shineBg = useTransform(
+      [sx, sy],
+      ([x, y]) => `radial-gradient(600px circle at ${x}% ${y}%, ${store.primary_color}18, transparent 40%), linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%)`
+    );
+    const glow = useMotionValue(0);
+
+    const onMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+      if (!isEnterprise || !cardRef.current) return;
+      const rect = cardRef.current.getBoundingClientRect();
+      mx.set((e.clientX - rect.left) / rect.width);
+      my.set((e.clientY - rect.top) / rect.height);
+      glow.set(1);
+    }, [isEnterprise, mx, my, glow]);
+
+    const onLeave = useCallback(() => {
+      if (!isEnterprise) return;
+      mx.set(0.5); my.set(0.5); glow.set(0);
+    }, [isEnterprise, mx, my, glow]);
+
     const cardAnim = isEnterprise 
-      ? { initial: { opacity: 0, y: 40, scale: 0.95 }, whileInView: { opacity: 1, y: 0, scale: 1 }, whileHover: { y: -12, scale: 1.02 } }
+      ? { initial: { opacity: 0, y: 40, scale: 0.95 }, whileInView: { opacity: 1, y: 0, scale: 1 } }
       : isProfessional 
         ? { initial: { opacity: 0, y: 30 }, whileInView: { opacity: 1, y: 0 }, whileHover: { y: -8 } }
         : { initial: { opacity: 0, y: 20 }, whileInView: { opacity: 1, y: 0 }, whileHover: { y: -4 } };
 
     return (
       <motion.div
+        ref={cardRef}
         initial={cardAnim.initial}
         whileInView={cardAnim.whileInView}
-        whileHover={cardAnim.whileHover}
+        whileHover={!isEnterprise ? (cardAnim as any).whileHover : undefined}
         viewport={{ once: true }}
         transition={{ duration: isEnterprise ? 0.6 : 0.4, delay: index * 0.08 }}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        style={{
+          borderRadius: 'var(--store-radius, 12px)',
+          boxShadow: 'var(--store-card-shadow, 0 4px 6px -1px rgb(0 0 0 / 0.1))',
+          ...(isEnterprise && {
+            rotateX: rx,
+            rotateY: ry,
+            transformPerspective: 800,
+            transformStyle: "preserve-3d" as const,
+          }),
+        }}
         className={cn(
           "group relative bg-card overflow-hidden border transition-all duration-300",
           isEnterprise && "hover:shadow-2xl hover:border-primary/30",
           isProfessional && "hover:shadow-xl",
           isBasic && "hover:shadow-lg"
         )}
-        style={{
-          borderRadius: 'var(--store-radius, 12px)',
-          boxShadow: 'var(--store-card-shadow, 0 4px 6px -1px rgb(0 0 0 / 0.1))',
-        }}
       >
-        {/* Enterprise glow effect */}
+        {/* Enterprise 3D shine */}
         {isEnterprise && (
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none z-0"
-            style={{
-              background: `radial-gradient(400px circle at 50% 50%, ${store.primary_color}15, transparent 60%)`,
-            }}
-          />
+          <>
+            <motion.div
+              className="absolute inset-0 z-20 pointer-events-none"
+              style={{ opacity: glow, background: shineBg, borderRadius: 'var(--store-radius, 12px)' }}
+            />
+            <motion.div
+              className="absolute -inset-px pointer-events-none z-10"
+              style={{
+                opacity: glow,
+                background: `linear-gradient(135deg, ${store.primary_color}40, transparent 50%, ${store.primary_color}20)`,
+                borderRadius: 'var(--store-radius, 12px)',
+              }}
+            />
+          </>
         )}
 
         {/* Image container */}
