@@ -3,8 +3,9 @@ import { Store } from "@/types/store";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart, Eye, ShoppingCart, Star, Sparkles, Zap, Check } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useRef, useCallback } from "react";
 
 type PlanTier = "basic" | "professional" | "enterprise";
 
@@ -37,11 +38,43 @@ export const PremiumProductCard = ({
   const isProfessional = planTier === "professional";
   const isEnterprise = planTier === "enterprise";
 
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // 3D tilt motion values (Enterprise)
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const rotateX = useSpring(useTransform(mouseY, [0, 1], [8, -8]), { stiffness: 300, damping: 30 });
+  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-8, 8]), { stiffness: 300, damping: 30 });
+  const shineX = useTransform(mouseX, [0, 1], [0, 100]);
+  const shineY = useTransform(mouseY, [0, 1], [0, 100]);
+  const shineBackground = useTransform(
+    [shineX, shineY],
+    ([x, y]) =>
+      `radial-gradient(600px circle at ${x}% ${y}%, ${store.primary_color}18, transparent 40%), linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 60%)`
+  );
+  const glowOpacity = useMotionValue(0);
+
+  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    if (!isEnterprise || !cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
+    mouseX.set(x);
+    mouseY.set(y);
+    glowOpacity.set(1);
+  }, [isEnterprise, mouseX, mouseY, glowOpacity]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isEnterprise) return;
+    mouseX.set(0.5);
+    mouseY.set(0.5);
+    glowOpacity.set(0);
+  }, [isEnterprise, mouseX, mouseY, glowOpacity]);
+
   // Animation configurations based on plan tier
   const enterpriseAnim = {
     initial: { opacity: 0, y: 40, scale: 0.95 },
     whileInView: { opacity: 1, y: 0, scale: 1 },
-    whileHover: { y: -12, scale: 1.02 },
     transition: { duration: 0.6, delay: (index % 8) * 0.08, ease: "easeOut" as const },
   };
 
@@ -68,29 +101,47 @@ export const PremiumProductCard = ({
 
   return (
     <motion.div
+      ref={cardRef}
       initial={animConfig.initial}
       whileInView={animConfig.whileInView}
-      whileHover={animConfig.whileHover}
+      whileHover={!isEnterprise ? (animConfig as any).whileHover : undefined}
       viewport={{ once: true }}
       transition={animConfig.transition}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        ...(isEnterprise && {
+          rotateX,
+          rotateY,
+          transformPerspective: 800,
+          transformStyle: "preserve-3d" as const,
+        }),
+      }}
       className={cn(
         "group relative bg-card rounded-xl overflow-hidden border transition-all duration-300",
         isEnterprise && "hover:shadow-2xl hover:border-primary/30",
         isProfessional && "hover:shadow-xl",
         isBasic && "hover:shadow-md"
       )}
-      style={{
-        ...(isEnterprise && {
-          boxShadow: `0 0 0 0 ${store.primary_color}00`,
-        }),
-      }}
     >
-      {/* Enterprise glow effect */}
+      {/* Enterprise 3D shine overlay */}
       {isEnterprise && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        <motion.div
+          className="absolute inset-0 z-20 pointer-events-none rounded-xl"
           style={{
-            background: `radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${store.primary_color}10, transparent 40%)`,
+            opacity: glowOpacity,
+            background: shineBackground,
+          }}
+        />
+      )}
+
+      {/* Enterprise border glow on hover */}
+      {isEnterprise && (
+        <motion.div
+          className="absolute -inset-px rounded-xl pointer-events-none z-10"
+          style={{
+            opacity: glowOpacity,
+            background: `linear-gradient(135deg, ${store.primary_color}40, transparent 50%, ${store.primary_color}20)`,
           }}
         />
       )}
@@ -101,7 +152,7 @@ export const PremiumProductCard = ({
         onClick={() => onProductClick(product)}
       >
         {/* Main image */}
-        <img
+        <motion.img
           src={product.image}
           alt={product.name}
           className={cn(
@@ -110,6 +161,7 @@ export const PremiumProductCard = ({
             isProfessional && "duration-500 group-hover:scale-105",
             isBasic && "duration-300"
           )}
+          style={isEnterprise ? { translateZ: 20 } : undefined}
         />
 
         {/* Secondary image on hover (Enterprise only) */}
@@ -232,13 +284,13 @@ export const PremiumProductCard = ({
         {isEnterprise && (
           <motion.div
             className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100"
-            initial={false}
-            animate={{ y: 10 }}
-            whileInView={{ y: 0 }}
+            initial={{ y: 10, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.1 }}
           >
             <Button
               size="sm"
-              className="rounded-full shadow-xl"
+              className="rounded-full shadow-xl backdrop-blur-sm"
               style={{ backgroundColor: store.primary_color }}
               onClick={(e) => {
                 e.stopPropagation();
@@ -254,10 +306,13 @@ export const PremiumProductCard = ({
       </div>
 
       {/* Content */}
-      <div className={cn(
-        "p-4 space-y-3",
-        isEnterprise && "p-5"
-      )}>
+      <motion.div
+        className={cn(
+          "p-4 space-y-3",
+          isEnterprise && "p-5"
+        )}
+        style={isEnterprise ? { translateZ: 30 } : undefined}
+      >
         {/* Rating (Professional+) */}
         {!isBasic && product.rating > 0 && (
           <div className="flex items-center gap-1">
@@ -392,7 +447,7 @@ export const PremiumProductCard = ({
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
