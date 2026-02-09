@@ -65,12 +65,40 @@ const Index = () => {
   const [showBanner, setShowBanner] = useState(true);
   
   const heroRef = useRef(null);
+  const featuresParallaxRef = useRef(null);
+  const storesParallaxRef = useRef(null);
+  const ctaParallaxRef = useRef(null);
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"]
   });
   const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const heroBgY = useTransform(scrollYProgress, [0, 1], [0, -80]);
+
+  const { scrollYProgress: featuresScrollY } = useScroll({
+    target: featuresParallaxRef,
+    offset: ["start end", "end start"]
+  });
+  const featuresY = useTransform(featuresScrollY, [0, 1], [80, -80]);
+  const featuresRotate = useTransform(featuresScrollY, [0, 0.5, 1], [-2, 0, 2]);
+  const featuresBgY = useTransform(featuresScrollY, [0, 1], [100, -100]);
+
+  const { scrollYProgress: storesScrollY } = useScroll({
+    target: storesParallaxRef,
+    offset: ["start end", "end start"]
+  });
+  const storesY = useTransform(storesScrollY, [0, 1], [60, -60]);
+  const storesScale = useTransform(storesScrollY, [0, 0.3, 0.7, 1], [0.9, 1, 1, 0.95]);
+
+  const { scrollYProgress: ctaScrollY } = useScroll({
+    target: ctaParallaxRef,
+    offset: ["start end", "end start"]
+  });
+  const ctaY = useTransform(ctaScrollY, [0, 1], [100, -50]);
+  const ctaScale = useTransform(ctaScrollY, [0, 0.5, 1], [0.85, 1.02, 1]);
 
   const features = [
     {
@@ -275,11 +303,12 @@ const Index = () => {
       >
         {/* Animated Background - Ultra Premium */}
         <div className="absolute inset-0">
-          {/* Mesh Gradient Background */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_150%_100%_at_50%_-20%,hsl(var(--primary)/0.35),transparent_60%)]" />
+          {/* Mesh Gradient Background with parallax */}
+          <motion.div className="absolute inset-0" style={{ y: heroBgY }}>
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_150%_100%_at_50%_-20%,hsl(var(--primary)/0.35),transparent_60%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_80%_at_100%_100%,hsl(var(--gold)/0.25),transparent_50%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_0%_80%,hsl(var(--primary)/0.15),transparent_50%)]" />
-          
+          </motion.div>
           {/* Animated Aurora Effect */}
           <motion.div 
             className="absolute top-0 left-0 right-0 h-[600px] opacity-60"
@@ -386,7 +415,7 @@ const Index = () => {
           ))}
         </div>
         
-        <div className="container mx-auto px-4 md:px-8 relative z-10">
+        <motion.div className="container mx-auto px-4 md:px-8 relative z-10" style={{ y: heroY }}>
           <motion.div 
             className="max-w-6xl mx-auto text-center space-y-8"
             initial="hidden"
@@ -646,7 +675,7 @@ const Index = () => {
               ))}
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
 
         {/* Scroll Indicator - Enhanced */}
         <motion.div 
@@ -675,9 +704,11 @@ const Index = () => {
 
       {/* Features Section */}
       <section id="features" className="py-24 md:py-32 relative" ref={featuresRef}>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" />
+        <div ref={featuresParallaxRef} className="absolute inset-0">
+          <motion.div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/10 to-transparent" style={{ y: featuresBgY }} />
+        </div>
         
-        <div className="container mx-auto px-4 md:px-8 relative">
+        <motion.div className="container mx-auto px-4 md:px-8 relative" style={{ y: featuresY }}>
           <motion.div 
             className="text-center mb-16"
             initial="hidden"
@@ -732,12 +763,13 @@ const Index = () => {
               </motion.div>
             ))}
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Store Template Preview Section */}
       <section id="tiendas" className="py-24 md:py-32 relative" ref={storesRef}>
-        <div className="container mx-auto px-4 md:px-8">
+        <div ref={storesParallaxRef} className="absolute inset-0" />
+        <motion.div className="container mx-auto px-4 md:px-8" style={{ y: storesY, scale: storesScale }}>
           <motion.div 
             className="text-center mb-16"
             initial="hidden"
@@ -891,12 +923,12 @@ const Index = () => {
               </Button>
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* CTA Section */}
       <section className="py-24 md:py-32 relative overflow-hidden" ref={ctaRef}>
-        <div className="absolute inset-0">
+        <div ref={ctaParallaxRef} className="absolute inset-0">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-gold/5" />
           <motion.div 
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[200px]"
@@ -905,7 +937,7 @@ const Index = () => {
           />
         </div>
         
-        <div className="container mx-auto px-4 md:px-8 relative">
+        <motion.div className="container mx-auto px-4 md:px-8 relative" style={{ y: ctaY, scale: ctaScale }}>
           <motion.div 
             className="max-w-4xl mx-auto"
             initial="hidden"
@@ -954,7 +986,7 @@ const Index = () => {
               </CardContent>
             </Card>
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Footer */}
