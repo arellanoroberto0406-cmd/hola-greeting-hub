@@ -926,6 +926,221 @@ const Index = () => {
         </motion.div>
       </section>
 
+      {/* Testimonials Section with Parallax */}
+      {(() => {
+        const testimonials = [
+          {
+            name: "María García",
+            role: "Fundadora de ModaLatam",
+            avatar: "👩‍💼",
+            quote: "MiTienda transformó mi negocio. En solo 2 semanas pasé de vender por Instagram a tener una tienda profesional con pagos integrados.",
+            rating: 5,
+            metric: "+340% en ventas"
+          },
+          {
+            name: "Carlos Rodríguez",
+            role: "CEO de TechStore MX",
+            avatar: "👨‍💻",
+            quote: "La mejor plataforma de e-commerce que he usado. El soporte es increíble y las funcionalidades superan a competidores más caros.",
+            rating: 5,
+            metric: "50K+ pedidos"
+          },
+          {
+            name: "Ana Martínez",
+            role: "Dueña de Artesanías Oaxaca",
+            avatar: "👩‍🎨",
+            quote: "Sin saber programar pude crear una tienda hermosa. Mis clientes me felicitan por lo profesional que se ve. ¡Estoy encantada!",
+            rating: 5,
+            metric: "4.9★ rating"
+          },
+          {
+            name: "Diego López",
+            role: "Co-fundador de FitShop",
+            avatar: "🧑‍🏋️",
+            quote: "Pasamos de 0 a 1,000 pedidos mensuales en 3 meses. La integración con WhatsApp es un game changer para nuestro negocio.",
+            rating: 5,
+            metric: "1K pedidos/mes"
+          },
+          {
+            name: "Lucía Fernández",
+            role: "Directora de BellezaPura",
+            avatar: "👩‍🔬",
+            quote: "Los analytics me ayudan a entender qué productos venden más. Las métricas son claras y accionables. Totalmente recomendada.",
+            rating: 5,
+            metric: "+200% conversión"
+          },
+          {
+            name: "Roberto Sánchez",
+            role: "Fundador de GourmetBox",
+            avatar: "👨‍🍳",
+            quote: "MercadoPago integrado fue clave para nosotros. Recibimos pagos al instante y la gestión de pedidos es súper intuitiva.",
+            rating: 5,
+            metric: "99.9% uptime"
+          }
+        ];
+
+        return (
+          <section className="py-24 md:py-32 relative overflow-hidden" id="testimonials">
+            {/* Parallax Background */}
+            <div className="absolute inset-0">
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: "radial-gradient(ellipse 120% 80% at 20% 50%, hsl(var(--primary) / 0.08), transparent 60%)",
+                }}
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+              />
+              <motion.div
+                className="absolute inset-0"
+                style={{
+                  background: "radial-gradient(ellipse 100% 80% at 80% 50%, hsl(var(--gold) / 0.06), transparent 60%)",
+                }}
+                animate={{ opacity: [1, 0.5, 1] }}
+                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+              />
+              {/* Floating quote marks */}
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={`quote-${i}`}
+                  className="absolute text-primary/5 font-serif select-none pointer-events-none"
+                  style={{
+                    fontSize: 120 + i * 40,
+                    top: `${10 + i * 18}%`,
+                    left: `${5 + i * 20}%`,
+                  }}
+                  animate={{
+                    y: [0, -30, 0],
+                    rotate: [0, 5, -5, 0],
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{ duration: 8 + i * 2, repeat: Infinity, ease: "easeInOut", delay: i * 1.5 }}
+                >
+                  "
+                </motion.div>
+              ))}
+            </div>
+
+            <div className="container mx-auto px-4 md:px-8 relative z-10">
+              {/* Section Header */}
+              <motion.div
+                className="text-center mb-16"
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 0.6 }}
+              >
+                <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full">
+                  <Star className="h-3.5 w-3.5 mr-2 fill-yellow-400 text-yellow-400" />
+                  Testimonios
+                </Badge>
+                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-4">
+                  Lo que dicen nuestros
+                  <span className="block mt-2 bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">
+                    clientes felices
+                  </span>
+                </h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Miles de emprendedores ya confían en MiTienda para hacer crecer su negocio
+                </p>
+              </motion.div>
+
+              {/* Testimonial Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                {testimonials.map((testimonial, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 60, rotateX: 15 }}
+                    whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: index * 0.1, ease: "easeOut" }}
+                    whileHover={{ y: -8, scale: 1.02 }}
+                    className="perspective-1000"
+                  >
+                    <Card className="h-full border-border/50 bg-card/60 backdrop-blur-sm hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-500 overflow-hidden group relative">
+                      {/* Top accent line */}
+                      <motion.div
+                        className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-primary to-transparent"
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.3 + index * 0.1 }}
+                      />
+                      {/* Hover glow */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-gold/0 group-hover:from-primary/5 group-hover:via-transparent group-hover:to-gold/5 transition-all duration-500" />
+
+                      <CardContent className="p-6 relative">
+                        {/* Rating + Metric */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex gap-0.5">
+                            {[...Array(testimonial.rating)].map((_, i) => (
+                              <motion.div
+                                key={i}
+                                initial={{ opacity: 0, scale: 0 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.4 + index * 0.1 + i * 0.05 }}
+                              >
+                                <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                              </motion.div>
+                            ))}
+                          </div>
+                          <Badge variant="secondary" className="text-xs rounded-full bg-green-500/10 text-green-600 border-green-500/20">
+                            {testimonial.metric}
+                          </Badge>
+                        </div>
+
+                        {/* Quote */}
+                        <p className="text-muted-foreground leading-relaxed mb-6 text-sm">
+                          "{testimonial.quote}"
+                        </p>
+
+                        {/* Author */}
+                        <div className="flex items-center gap-3">
+                          <div className="h-11 w-11 rounded-full bg-gradient-to-br from-primary/20 to-gold/20 flex items-center justify-center text-2xl border border-primary/10 group-hover:border-primary/30 transition-colors">
+                            {testimonial.avatar}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-sm group-hover:text-primary transition-colors">{testimonial.name}</p>
+                            <p className="text-xs text-muted-foreground">{testimonial.role}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Bottom social proof bar */}
+              <motion.div
+                className="mt-16 flex flex-wrap items-center justify-center gap-8 md:gap-12"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                {[
+                  { value: "4.9/5", label: "Calificación promedio" },
+                  { value: "2,500+", label: "Reseñas verificadas" },
+                  { value: "98%", label: "Recomiendan MiTienda" },
+                ].map((stat, i) => (
+                  <motion.div
+                    key={i}
+                    className="text-center group cursor-default"
+                    whileHover={{ scale: 1.08 }}
+                  >
+                    <p className="text-3xl md:text-4xl font-bold font-heading bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">
+                      {stat.value}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </section>
+        );
+      })()}
+
       {/* CTA Section */}
       <section className="py-24 md:py-32 relative overflow-hidden" ref={ctaRef}>
         <div ref={ctaParallaxRef} className="absolute inset-0">
