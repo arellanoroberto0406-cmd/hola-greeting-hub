@@ -63,6 +63,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showBanner, setShowBanner] = useState(true);
+  const [activeStore, setActiveStore] = useState(0);
   
   const heroRef = useRef(null);
   const featuresParallaxRef = useRef(null);
@@ -766,165 +767,233 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* Store Template Preview Section */}
-      <section id="tiendas" className="py-24 md:py-32 relative" ref={storesRef}>
-        <div ref={storesParallaxRef} className="absolute inset-0" />
-        <motion.div className="container mx-auto px-4 md:px-8" style={{ y: storesY, scale: storesScale }}>
-          <motion.div 
-            className="text-center mb-16"
-            initial="hidden"
-            animate={storesInView ? "visible" : "hidden"}
-            variants={staggerContainer}
-          >
-            <motion.div variants={fadeInUp}>
-              <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full">
-                <Palette className="h-3.5 w-3.5 mr-2" />
-                Vista Previa
-              </Badge>
-            </motion.div>
-            <motion.h2 
-              variants={fadeInUp}
-              className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-4"
-            >
-              Así lucirá tu tienda
-            </motion.h2>
-            <motion.p 
-              variants={fadeInUp}
-              className="text-xl text-muted-foreground max-w-2xl mx-auto"
-            >
-              Una vista previa de cómo se verá tu tienda con productos de ejemplo
-            </motion.p>
-          </motion.div>
-          
-          {/* Demo Store Preview */}
-          <motion.div 
-            className="max-w-5xl mx-auto"
-            initial="hidden"
-            animate={storesInView ? "visible" : "hidden"}
-            variants={fadeInUp}
-          >
-            {/* Store Header Preview */}
-            <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm mb-8">
-              <div className="relative h-48 md:h-64 bg-gradient-to-br from-primary/30 via-orange-400/20 to-gold/30">
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-6 flex items-end gap-4">
-                  <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary to-orange-500 flex items-center justify-center border-4 border-card shadow-xl">
-                    <Store className="h-10 w-10 text-white" />
-                  </div>
-                  <div className="pb-2">
-                    <h3 className="text-2xl font-heading font-bold text-foreground">Tu Tienda Online</h3>
-                    <p className="text-muted-foreground">Los mejores productos al mejor precio</p>
-                  </div>
-                </div>
-              </div>
-            </Card>
+      {/* Store Template Preview Section - Two Stores */}
+      {(() => {
 
-            {/* Category Tabs */}
-            <div className="flex flex-wrap justify-center gap-2 mb-8">
-              {[
-                { name: "Electrónicos", icon: "⚡" },
-                { name: "Ropa", icon: "👕" },
-                { name: "Accesorios", icon: "💎" },
-                { name: "Calzado", icon: "👟" },
-              ].map((cat, i) => (
-                <Badge 
-                  key={i} 
-                  variant={i === 0 ? "default" : "outline"} 
-                  className="px-4 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-                >
-                  <span className="mr-2">{cat.icon}</span>
-                  {cat.name}
-                </Badge>
-              ))}
-            </div>
+        const demoStores = [
+          {
+            name: "TechWorld",
+            tagline: "Lo último en tecnología",
+            icon: "🚀",
+            gradient: "from-blue-500/30 via-cyan-400/20 to-violet-500/30",
+            logoGradient: "from-blue-500 to-violet-500",
+            categories: [
+              { name: "Smartphones", icon: "📱" },
+              { name: "Audio", icon: "🎧" },
+              { name: "Wearables", icon: "⌚" },
+              { name: "Gaming", icon: "🎮" },
+            ],
+            products: [
+              { name: "iPhone 16 Pro", price: "$1,199.00", originalPrice: "$1,399.00", badge: "Oferta", image: "📱" },
+              { name: "AirPods Max", price: "$549.00", badge: "Popular", image: "🎧" },
+              { name: "Apple Watch Ultra", price: "$799.00", badge: "Nuevo", image: "⌚" },
+              { name: "Steam Deck OLED", price: "$649.00", originalPrice: "$799.00", badge: "Oferta", image: "🎮" },
+              { name: "MacBook Air M3", price: "$1,099.00", badge: "Trending", image: "💻" },
+              { name: "iPad Pro M4", price: "$999.00", badge: "Exclusivo", image: "📲" },
+              { name: "Sony WH-1000XM5", price: "$349.00", originalPrice: "$399.00", badge: "Oferta", image: "🎵" },
+              { name: "Galaxy S24 Ultra", price: "$1,299.00", badge: "Nuevo", image: "📱" },
+            ]
+          },
+          {
+            name: "Moda Urbana",
+            tagline: "Tu estilo, tu identidad",
+            icon: "✨",
+            gradient: "from-pink-500/30 via-rose-400/20 to-orange-500/30",
+            logoGradient: "from-pink-500 to-orange-500",
+            categories: [
+              { name: "Ropa", icon: "👕" },
+              { name: "Calzado", icon: "👟" },
+              { name: "Accesorios", icon: "💎" },
+              { name: "Bolsos", icon: "👜" },
+            ],
+            products: [
+              { name: "Hoodie Premium", price: "$89.00", originalPrice: "$120.00", badge: "Oferta", image: "🧥" },
+              { name: "Sneakers Limited", price: "$199.00", badge: "Exclusivo", image: "👟" },
+              { name: "Gafas Aviador", price: "$159.00", badge: "Trending", image: "🕶️" },
+              { name: "Bolso Cuero", price: "$249.00", badge: "Popular", image: "👜" },
+              { name: "Vestido Elegante", price: "$129.00", originalPrice: "$179.00", badge: "Oferta", image: "👗" },
+              { name: "Jeans Slim Fit", price: "$75.00", badge: "Nuevo", image: "👖" },
+              { name: "Collar Dorado", price: "$59.00", badge: "Popular", image: "📿" },
+              { name: "Camiseta Graphic", price: "$45.00", badge: "Nuevo", image: "👕" },
+            ]
+          }
+        ];
 
-            {/* Demo Products Grid */}
-            <motion.div 
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
-              variants={staggerContainer}
-            >
-              {[
-                // Electrónicos
-                { name: "Smartphone Pro Max", price: "$899.00", originalPrice: "$1,099.00", badge: "Oferta", image: "📱", category: "Electrónicos" },
-                { name: "Audífonos Wireless", price: "$149.00", badge: "Popular", image: "🎧", category: "Electrónicos" },
-                { name: "Smartwatch Elite", price: "$349.00", badge: "Nuevo", image: "⌚", category: "Electrónicos" },
-                { name: "Tablet Ultra", price: "$599.00", originalPrice: "$749.00", badge: "Oferta", image: "📲", category: "Electrónicos" },
-                // Ropa
-                { name: "Camiseta Premium", price: "$45.00", badge: "Nuevo", image: "👕", category: "Ropa" },
-                { name: "Hoodie Urbano", price: "$89.00", originalPrice: "$120.00", badge: "Oferta", image: "🧥", category: "Ropa" },
-                { name: "Jeans Classic Fit", price: "$75.00", badge: "Popular", image: "👖", category: "Ropa" },
-                { name: "Vestido Elegante", price: "$129.00", badge: "Exclusivo", image: "👗", category: "Ropa" },
-                // Accesorios
-                { name: "Gafas de Sol", price: "$159.00", badge: "Trending", image: "🕶️", category: "Accesorios" },
-                { name: "Bolso de Cuero", price: "$199.00", originalPrice: "$259.00", badge: "Oferta", image: "👜", category: "Accesorios" },
-                { name: "Collar Dorado", price: "$79.00", badge: "Nuevo", image: "📿", category: "Accesorios" },
-                { name: "Reloj Clásico", price: "$249.00", badge: "Exclusivo", image: "🕰️", category: "Accesorios" },
-              ].map((product, index) => (
-                <motion.div
-                  key={index}
-                  variants={fadeInUp}
-                  whileHover={{ y: -8, scale: 1.02 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
-                    <div className="relative aspect-square bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center">
-                      <span className="text-5xl md:text-6xl">{product.image}</span>
-                      <Badge className="absolute top-2 left-2 rounded-full text-xs" variant="secondary">
-                        {product.badge}
-                      </Badge>
-                      <Badge className="absolute top-2 right-2 rounded-full text-xs bg-background/80 text-foreground" variant="outline">
-                        {product.category}
-                      </Badge>
-                      <motion.div 
-                        className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
-                        initial={false}
-                      />
-                    </div>
-                    <CardContent className="p-4">
-                      <h4 className="font-medium text-sm md:text-base line-clamp-1 group-hover:text-primary transition-colors">
-                        {product.name}
-                      </h4>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-lg font-bold text-primary">{product.price}</span>
-                        {product.originalPrice && (
-                          <span className="text-sm text-muted-foreground line-through">{product.originalPrice}</span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-1 mt-2">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className={`h-3 w-3 ${i < 4 + (index % 2) ? 'fill-yellow-400 text-yellow-400' : 'fill-muted text-muted'}`} />
-                        ))}
-                        <span className="text-xs text-muted-foreground ml-1">({(4.5 + Math.random() * 0.5).toFixed(1)})</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </motion.div>
+        const store = demoStores[activeStore];
 
-            {/* Call to Action */}
-            <motion.div 
-              className="text-center mt-12 space-y-6"
-              variants={fadeInUp}
-            >
-              <div className="flex flex-wrap justify-center gap-3">
-                {["Personaliza colores", "Agrega tus productos", "Recibe pagos", "Conecta WhatsApp"].map((item, i) => (
-                  <Badge key={i} variant="outline" className="px-4 py-2 rounded-full gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-green-500" />
-                    {item}
+        return (
+          <section id="tiendas" className="py-24 md:py-32 relative" ref={storesRef}>
+            <div ref={storesParallaxRef} className="absolute inset-0" />
+            <motion.div className="container mx-auto px-4 md:px-8" style={{ y: storesY, scale: storesScale }}>
+              <motion.div 
+                className="text-center mb-16"
+                initial="hidden"
+                animate={storesInView ? "visible" : "hidden"}
+                variants={staggerContainer}
+              >
+                <motion.div variants={fadeInUp}>
+                  <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full">
+                    <Palette className="h-3.5 w-3.5 mr-2" />
+                    Vista Previa
                   </Badge>
-                ))}
-              </div>
-              <Button onClick={() => navigate("/auth")} size="lg" className="gap-2 rounded-xl shadow-lg shadow-primary/20">
-                <Rocket className="h-5 w-5" />
-                Crear Mi Tienda Ahora
-                <ArrowRight className="h-5 w-5" />
-              </Button>
+                </motion.div>
+                <motion.h2 
+                  variants={fadeInUp}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-4"
+                >
+                  Así lucirá tu tienda
+                </motion.h2>
+                <motion.p 
+                  variants={fadeInUp}
+                  className="text-xl text-muted-foreground max-w-2xl mx-auto mb-10"
+                >
+                  Explora dos estilos de tienda completamente diferentes — cada una personalizable
+                </motion.p>
+
+                {/* Store Switcher Tabs */}
+                <motion.div variants={fadeInUp} className="flex justify-center gap-3">
+                  {demoStores.map((s, i) => (
+                    <motion.button
+                      key={i}
+                      onClick={() => setActiveStore(i)}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex items-center gap-2.5 px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
+                        activeStore === i
+                          ? "border-primary bg-primary/10 shadow-lg shadow-primary/15"
+                          : "border-border/50 bg-card/50 hover:border-primary/30"
+                      }`}
+                    >
+                      <span className="text-xl">{s.icon}</span>
+                      <span className={`font-heading font-semibold text-sm ${activeStore === i ? "text-primary" : "text-muted-foreground"}`}>
+                        {s.name}
+                      </span>
+                    </motion.button>
+                  ))}
+                </motion.div>
+              </motion.div>
+              
+              {/* Demo Store Preview - Animated */}
+              <motion.div 
+                key={activeStore}
+                className="max-w-5xl mx-auto"
+                initial={{ opacity: 0, y: 30, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+              >
+                {/* Store Header Preview */}
+                <Card className="overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm mb-8">
+                  <div className={`relative h-48 md:h-64 bg-gradient-to-br ${store.gradient}`}>
+                    <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
+                    <div className="absolute bottom-4 left-6 flex items-end gap-4">
+                      <motion.div 
+                        className={`h-20 w-20 rounded-2xl bg-gradient-to-br ${store.logoGradient} flex items-center justify-center border-4 border-card shadow-xl text-3xl`}
+                        initial={{ scale: 0, rotate: -20 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
+                      >
+                        {store.icon}
+                      </motion.div>
+                      <div className="pb-2">
+                        <h3 className="text-2xl font-heading font-bold text-foreground">{store.name}</h3>
+                        <p className="text-muted-foreground">{store.tagline}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Category Tabs */}
+                <div className="flex flex-wrap justify-center gap-2 mb-8">
+                  {store.categories.map((cat, i) => (
+                    <motion.div
+                      key={cat.name}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + i * 0.05 }}
+                    >
+                      <Badge 
+                        variant={i === 0 ? "default" : "outline"} 
+                        className="px-4 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                      >
+                        <span className="mr-2">{cat.icon}</span>
+                        {cat.name}
+                      </Badge>
+                    </motion.div>
+                  ))}
+                </div>
+
+                {/* Demo Products Grid */}
+                <motion.div 
+                  className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6"
+                  initial="hidden"
+                  animate="visible"
+                  variants={staggerContainer}
+                >
+                  {store.products.map((product, index) => (
+                    <motion.div
+                      key={`${activeStore}-${index}`}
+                      variants={fadeInUp}
+                      whileHover={{ y: -8, scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <Card className="group h-full overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300">
+                        <div className="relative aspect-square bg-gradient-to-br from-muted/50 to-muted/30 flex items-center justify-center">
+                          <span className="text-5xl md:text-6xl">{product.image}</span>
+                          <Badge className="absolute top-2 left-2 rounded-full text-xs" variant="secondary">
+                            {product.badge}
+                          </Badge>
+                          <motion.div 
+                            className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"
+                            initial={false}
+                          />
+                        </div>
+                        <CardContent className="p-4">
+                          <h4 className="font-medium text-sm md:text-base line-clamp-1 group-hover:text-primary transition-colors">
+                            {product.name}
+                          </h4>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="text-lg font-bold text-primary">{product.price}</span>
+                            {product.originalPrice && (
+                              <span className="text-sm text-muted-foreground line-through">{product.originalPrice}</span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1 mt-2">
+                            {[...Array(5)].map((_, i) => (
+                              <Star key={i} className={`h-3 w-3 ${i < 4 + (index % 2) ? 'fill-yellow-400 text-yellow-400' : 'fill-muted text-muted'}`} />
+                            ))}
+                            <span className="text-xs text-muted-foreground ml-1">(4.{7 + (index % 3)})</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* Call to Action */}
+                <motion.div 
+                  className="text-center mt-12 space-y-6"
+                  variants={fadeInUp}
+                >
+                  <div className="flex flex-wrap justify-center gap-3">
+                    {["Personaliza colores", "Agrega tus productos", "Recibe pagos", "Conecta WhatsApp"].map((item, i) => (
+                      <Badge key={i} variant="outline" className="px-4 py-2 rounded-full gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        {item}
+                      </Badge>
+                    ))}
+                  </div>
+                  <Button onClick={() => navigate("/auth")} size="lg" className="gap-2 rounded-xl shadow-lg shadow-primary/20">
+                    <Rocket className="h-5 w-5" />
+                    Crear Mi Tienda Ahora
+                    <ArrowRight className="h-5 w-5" />
+                  </Button>
+                </motion.div>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        </motion.div>
-      </section>
+          </section>
+        );
+      })()}
 
       {/* Testimonials Section with Parallax */}
       {(() => {
