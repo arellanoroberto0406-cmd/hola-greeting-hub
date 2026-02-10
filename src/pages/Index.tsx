@@ -1204,32 +1204,137 @@ const Index = () => {
         </motion.div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border/40 py-12 bg-muted/5">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
-                <Store className="h-4 w-4 text-primary-foreground" />
+      {/* Premium Footer */}
+      <footer className="relative border-t border-border/30 bg-gradient-to-b from-background to-muted/10 overflow-hidden">
+        {/* Background accents */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
+          <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gold/5 rounded-full blur-[120px]" />
+        </div>
+
+        <div className="container mx-auto px-4 md:px-8 relative z-10">
+          {/* Main Footer Content */}
+          <div className="py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+            {/* Brand Column */}
+            <div className="lg:col-span-1 space-y-5">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-primary/30 blur-lg rounded-xl" />
+                  <div className="relative h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+                    <Store className="h-5 w-5 text-primary-foreground" />
+                  </div>
+                </div>
+                <span className="font-heading text-xl font-bold tracking-tight">APP TIENDA</span>
               </div>
-              <span className="font-heading text-lg font-bold">MiTienda</span>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
+                La plataforma #1 de e-commerce en LATAM. Crea tu tienda online profesional en minutos, sin código.
+              </p>
+              <div className="flex items-center gap-3">
+                {[
+                  { icon: "𝕏", href: "#" },
+                  { icon: "📷", href: "#" },
+                  { icon: "📘", href: "#" },
+                  { icon: "💬", href: "#" },
+                ].map((social, i) => (
+                  <a
+                    key={i}
+                    href={social.href}
+                    className="h-9 w-9 rounded-lg border border-border/50 bg-card/50 flex items-center justify-center text-sm hover:border-primary/40 hover:bg-primary/10 transition-all duration-300"
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
             </div>
-            
-            <nav className="flex items-center gap-6">
-              {["Características", "Tiendas", "Términos", "Privacidad"].map((item) => (
-                <a 
-                  key={item}
-                  href={item === "Características" ? "#features" : item === "Tiendas" ? "#tiendas" : "#"}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {item}
-                </a>
-              ))}
-            </nav>
-            
-            <p className="text-sm text-muted-foreground">
-              © {new Date().getFullYear()} MiTienda
+
+            {/* Links Columns */}
+            {[
+              {
+                title: "Producto",
+                links: [
+                  { name: "Características", href: "#features" },
+                  { name: "Precios", href: "#pricing" },
+                  { name: "Tiendas", href: "#tiendas" },
+                  { name: "Testimonios", href: "#testimonials" },
+                  { name: "Integraciones", href: "#" },
+                ]
+              },
+              {
+                title: "Recursos",
+                links: [
+                  { name: "Centro de Ayuda", href: "#" },
+                  { name: "Guía de Inicio", href: "#" },
+                  { name: "Blog", href: "#" },
+                  { name: "API Docs", href: "#" },
+                  { name: "Estado del Servicio", href: "#" },
+                ]
+              },
+              {
+                title: "Empresa",
+                links: [
+                  { name: "Sobre Nosotros", href: "#" },
+                  { name: "Contacto", href: "#" },
+                  { name: "Términos de Servicio", href: "#" },
+                  { name: "Política de Privacidad", href: "#" },
+                  { name: "Programa de Afiliados", href: "#" },
+                ]
+              }
+            ].map((column) => (
+              <div key={column.title}>
+                <h4 className="font-heading font-semibold text-sm uppercase tracking-wider mb-4 text-foreground/80">
+                  {column.title}
+                </h4>
+                <ul className="space-y-3">
+                  {column.links.map((link) => (
+                    <li key={link.name}>
+                      <a
+                        href={link.href}
+                        className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200 inline-flex items-center gap-1 group"
+                      >
+                        {link.name}
+                        <ChevronRight className="h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          {/* Newsletter mini */}
+          <div className="py-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-3">
+              <Zap className="h-5 w-5 text-primary" />
+              <p className="text-sm text-muted-foreground">
+                Recibe tips de e-commerce y novedades de la plataforma
+              </p>
+            </div>
+            <div className="flex gap-2 w-full md:w-auto">
+              <input
+                type="email"
+                placeholder="tu@email.com"
+                className="flex-1 md:w-64 h-10 rounded-xl border border-border/50 bg-card/50 px-4 text-sm placeholder:text-muted-foreground/50 focus:outline-none focus:border-primary/50 transition-colors"
+              />
+              <Button size="sm" className="rounded-xl px-5 gap-2">
+                Suscribirse
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="py-6 border-t border-border/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-xs text-muted-foreground">
+              © {new Date().getFullYear()} APP TIENDA. Todos los derechos reservados.
             </p>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                Todos los sistemas operativos
+              </span>
+              <span className="mx-2">•</span>
+              <span>Hecho con 💜 en LATAM</span>
+            </div>
           </div>
         </div>
       </footer>
