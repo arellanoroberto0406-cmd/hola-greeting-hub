@@ -278,20 +278,60 @@ const StoreFront = () => {
 
   if (storeLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/30 to-background">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="flex flex-col items-center gap-6"
+        >
+          <div className="relative">
+            <motion.div
+              className="h-16 w-16 rounded-2xl bg-primary/10 flex items-center justify-center"
+              animate={{ rotate: [0, 5, -5, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <Store className="h-8 w-8 text-primary" />
+            </motion.div>
+            <motion.div
+              className="absolute -inset-3 rounded-3xl border-2 border-primary/20"
+              animate={{ scale: [1, 1.1, 1], opacity: [0.5, 0, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </div>
+          <div className="space-y-2 text-center">
+            <motion.div className="h-4 w-32 bg-muted rounded-full mx-auto" animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }} />
+            <motion.div className="h-3 w-48 bg-muted/60 rounded-full mx-auto" animate={{ opacity: [0.3, 0.7, 0.3] }} transition={{ duration: 1.5, repeat: Infinity, delay: 0.2 }} />
+          </div>
+        </motion.div>
       </div>
     );
   }
 
   if (!store) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">Tienda no encontrada</h1>
-          <p className="text-muted-foreground">La tienda que buscas no existe o no está disponible.</p>
-          <Button onClick={() => navigate("/")}>Ir al inicio</Button>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="text-center space-y-6 max-w-md px-6"
+        >
+          <motion.div
+            className="mx-auto h-20 w-20 rounded-3xl bg-destructive/10 flex items-center justify-center"
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <Store className="h-10 w-10 text-destructive/60" />
+          </motion.div>
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold tracking-tight">Tienda no encontrada</h1>
+            <p className="text-muted-foreground text-lg">La tienda que buscas no existe o no está disponible en este momento.</p>
+          </div>
+          <Button size="lg" className="rounded-xl shadow-lg" onClick={() => navigate("/")}>
+            <ChevronRight className="h-4 w-4 mr-2 rotate-180" />
+            Volver al inicio
+          </Button>
+        </motion.div>
       </div>
     );
   }
@@ -335,16 +375,47 @@ const StoreFront = () => {
 
 
       {/* Dynamic Sections */}
-      <div className="container mx-auto px-4 py-8">
-        {productsLoading ? (
-          <div className="flex justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin" style={{ color: store.primary_color }} />
-          </div>
-        ) : (
-          <div 
-            className="flex flex-col"
-            style={{ gap: 'var(--store-section-spacing, 4rem)' }}
-          >
+      <div className="relative">
+        {/* Subtle background texture */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
+          backgroundSize: '32px 32px',
+        }} />
+        
+        <div className="container mx-auto px-4 py-8 relative">
+          {productsLoading ? (
+            <div className="flex flex-col items-center justify-center py-24 gap-6">
+              <motion.div
+                className="relative"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <motion.div
+                  className="h-12 w-12 rounded-2xl flex items-center justify-center"
+                  style={{ backgroundColor: `${store.primary_color}15` }}
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                >
+                  <Loader2 className="w-6 h-6" style={{ color: store.primary_color }} />
+                </motion.div>
+              </motion.div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-4xl">
+                {[...Array(4)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="rounded-xl bg-muted/40 aspect-[3/4]"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: [0.3, 0.6, 0.3], y: 0 }}
+                    transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.15 }}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div 
+              className="flex flex-col"
+              style={{ gap: 'var(--store-section-spacing, 4rem)' }}
+            >
             {sections.map((section) => {
               switch (section.type) {
                 case 'hero':
@@ -586,12 +657,28 @@ const StoreFront = () => {
 
             {/* Empty state */}
             {allProducts.length === 0 && (
-              <div className="text-center py-16">
-                <p className="text-lg text-muted-foreground">Esta tienda aún no tiene productos</p>
-              </div>
+              <motion.div 
+                className="text-center py-24"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <motion.div
+                  className="mx-auto h-24 w-24 rounded-3xl flex items-center justify-center mb-6"
+                  style={{ backgroundColor: `${store.primary_color}10` }}
+                  animate={{ y: [0, -8, 0] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                >
+                  <Package className="h-12 w-12" style={{ color: `${store.primary_color}60` }} />
+                </motion.div>
+                <h3 className="text-2xl font-bold mb-2">Próximamente</h3>
+                <p className="text-lg text-muted-foreground max-w-md mx-auto">
+                  Estamos preparando productos increíbles para ti. ¡Vuelve pronto!
+                </p>
+              </motion.div>
             )}
           </div>
         )}
+        </div>
       </div>
 
       {/* Premium Product Detail Modal */}

@@ -171,15 +171,21 @@ export const SectionWrapper = ({
     ...borderStyle,
     borderRadius: 'var(--store-radius, 12px)',
   };
+
+  const innerContent = (
+    <div className="relative">
+      {children}
+    </div>
+  );
   
   // Don't wrap with animation if animation is 'none'
   if (animation === 'none') {
     return (
       <div 
-        className={`${paddingClass} ${className}`}
+        className={`${paddingClass} ${className} relative overflow-hidden`}
         style={combinedStyle}
       >
-        {children}
+        {innerContent}
       </div>
     );
   }
@@ -191,10 +197,10 @@ export const SectionWrapper = ({
       viewport={{ once: true, margin: "-50px" }}
       variants={variants}
       transition={{ delay }}
-      className={`${paddingClass} ${className}`}
+      className={`${paddingClass} ${className} relative overflow-hidden`}
       style={combinedStyle}
     >
-      {children}
+      {innerContent}
     </motion.div>
   );
 };
