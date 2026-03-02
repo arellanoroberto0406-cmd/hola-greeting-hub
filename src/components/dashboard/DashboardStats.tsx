@@ -5,8 +5,8 @@ import {
   Package, 
   ShoppingCart, 
   TrendingUp,
-  Users,
-  Eye
+  ArrowUpRight,
+  ArrowDownRight
 } from "lucide-react";
 import { useStoreOrdersStats } from "@/hooks/useStoreOrders";
 import { useEffect, useState } from "react";
@@ -17,19 +17,12 @@ interface DashboardStatsProps {
   productsCount: number;
 }
 
-interface AnimatedNumberProps {
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  decimals?: number;
-}
-
-const AnimatedNumber = ({ value, prefix = "", suffix = "", decimals = 0 }: AnimatedNumberProps) => {
+const AnimatedNumber = ({ value, prefix = "", decimals = 0 }: { value: number; prefix?: string; decimals?: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    const duration = 1000;
-    const steps = 30;
+    const duration = 800;
+    const steps = 25;
     const increment = value / steps;
     let current = 0;
     let step = 0;
@@ -49,29 +42,8 @@ const AnimatedNumber = ({ value, prefix = "", suffix = "", decimals = 0 }: Anima
   }, [value]);
 
   return (
-    <span>
-      {prefix}{displayValue.toFixed(decimals)}{suffix}
-    </span>
+    <span>{prefix}{displayValue.toFixed(decimals)}</span>
   );
-};
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
-    y: 0,
-    transition: { duration: 0.4, ease: "easeOut" as const }
-  }
 };
 
 const DashboardStats = ({ storeId, primaryColor, productsCount }: DashboardStatsProps) => {
@@ -79,24 +51,26 @@ const DashboardStats = ({ storeId, primaryColor, productsCount }: DashboardStats
 
   const statCards = [
     {
-      title: "Ingresos Totales",
+      title: "Ingresos",
       value: stats?.totalRevenue || 0,
       prefix: "$",
       decimals: 2,
       icon: DollarSign,
-      color: "from-green-500 to-emerald-600",
-      bgColor: "bg-green-500/10",
-      iconColor: "text-green-500"
+      trend: "+12%",
+      trendUp: true,
+      accentClass: "text-emerald-600 dark:text-emerald-400",
+      bgClass: "bg-emerald-500/10",
     },
     {
-      title: "Total Pedidos",
+      title: "Pedidos",
       value: stats?.totalOrders || 0,
       prefix: "",
       decimals: 0,
       icon: ShoppingCart,
-      color: "from-blue-500 to-cyan-600",
-      bgColor: "bg-blue-500/10",
-      iconColor: "text-blue-500"
+      trend: "+8%",
+      trendUp: true,
+      accentClass: "text-blue-600 dark:text-blue-400",
+      bgClass: "bg-blue-500/10",
     },
     {
       title: "Pendientes",
@@ -104,9 +78,10 @@ const DashboardStats = ({ storeId, primaryColor, productsCount }: DashboardStats
       prefix: "",
       decimals: 0,
       icon: Package,
-      color: "from-amber-500 to-orange-600",
-      bgColor: "bg-amber-500/10",
-      iconColor: "text-amber-500"
+      trend: "-3%",
+      trendUp: false,
+      accentClass: "text-amber-600 dark:text-amber-400",
+      bgClass: "bg-amber-500/10",
     },
     {
       title: "Productos",
@@ -114,19 +89,20 @@ const DashboardStats = ({ storeId, primaryColor, productsCount }: DashboardStats
       prefix: "",
       decimals: 0,
       icon: Package,
-      color: "from-purple-500 to-violet-600",
-      bgColor: "bg-purple-500/10",
-      iconColor: "text-purple-500"
+      trend: `${productsCount}`,
+      trendUp: true,
+      accentClass: "text-violet-600 dark:text-violet-400",
+      bgClass: "bg-violet-500/10",
     }
   ];
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
         {[1, 2, 3, 4].map((i) => (
-          <Card key={i} className="animate-pulse">
-            <CardContent className="p-6">
-              <div className="h-20 bg-muted rounded" />
+          <Card key={i} className="animate-pulse border-border/50">
+            <CardContent className="p-5">
+              <div className="h-16 bg-muted rounded-lg" />
             </CardContent>
           </Card>
         ))}
@@ -136,42 +112,43 @@ const DashboardStats = ({ storeId, primaryColor, productsCount }: DashboardStats
 
   return (
     <motion.div 
-      className="grid grid-cols-2 lg:grid-cols-4 gap-4"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+      className="grid grid-cols-2 xl:grid-cols-4 gap-3"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, staggerChildren: 0.1 }}
     >
       {statCards.map((stat, index) => (
-        <motion.div key={index} variants={itemVariants}>
-          <Card className="relative overflow-hidden group hover:shadow-lg transition-all duration-300 border-border/50 bg-card/50 backdrop-blur-sm hover:border-primary/30">
-            <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover:opacity-5 transition-opacity duration-300`} />
-            <CardContent className="p-6 relative">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <p className="text-3xl font-bold font-heading tracking-tight">
-                    <AnimatedNumber 
-                      value={stat.value} 
-                      prefix={stat.prefix}
-                      decimals={stat.decimals}
-                    />
-                  </p>
+        <motion.div 
+          key={index} 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.08 }}
+        >
+          <Card className="border-border/50 bg-card/80 hover:shadow-md transition-shadow duration-300">
+            <CardContent className="p-4 sm:p-5">
+              <div className="flex items-center justify-between mb-3">
+                <div className={`p-2 rounded-lg ${stat.bgClass}`}>
+                  <stat.icon className={`h-4 w-4 ${stat.accentClass}`} />
                 </div>
-                <motion.div 
-                  className={`p-3 rounded-xl ${stat.bgColor}`}
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400 }}
-                >
-                  <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
-                </motion.div>
+                <div className="flex items-center gap-0.5 text-xs">
+                  {stat.trendUp ? (
+                    <ArrowUpRight className="h-3 w-3 text-emerald-500" />
+                  ) : (
+                    <ArrowDownRight className="h-3 w-3 text-amber-500" />
+                  )}
+                  <span className={stat.trendUp ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}>
+                    {stat.trend}
+                  </span>
+                </div>
               </div>
-              
-              {/* Trend indicator - placeholder */}
-              <div className="flex items-center gap-1 mt-3 text-xs">
-                <TrendingUp className="h-3 w-3 text-green-500" />
-                <span className="text-green-500 font-medium">+12%</span>
-                <span className="text-muted-foreground">vs mes anterior</span>
-              </div>
+              <p className="text-2xl sm:text-3xl font-bold font-heading tracking-tight leading-none">
+                <AnimatedNumber 
+                  value={stat.value} 
+                  prefix={stat.prefix}
+                  decimals={stat.decimals}
+                />
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">{stat.title}</p>
             </CardContent>
           </Card>
         </motion.div>
