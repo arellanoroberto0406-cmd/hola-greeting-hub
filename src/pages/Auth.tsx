@@ -21,10 +21,7 @@ import {
   Zap,
   Star
 } from "lucide-react";
-import { z } from "zod";
-
-const emailSchema = z.string().email("Email inválido");
-const passwordSchema = z.string().min(6, "La contraseña debe tener al menos 6 caracteres");
+import { signInSchema, signUpSchema } from "@/lib/validation";
 
 const floatingAnimation = {
   initial: { y: 0 },
@@ -44,7 +41,7 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; fullName?: string }>({});
   
   const redirectTo = searchParams.get("redirect") || "/dashboard";
 
@@ -60,22 +57,22 @@ const Auth = () => {
     }
   }, [user, loading, navigate, redirectTo]);
 
-  const validateForm = () => {
-    const newErrors: { email?: string; password?: string } = {};
+  const validateForm = (isSignUp = false) => {
+    const newErrors: { email?: string; password?: string; fullName?: string } = {};
     
-    try {
-      emailSchema.parse(email);
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        newErrors.email = e.errors[0].message;
-      }
-    }
+    const schema = isSignUp ? signUpSchema : signInSchema;
+    const result = schema.safeParse({ 
+      email, 
+      password,
+      ...(isSignUp ? { fullName: fullName || "" } : {})
+    });
     
-    try {
-      passwordSchema.parse(password);
-    } catch (e) {
-      if (e instanceof z.ZodError) {
-        newErrors.password = e.errors[0].message;
+    if (!result.success) {
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (field === "email") newErrors.email = issue.message;
+        if (field === "password") newErrors.password = issue.message;
+        if (field === "fullName") newErrors.fullName = issue.message;
       }
     }
     
@@ -85,7 +82,7 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm(false)) return;
     
     setIsSubmitting(true);
     const { error } = await signIn(email, password);
@@ -104,7 +101,7 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm(true)) return;
     
     setIsSubmitting(true);
     const { error } = await signUp(email, password, fullName);
