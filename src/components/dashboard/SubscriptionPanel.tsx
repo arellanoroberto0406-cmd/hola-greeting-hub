@@ -82,7 +82,11 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
   const handlePayWithPayPal = () => {
     if (!selectedPlan) return;
-    createOrder(storeId, selectedPlan.id, billingCycle);
+    createPayPalSubscription(storeId, selectedPlan.id, billingCycle);
+  };
+
+  const handleCancelSubscription = () => {
+    cancelSubscription(storeId);
   };
 
   const getStatusBadge = () => {
