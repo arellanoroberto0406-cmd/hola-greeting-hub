@@ -34,6 +34,8 @@ export interface StoreSubscription {
   next_payment_date: string | null;
   created_at: string;
   updated_at: string;
+  paypal_subscription_id?: string | null;
+  auto_renew?: boolean;
   plan?: SubscriptionPlan;
 }
 
