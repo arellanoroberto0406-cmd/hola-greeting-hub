@@ -457,6 +457,44 @@ export type Database = {
           },
         ]
       }
+      paypal_billing_plans: {
+        Row: {
+          billing_cycle: string
+          created_at: string
+          id: string
+          is_active: boolean
+          paypal_plan_id: string
+          subscription_plan_id: string
+          updated_at: string
+        }
+        Insert: {
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          paypal_plan_id: string
+          subscription_plan_id: string
+          updated_at?: string
+        }
+        Update: {
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          paypal_plan_id?: string
+          subscription_plan_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "paypal_billing_plans_subscription_plan_id_fkey"
+            columns: ["subscription_plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paypal_pending_orders: {
         Row: {
           amount: number
@@ -889,12 +927,14 @@ export type Database = {
       }
       store_subscriptions: {
         Row: {
+          auto_renew: boolean | null
           created_at: string
           id: string
           last_payment_date: string | null
           next_payment_date: string | null
           payment_method: string | null
           payment_reference: string | null
+          paypal_subscription_id: string | null
           plan_id: string
           status: string
           store_id: string
@@ -905,12 +945,14 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          auto_renew?: boolean | null
           created_at?: string
           id?: string
           last_payment_date?: string | null
           next_payment_date?: string | null
           payment_method?: string | null
           payment_reference?: string | null
+          paypal_subscription_id?: string | null
           plan_id: string
           status?: string
           store_id: string
@@ -921,12 +963,14 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          auto_renew?: boolean | null
           created_at?: string
           id?: string
           last_payment_date?: string | null
           next_payment_date?: string | null
           payment_method?: string | null
           payment_reference?: string | null
+          paypal_subscription_id?: string | null
           plan_id?: string
           status?: string
           store_id?: string

@@ -39,7 +39,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const { data: plans, isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
   const { subscription, isActive, status, daysLeft, plan: currentPlan } = useSubscriptionStatus(storeId);
   const createSubscription = useCreateSubscription();
-  const { createOrder, isProcessing, error: paymentError } = usePayPalPayment();
+  const { createSubscription: createPayPalSubscription, cancelSubscription, isProcessing, error: paymentError } = usePayPalPayment();
   
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
@@ -82,7 +82,11 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
   const handlePayWithPayPal = () => {
     if (!selectedPlan) return;
-    createOrder(storeId, selectedPlan.id, billingCycle);
+    createPayPalSubscription(storeId, selectedPlan.id, billingCycle);
+  };
+
+  const handleCancelSubscription = () => {
+    cancelSubscription(storeId);
   };
 
   const getStatusBadge = () => {
@@ -271,22 +275,40 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
         <CardHeader>
           <CardTitle>Información de Pago</CardTitle>
           <CardDescription>
-            Pagos automáticos y seguros con PayPal
+            Cobro automático mensual/anual con PayPal. El dinero llega directo a tu cuenta PayPal.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="border rounded-lg p-4 flex items-center gap-4">
             <div className="bg-[#0070ba] text-white p-3 rounded-lg">
               <CreditCard className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-medium">💳 PayPal</h4>
+              <h4 className="font-medium">💳 PayPal - Cobro Recurrente</h4>
               <p className="text-sm text-muted-foreground">
-                Paga de forma segura con tu cuenta de PayPal o tarjeta de crédito/débito. 
-                Tu suscripción se activará automáticamente.
+                Se cobra automáticamente cada mes (o año). Los pagos se depositan directamente en tu cuenta PayPal.
+                El cliente puede cancelar en cualquier momento.
               </p>
             </div>
           </div>
+          {subscription?.paypal_subscription_id && status === 'active' && (
+            <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/30">
+              <div>
+                <p className="text-sm font-medium">Suscripción activa con cobro automático</p>
+                <p className="text-xs text-muted-foreground">
+                  ID: {subscription.paypal_subscription_id}
+                </p>
+              </div>
+              <Button 
+                variant="destructive" 
+                size="sm"
+                onClick={handleCancelSubscription}
+                disabled={isProcessing}
+              >
+                {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cancelar suscripción'}
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

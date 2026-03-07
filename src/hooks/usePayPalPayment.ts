@@ -11,20 +11,20 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const createOrder = async (
-    storeId: string, 
-    planId: string, 
+  const createSubscription = async (
+    storeId: string,
+    planId: string,
     billingCycle: 'monthly' | 'yearly' = 'monthly'
   ) => {
     setIsProcessing(true);
     setError(null);
-    
+
     try {
-      console.log('Creating PayPal order:', { storeId, planId, billingCycle });
-      
+      console.log('Creating PayPal recurring subscription:', { storeId, planId, billingCycle });
+
       const { data, error: invokeError } = await supabase.functions.invoke('paypal-subscription', {
         body: {
-          action: 'create-order',
+          action: 'create-subscription',
           storeId,
           planId,
           billingCycle,
@@ -42,25 +42,53 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       }
 
       if (data?.approvalUrl) {
-        console.log('Redirecting to PayPal:', data.approvalUrl);
-        // Redirect to PayPal for payment
+        console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
         window.location.href = data.approvalUrl;
       } else {
         throw new Error('No se recibió la URL de aprobación de PayPal');
       }
-
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      console.error('PayPal payment error:', err);
+      console.error('PayPal subscription error:', err);
       setError(errorMessage);
-      toast.error('Error al procesar el pago: ' + errorMessage);
+      toast.error('Error al procesar la suscripción: ' + errorMessage);
       options.onError?.(err as Error);
       setIsProcessing(false);
     }
   };
 
+  const cancelSubscription = async (storeId: string) => {
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      const { data, error: invokeError } = await supabase.functions.invoke('paypal-subscription', {
+        body: {
+          action: 'cancel-subscription',
+          storeId,
+        },
+      });
+
+      if (invokeError) throw new Error(invokeError.message);
+      if (data?.error) throw new Error(data.error);
+
+      toast.success('Suscripción cancelada. Tu plan seguirá activo hasta el fin del período.');
+      options.onSuccess?.();
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
+      setError(errorMessage);
+      toast.error('Error al cancelar: ' + errorMessage);
+      options.onError?.(err as Error);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   return {
-    createOrder,
+    createSubscription,
+    cancelSubscription,
+    // Keep legacy name for backward compat
+    createOrder: createSubscription,
     isProcessing,
     error,
   };
