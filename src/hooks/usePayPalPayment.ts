@@ -7,6 +7,14 @@ interface UsePayPalPaymentOptions {
   onError?: (error: Error) => void;
 }
 
+type PayPalFunctionResponse = {
+  approvalUrl?: string;
+  error?: string;
+  errorCode?: string;
+  debugId?: string | null;
+  technicalDetails?: string;
+};
+
 export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);

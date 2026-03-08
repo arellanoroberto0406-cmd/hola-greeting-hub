@@ -74,7 +74,8 @@ async function createPayPalOrder(
   if (!res.ok) {
     const err = await res.text()
     console.error(`PayPal order creation failed (${res.status}):`, err)
-    throw new Error(`Failed to create PayPal order: ${err}`)
+    const mapped = mapPayPalErrorForClient(err)
+    throw new Error(JSON.stringify(mapped))
   }
 
   const order = await res.json()
