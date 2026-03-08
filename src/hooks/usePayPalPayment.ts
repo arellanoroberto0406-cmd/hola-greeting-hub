@@ -32,8 +32,19 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       });
 
       if (invokeError) {
-        console.error('Supabase function error:', invokeError);
-        throw new Error(invokeError.message || 'Error al conectar con PayPal');
+        const invokeDetails = invokeError as { message?: string; context?: unknown };
+        const contextText = typeof invokeDetails.context === 'string'
+          ? invokeDetails.context
+          : invokeDetails.context
+            ? JSON.stringify(invokeDetails.context)
+            : '';
+
+        console.error('Function invoke error:', invokeError, 'Context:', invokeDetails.context);
+        throw new Error(
+          contextText
+            ? `${invokeDetails.message || 'Error al conectar con PayPal'}: ${contextText}`
+            : (invokeDetails.message || 'Error al conectar con PayPal')
+        );
       }
 
       if (data?.error) {

@@ -380,8 +380,21 @@ Deno.serve(async (req) => {
     }
 
     // ========== API: Create subscription (called from frontend) ==========
-    const body = await req.json()
-    const { action: bodyAction, planId, storeId, billingCycle = 'monthly' } = body
+    let body: Record<string, unknown> = {}
+    try {
+      body = await req.json()
+    } catch {
+      body = {}
+    }
+
+    const { action: bodyAction, planId, storeId, billingCycle = 'monthly' } = body as {
+      action?: string
+      planId?: string
+      storeId?: string
+      billingCycle?: 'monthly' | 'yearly'
+    }
+
+    console.log('Incoming request action:', bodyAction ?? 'none', '| storeId:', storeId ?? 'none', '| planId:', planId ?? 'none')
 
     if (bodyAction === 'create-subscription') {
       console.log(`Creating recurring subscription for store ${storeId}, plan ${planId}, cycle ${billingCycle}`)
@@ -497,8 +510,8 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ error: 'Invalid action' }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      JSON.stringify({ error: `Invalid action: ${String(bodyAction ?? 'none')}` }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error: unknown) {
@@ -506,7 +519,7 @@ Deno.serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     return new Response(
       JSON.stringify({ error: errorMessage }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
