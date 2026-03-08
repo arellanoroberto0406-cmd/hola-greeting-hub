@@ -39,7 +39,14 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const { data: plans, isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
   const { subscription, isActive, status, daysLeft, plan: currentPlan } = useSubscriptionStatus(storeId);
   const createSubscription = useCreateSubscription();
-  const { createSubscription: createPayPalSubscription, cancelSubscription, isProcessing, error: paymentError } = usePayPalPayment();
+  const { 
+    createSubscription: createPayPalSubscription, 
+    cancelSubscription, 
+    isProcessing, 
+    error: paymentError,
+    manualApprovalUrl,
+    clearManualApprovalUrl,
+  } = usePayPalPayment();
   
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
@@ -82,6 +89,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
   const handlePayWithPayPal = () => {
     if (!selectedPlan) return;
+    clearManualApprovalUrl();
     createPayPalSubscription(storeId, selectedPlan.id, billingCycle);
   };
 
@@ -378,6 +386,38 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
               </div>
             </div>
           </div>
+
+          {manualApprovalUrl && (
+            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
+              <p className="text-sm font-medium">Si PayPal no se abrió, continúa manualmente:</p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button asChild variant="secondary" className="w-full sm:w-auto">
+                  <a href={manualApprovalUrl} target="_blank" rel="noopener noreferrer">
+                    Abrir PayPal
+                  </a>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(manualApprovalUrl);
+                      toast.success('Enlace de PayPal copiado. Ábrelo en Safari/Chrome.');
+                    } catch {
+                      toast.error('No se pudo copiar el enlace.');
+                    }
+                  }}
+                >
+                  Copiar enlace
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {paymentError && !manualApprovalUrl && (
+            <p className="text-sm text-destructive">{paymentError}</p>
+          )}
           
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setShowUpgradeDialog(false)}>
@@ -386,7 +426,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
             <Button 
               onClick={handlePayWithPayPal}
               disabled={isProcessing}
-              className="bg-[#0070ba] hover:bg-[#005ea6] text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isProcessing ? (
                 <>

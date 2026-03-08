@@ -10,6 +10,9 @@ interface UsePayPalPaymentOptions {
 export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [manualApprovalUrl, setManualApprovalUrl] = useState<string | null>(null);
+
+  const clearManualApprovalUrl = () => setManualApprovalUrl(null);
 
   const createSubscription = async (
     storeId: string,
@@ -18,6 +21,7 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   ) => {
     setIsProcessing(true);
     setError(null);
+    setManualApprovalUrl(null);
 
     // Detect preview/embedded contexts where PayPal commonly fails in-place
     const userAgent = navigator.userAgent || '';
@@ -32,19 +36,13 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
     const isEmbeddedWebView = /FBAN|FBAV|Instagram|Line|wv|WebView/i.test(userAgent);
     const shouldUsePopupFlow = isInIframe || isPreviewHost || isEmbeddedWebView;
 
-    // Open popup synchronously from user click to avoid popup blockers
+    // Try to pre-open popup synchronously from user click (best chance to avoid blockers)
     let checkoutWindow: Window | null = null;
     if (shouldUsePopupFlow) {
       checkoutWindow = window.open('', '_blank', 'noopener,noreferrer');
-      if (!checkoutWindow) {
-        const msg = 'Tu navegador bloqueó la apertura de PayPal. Abre la app en Safari/Chrome y vuelve a intentar.';
-        setError(msg);
-        toast.error(msg);
-        setIsProcessing(false);
-        return;
+      if (checkoutWindow) {
+        checkoutWindow.document.write('<p style="font-family: sans-serif; padding: 16px;">Redirigiendo a PayPal...</p>');
       }
-
-      checkoutWindow.document.write('<p style="font-family: sans-serif; padding: 16px;">Redirigiendo a PayPal...</p>');
     }
 
     try {
@@ -80,36 +78,41 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
         throw new Error(data.error);
       }
 
-      if (data?.approvalUrl) {
-        console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
-        const approvalUrl = data.approvalUrl as string;
+      if (!data?.approvalUrl) {
+        throw new Error('No se recibió la URL de aprobación de PayPal');
+      }
 
-        if (checkoutWindow && !checkoutWindow.closed) {
+      console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
+      const approvalUrl = data.approvalUrl as string;
+
+      if (checkoutWindow && !checkoutWindow.closed) {
+        try {
           checkoutWindow.location.href = approvalUrl;
           toast.info('Se abrió PayPal en una nueva pestaña para completar el pago.');
           setIsProcessing(false);
           return;
+        } catch (windowError) {
+          console.warn('Could not redirect pre-opened PayPal window:', windowError);
         }
+      }
 
-        if (shouldUsePopupFlow) {
-          const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
-          if (!popup) {
-            const msg = 'No se pudo abrir PayPal en nueva pestaña. Abre el sitio en Safari/Chrome e intenta de nuevo.';
-            setError(msg);
-            toast.error(msg);
-            setIsProcessing(false);
-            return;
-          }
-
+      if (shouldUsePopupFlow) {
+        const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
+        if (popup) {
           toast.info('Se abrió PayPal en una nueva pestaña para completar el pago.');
           setIsProcessing(false);
           return;
         }
 
-        window.location.href = approvalUrl;
-      } else {
-        throw new Error('No se recibió la URL de aprobación de PayPal');
+        const msg = 'No se pudo abrir PayPal automáticamente. Usa el botón "Abrir PayPal" para continuar el pago.';
+        setError(msg);
+        setManualApprovalUrl(approvalUrl);
+        toast.warning(msg);
+        setIsProcessing(false);
+        return;
       }
+
+      window.location.href = approvalUrl;
     } catch (err) {
       if (checkoutWindow && !checkoutWindow.closed) {
         checkoutWindow.close();
@@ -153,6 +156,8 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   return {
     createSubscription,
     cancelSubscription,
+    clearManualApprovalUrl,
+    manualApprovalUrl,
     // Keep legacy name for backward compat
     createOrder: createSubscription,
     isProcessing,
