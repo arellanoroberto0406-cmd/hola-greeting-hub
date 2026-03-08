@@ -142,10 +142,16 @@ async function createPayPalSubscription(
   })
   if (!res.ok) {
     const err = await res.text()
+    console.error(`PayPal subscription creation failed (${res.status}):`, err)
     throw new Error(`Failed to create PayPal subscription: ${err}`)
   }
   const sub = await res.json()
-  const approvalUrl = sub.links.find((l: { rel: string }) => l.rel === 'approve')?.href
+  console.log('PayPal subscription created:', sub.id, 'Status:', sub.status)
+  const approvalUrl = sub.links?.find((l: { rel: string }) => l.rel === 'approve')?.href
+  if (!approvalUrl) {
+    console.error('No approval URL in response:', JSON.stringify(sub.links))
+    throw new Error('PayPal did not return an approval URL')
+  }
   return { subscriptionId: sub.id, approvalUrl }
 }
 
