@@ -368,7 +368,7 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
                     className="block"
                   >
                     <img 
-                      src={(selectedOrder as any).payment_proof_url} 
+                      src={selectedOrder.payment_proof_url} 
                       alt="Comprobante de pago" 
                       className="max-w-full max-h-64 rounded-lg border object-contain mx-auto"
                     />
