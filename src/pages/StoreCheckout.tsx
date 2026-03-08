@@ -305,7 +305,7 @@ const StoreCheckout = () => {
             last_name: data.lastName,
           },
           finalTotal,
-          store.currency || 'MXN'
+          (store as any).currency || 'MXN'
         );
         // The hook will redirect to PayPal
         return;
