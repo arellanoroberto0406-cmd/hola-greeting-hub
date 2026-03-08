@@ -354,6 +354,39 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
                 )}
               </div>
 
+              {/* Payment Proof */}
+              {(selectedOrder as any).payment_proof_url && (
+                <div className="border rounded-lg p-4 bg-muted/30">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    Comprobante de pago
+                  </h4>
+                  <a 
+                    href={(selectedOrder as any).payment_proof_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <img 
+                      src={(selectedOrder as any).payment_proof_url} 
+                      alt="Comprobante de pago" 
+                      className="max-w-full max-h-64 rounded-lg border object-contain mx-auto"
+                    />
+                    <p className="text-xs text-center text-muted-foreground mt-2 hover:underline">
+                      Click para ver en tamaño completo
+                    </p>
+                  </a>
+                </div>
+              )}
+              {selectedOrder.payment_method === 'transfer' && !(selectedOrder as any).payment_proof_url && (
+                <div className="border rounded-lg p-3 bg-yellow-50 dark:bg-yellow-900/10">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    El cliente aún no ha subido comprobante de pago
+                  </p>
+                </div>
+              )}
+
               {/* Print Invoice */}
               {store && (
                 <div className="border-t pt-4">
