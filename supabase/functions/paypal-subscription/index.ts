@@ -7,9 +7,12 @@ const corsHeaders = {
 
 const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!
 const PAYPAL_CLIENT_SECRET = Deno.env.get('PAYPAL_CLIENT_SECRET')!
-const PAYPAL_API_URL = Deno.env.get('PAYPAL_MODE') === 'sandbox'
+const PAYPAL_MODE = Deno.env.get('PAYPAL_MODE') || 'live'
+const PAYPAL_API_URL = PAYPAL_MODE === 'sandbox'
   ? 'https://api-m.sandbox.paypal.com'
   : 'https://api-m.paypal.com'
+
+console.log('PayPal mode:', PAYPAL_MODE, '| API URL:', PAYPAL_API_URL)
 
 async function getPayPalAccessToken(): Promise<string> {
   const auth = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)
