@@ -82,7 +82,19 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       }
 
       if (data?.error) {
-        console.error('PayPal API error:', data.error);
+        console.error('PayPal API error:', data.errorCode, data.technicalDetails || data.error);
+
+        if (data.errorCode === 'PAYEE_ACCOUNT_RESTRICTED') {
+          const msg = data.debugId
+            ? `Tu cuenta de PayPal está restringida. Resuélvelo en PayPal y comparte este código si te lo piden: ${data.debugId}`
+            : 'Tu cuenta de PayPal está restringida. Resuélvelo en PayPal para poder cobrar.';
+
+          setError(msg);
+          toast.error(msg);
+          setIsProcessing(false);
+          return;
+        }
+
         throw new Error(data.error);
       }
 

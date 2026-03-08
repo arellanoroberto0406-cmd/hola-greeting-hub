@@ -295,8 +295,30 @@ Deno.serve(async (req) => {
   } catch (error: unknown) {
     console.error('PayPal payment error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+    let clientError = {
+      error: errorMessage,
+      errorCode: 'PAYPAL_UNKNOWN_ERROR',
+      debugId: null as string | null,
+      technicalDetails: errorMessage,
+    }
+
+    try {
+      const parsed = JSON.parse(errorMessage)
+      if (parsed && typeof parsed === 'object' && 'error' in parsed) {
+        clientError = {
+          error: String((parsed as { error: unknown }).error),
+          errorCode: String((parsed as { errorCode?: unknown }).errorCode ?? 'PAYPAL_UNKNOWN_ERROR'),
+          debugId: (parsed as { debugId?: string | null }).debugId ?? null,
+          technicalDetails: String((parsed as { technicalDetails?: unknown }).technicalDetails ?? errorMessage),
+        }
+      }
+    } catch {
+      // Keep default clientError
+    }
+
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify(clientError),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
