@@ -32,6 +32,25 @@ async function getPayPalAccessToken(): Promise<string> {
   return data.access_token
 }
 
+function mapPayPalErrorForClient(errorText: string) {
+  if (errorText.includes('PAYEE_ACCOUNT_RESTRICTED')) {
+    const debugIdMatch = errorText.match(/"debug_id"\s*:\s*"([^"]+)"/i)
+    return {
+      error: 'Tu cuenta de PayPal está restringida. Debes resolverlo en PayPal para poder cobrar.',
+      errorCode: 'PAYEE_ACCOUNT_RESTRICTED',
+      debugId: debugIdMatch?.[1] ?? null,
+      technicalDetails: errorText,
+    }
+  }
+
+  return {
+    error: 'No se pudo procesar el pago con PayPal.',
+    errorCode: 'PAYPAL_API_ERROR',
+    debugId: null,
+    technicalDetails: errorText,
+  }
+}
+
 // ========== PayPal Orders API v2 (one-time payment) ==========
 
 async function createPayPalOrder(
