@@ -7,6 +7,14 @@ interface UsePayPalPaymentOptions {
   onError?: (error: Error) => void;
 }
 
+type PayPalFunctionResponse = {
+  approvalUrl?: string;
+  error?: string;
+  errorCode?: string;
+  debugId?: string | null;
+  technicalDetails?: string;
+};
+
 export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +56,7 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
     try {
       console.log('Creating PayPal recurring subscription:', { storeId, planId, billingCycle });
 
-      const { data, error: invokeError } = await supabase.functions.invoke('paypal-subscription', {
+      const { data, error: invokeError } = await supabase.functions.invoke<PayPalFunctionResponse>('paypal-subscription', {
         body: {
           action: 'create-subscription',
           storeId,
@@ -74,7 +82,19 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       }
 
       if (data?.error) {
-        console.error('PayPal API error:', data.error);
+        console.error('PayPal API error:', data.errorCode, data.technicalDetails || data.error);
+
+        if (data.errorCode === 'PAYEE_ACCOUNT_RESTRICTED') {
+          const msg = data.debugId
+            ? `Tu cuenta de PayPal está restringida. Resuélvelo en PayPal y comparte este código si te lo piden: ${data.debugId}`
+            : 'Tu cuenta de PayPal está restringida. Resuélvelo en PayPal para poder cobrar.';
+
+          setError(msg);
+          toast.error(msg);
+          setIsProcessing(false);
+          return;
+        }
+
         throw new Error(data.error);
       }
 

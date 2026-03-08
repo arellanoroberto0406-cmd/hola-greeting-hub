@@ -32,6 +32,25 @@ async function getPayPalAccessToken(): Promise<string> {
   return data.access_token
 }
 
+function mapPayPalErrorForClient(errorText: string) {
+  if (errorText.includes('PAYEE_ACCOUNT_RESTRICTED')) {
+    const debugIdMatch = errorText.match(/"debug_id"\s*:\s*"([^"]+)"/i)
+    return {
+      error: 'Tu cuenta de PayPal está restringida. Debes resolverlo en PayPal para poder cobrar.',
+      errorCode: 'PAYEE_ACCOUNT_RESTRICTED',
+      debugId: debugIdMatch?.[1] ?? null,
+      technicalDetails: errorText,
+    }
+  }
+
+  return {
+    error: 'No se pudo procesar el pago con PayPal.',
+    errorCode: 'PAYPAL_API_ERROR',
+    debugId: null,
+    technicalDetails: errorText,
+  }
+}
+
 // ========== PayPal Orders API v2 (one-time payment) ==========
 
 async function createPayPalOrder(
@@ -74,7 +93,8 @@ async function createPayPalOrder(
   if (!res.ok) {
     const err = await res.text()
     console.error(`PayPal order creation failed (${res.status}):`, err)
-    throw new Error(`Failed to create PayPal order: ${err}`)
+    const mapped = mapPayPalErrorForClient(err)
+    throw new Error(JSON.stringify(mapped))
   }
 
   const order = await res.json()
@@ -294,8 +314,30 @@ Deno.serve(async (req) => {
   } catch (error: unknown) {
     console.error('PayPal payment error:', error)
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+
+    let clientError = {
+      error: errorMessage,
+      errorCode: 'PAYPAL_UNKNOWN_ERROR',
+      debugId: null as string | null,
+      technicalDetails: errorMessage,
+    }
+
+    try {
+      const parsed = JSON.parse(errorMessage)
+      if (parsed && typeof parsed === 'object' && 'error' in parsed) {
+        clientError = {
+          error: String((parsed as { error: unknown }).error),
+          errorCode: String((parsed as { errorCode?: unknown }).errorCode ?? 'PAYPAL_UNKNOWN_ERROR'),
+          debugId: (parsed as { debugId?: string | null }).debugId ?? null,
+          technicalDetails: String((parsed as { technicalDetails?: unknown }).technicalDetails ?? errorMessage),
+        }
+      }
+    } catch {
+      // Keep default clientError
+    }
+
     return new Response(
-      JSON.stringify({ error: errorMessage }),
+      JSON.stringify(clientError),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
