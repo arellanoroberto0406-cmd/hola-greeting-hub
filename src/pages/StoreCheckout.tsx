@@ -954,12 +954,12 @@ const StoreCheckout = () => {
                     size="lg" 
                     className="w-full"
                     style={{ backgroundColor: primaryColor }}
-                    disabled={isSubmitting || isMPProcessing}
+                    disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
                   >
-                    {isSubmitting || isMPProcessing ? (
+                    {isSubmitting || isMPProcessing || isPayPalProcessing ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {isMPProcessing ? 'Redirigiendo a MercadoPago...' : 'Procesando...'}
+                        {isMPProcessing ? 'Redirigiendo a MercadoPago...' : isPayPalProcessing ? 'Redirigiendo a PayPal...' : 'Procesando...'}
                       </>
                     ) : (
                       `Pagar $${finalTotal.toLocaleString()}`
