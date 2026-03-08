@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { useMercadoPagoPayment } from "@/hooks/useMercadoPagoPayment";
+import { usePayPalStorePayment } from "@/hooks/usePayPalStorePayment";
 import {
   Form,
   FormControl,
@@ -88,6 +89,7 @@ const StoreCheckout = () => {
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
   const { createPreference, isProcessing: isMPProcessing } = useMercadoPagoPayment();
+  const { createPayPalOrder, isProcessing: isPayPalProcessing } = usePayPalStorePayment();
 
   // Check for payment status from URL (MercadoPago redirect)
   useEffect(() => {
@@ -179,7 +181,7 @@ const StoreCheckout = () => {
         subtotal,
         shipping_cost: shipping,
         total,
-        status: data.paymentMethod === 'mercadopago' ? 'awaiting_payment' : 'pending',
+        status: (data.paymentMethod === 'mercadopago' || data.paymentMethod === 'paypal') ? 'awaiting_payment' : 'pending',
       };
 
       // Create the order with store_id
@@ -264,6 +266,48 @@ const StoreCheckout = () => {
           slug || ''
         );
         // The hook will redirect to MercadoPago
+        return;
+      }
+
+      // Handle PayPal payment
+      if (data.paymentMethod === 'paypal') {
+        if (!store.paypal_email) {
+          toast({
+            title: "PayPal no configurado",
+            description: "Esta tienda no tiene PayPal configurado. Por favor selecciona otro método de pago.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const ppItems = items.map(item => ({
+          title: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+        }));
+
+        if (shippingCost > 0) {
+          ppItems.push({
+            title: 'Envío',
+            quantity: 1,
+            unit_price: shippingCost,
+          });
+        }
+
+        await createPayPalOrder(
+          store.id,
+          order.id,
+          ppItems,
+          {
+            email: data.email,
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+          finalTotal,
+          (store as any).currency || 'MXN'
+        );
+        // The hook will redirect to PayPal
         return;
       }
 
@@ -592,14 +636,15 @@ const StoreCheckout = () => {
                   <>
                     <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
                       <Wallet className="w-5 h-5" style={{ color: primaryColor }} />
-                      Pago con PayPal
+                      Pago con PayPal - Completado
                     </h2>
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-muted-foreground mb-4">
-                        Tu pedido ha sido registrado. El vendedor te contactará con el link de pago de PayPal.
+                        Tu pago ha sido procesado exitosamente a través de PayPal. 
+                        Recibirás un correo de confirmación.
                       </p>
                       <Separator className="my-3" />
-                      <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                      <p><span className="text-muted-foreground">Monto pagado:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()}</span></p>
                     </div>
                   </>
                 )}
@@ -870,8 +915,8 @@ const StoreCheckout = () => {
                               >
                                 <RadioGroupItem value="paypal" id="paypal" />
                                 <Label htmlFor="paypal" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">PayPal</div>
-                                  <div className="text-sm text-muted-foreground">Pago seguro con PayPal</div>
+                                  <div className="font-medium">PayPal / Tarjeta</div>
+                                  <div className="text-sm text-muted-foreground">Paga con tarjeta o saldo PayPal de forma segura</div>
                                 </Label>
                                 <Wallet className="w-5 h-5 text-muted-foreground" />
                               </div>
@@ -910,12 +955,12 @@ const StoreCheckout = () => {
                     size="lg" 
                     className="w-full"
                     style={{ backgroundColor: primaryColor }}
-                    disabled={isSubmitting || isMPProcessing}
+                    disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
                   >
-                    {isSubmitting || isMPProcessing ? (
+                    {isSubmitting || isMPProcessing || isPayPalProcessing ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {isMPProcessing ? 'Redirigiendo a MercadoPago...' : 'Procesando...'}
+                        {isMPProcessing ? 'Redirigiendo a MercadoPago...' : isPayPalProcessing ? 'Redirigiendo a PayPal...' : 'Procesando...'}
                       </>
                     ) : (
                       `Pagar $${finalTotal.toLocaleString()}`
@@ -987,13 +1032,13 @@ const StoreCheckout = () => {
                   size="lg" 
                   className="w-full"
                   style={{ backgroundColor: primaryColor }}
-                  disabled={isSubmitting || isMPProcessing}
+                  disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
                   onClick={form.handleSubmit(onSubmit)}
                 >
-                  {isSubmitting || isMPProcessing ? (
+                  {isSubmitting || isMPProcessing || isPayPalProcessing ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      {isMPProcessing ? 'Redirigiendo a MercadoPago...' : 'Procesando...'}
+                      {isMPProcessing ? 'Redirigiendo a MercadoPago...' : isPayPalProcessing ? 'Redirigiendo a PayPal...' : 'Procesando...'}
                     </>
                   ) : (
                     "Confirmar Pedido"
