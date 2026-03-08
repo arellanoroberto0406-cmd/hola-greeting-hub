@@ -181,7 +181,7 @@ const StoreCheckout = () => {
         subtotal,
         shipping_cost: shipping,
         total,
-        status: data.paymentMethod === 'mercadopago' ? 'awaiting_payment' : 'pending',
+        status: (data.paymentMethod === 'mercadopago' || data.paymentMethod === 'paypal') ? 'awaiting_payment' : 'pending',
       };
 
       // Create the order with store_id
