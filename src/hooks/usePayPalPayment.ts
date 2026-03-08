@@ -19,6 +19,34 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
     setIsProcessing(true);
     setError(null);
 
+    // Detect preview/embedded contexts where PayPal commonly fails in-place
+    const userAgent = navigator.userAgent || '';
+    const isInIframe = (() => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    })();
+    const isPreviewHost = /lovableproject\.com|lovable\.dev|id-preview--.*\.lovable\.app/i.test(window.location.hostname);
+    const isEmbeddedWebView = /FBAN|FBAV|Instagram|Line|wv|WebView/i.test(userAgent);
+    const shouldUsePopupFlow = isInIframe || isPreviewHost || isEmbeddedWebView;
+
+    // Open popup synchronously from user click to avoid popup blockers
+    let checkoutWindow: Window | null = null;
+    if (shouldUsePopupFlow) {
+      checkoutWindow = window.open('', '_blank', 'noopener,noreferrer');
+      if (!checkoutWindow) {
+        const msg = 'Tu navegador bloqueó la apertura de PayPal. Abre la app en Safari/Chrome y vuelve a intentar.';
+        setError(msg);
+        toast.error(msg);
+        setIsProcessing(false);
+        return;
+      }
+
+      checkoutWindow.document.write('<p style="font-family: sans-serif; padding: 16px;">Redirigiendo a PayPal...</p>');
+    }
+
     try {
       console.log('Creating PayPal recurring subscription:', { storeId, planId, billingCycle });
 
@@ -56,21 +84,25 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
         console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
         const approvalUrl = data.approvalUrl as string;
 
-        // PayPal fails in embedded browsers/webviews (common in mobile in-app previews)
-        const userAgent = navigator.userAgent || '';
-        const isEmbeddedBrowser = window.self !== window.top || /FBAN|FBAV|Instagram|Line|wv|WebView/i.test(userAgent);
+        if (checkoutWindow && !checkoutWindow.closed) {
+          checkoutWindow.location.href = approvalUrl;
+          toast.info('Se abrió PayPal en una nueva pestaña para completar el pago.');
+          setIsProcessing(false);
+          return;
+        }
 
-        if (isEmbeddedBrowser) {
+        if (shouldUsePopupFlow) {
           const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
-
           if (!popup) {
-            const msg = 'Tu navegador embebido bloqueó PayPal. Abre esta app en Safari o Chrome y vuelve a intentar.';
+            const msg = 'No se pudo abrir PayPal en nueva pestaña. Abre el sitio en Safari/Chrome e intenta de nuevo.';
             setError(msg);
-            setIsProcessing(false);
             toast.error(msg);
+            setIsProcessing(false);
             return;
           }
 
+          toast.info('Se abrió PayPal en una nueva pestaña para completar el pago.');
+          setIsProcessing(false);
           return;
         }
 
@@ -79,6 +111,9 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
         throw new Error('No se recibió la URL de aprobación de PayPal');
       }
     } catch (err) {
+      if (checkoutWindow && !checkoutWindow.closed) {
+        checkoutWindow.close();
+      }
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
       console.error('PayPal subscription error:', err);
       setError(errorMessage);
