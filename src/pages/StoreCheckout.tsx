@@ -269,6 +269,48 @@ const StoreCheckout = () => {
         return;
       }
 
+      // Handle PayPal payment
+      if (data.paymentMethod === 'paypal') {
+        if (!store.paypal_email) {
+          toast({
+            title: "PayPal no configurado",
+            description: "Esta tienda no tiene PayPal configurado. Por favor selecciona otro método de pago.",
+            variant: "destructive",
+          });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const ppItems = items.map(item => ({
+          title: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+        }));
+
+        if (shippingCost > 0) {
+          ppItems.push({
+            title: 'Envío',
+            quantity: 1,
+            unit_price: shippingCost,
+          });
+        }
+
+        await createPayPalOrder(
+          store.id,
+          order.id,
+          ppItems,
+          {
+            email: data.email,
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+          finalTotal,
+          store.currency || 'MXN'
+        );
+        // The hook will redirect to PayPal
+        return;
+      }
+
       // Send notifications (email + WhatsApp) to store owner
       try {
         const notificationResponse = await supabase.functions.invoke('send-order-notification', {
