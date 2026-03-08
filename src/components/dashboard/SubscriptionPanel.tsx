@@ -426,7 +426,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
             <Button 
               onClick={handlePayWithPayPal}
               disabled={isProcessing}
-              className="bg-[#0070ba] hover:bg-[#005ea6] text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
             >
               {isProcessing ? (
                 <>
