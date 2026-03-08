@@ -362,7 +362,7 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
                     Comprobante de pago
                   </h4>
                   <a 
-                    href={(selectedOrder as any).payment_proof_url} 
+                    href={selectedOrder.payment_proof_url} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="block"
