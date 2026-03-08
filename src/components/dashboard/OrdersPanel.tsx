@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink, RotateCcw, CreditCard, Printer } from "lucide-react";
+import { Loader2, Package, Eye, Clock, Truck, CheckCircle, XCircle, ExternalLink, RotateCcw, CreditCard, Printer, Image as ImageIcon } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import TrackingInput from "./TrackingInput";
@@ -353,6 +353,39 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
                   </Badge>
                 )}
               </div>
+
+              {/* Payment Proof */}
+              {selectedOrder.payment_proof_url && (
+                <div className="border rounded-lg p-4 bg-muted/30">
+                  <h4 className="font-medium mb-2 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4" />
+                    Comprobante de pago
+                  </h4>
+                  <a 
+                    href={selectedOrder.payment_proof_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block"
+                  >
+                    <img 
+                      src={selectedOrder.payment_proof_url} 
+                      alt="Comprobante de pago" 
+                      className="max-w-full max-h-64 rounded-lg border object-contain mx-auto"
+                    />
+                    <p className="text-xs text-center text-muted-foreground mt-2 hover:underline">
+                      Click para ver en tamaño completo
+                    </p>
+                  </a>
+                </div>
+              )}
+              {selectedOrder.payment_method === 'transfer' && !selectedOrder.payment_proof_url && (
+                <div className="border rounded-lg p-3 bg-yellow-50 dark:bg-yellow-900/10">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    El cliente aún no ha subido comprobante de pago
+                  </p>
+                </div>
+              )}
 
               {/* Print Invoice */}
               {store && (

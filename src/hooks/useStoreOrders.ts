@@ -18,6 +18,7 @@ export interface OrderWithItems {
   shipping_cost: number;
   total: number;
   status: string;
+  payment_proof_url: string | null;
   created_at: string;
   updated_at: string;
   order_items: {

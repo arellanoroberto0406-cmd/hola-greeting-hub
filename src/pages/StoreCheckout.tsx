@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useParams, Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet, AlertCircle, Clock } from "lucide-react";
+import CopyButton from "@/components/store/CopyButton";
+import PaymentProofUpload from "@/components/store/PaymentProofUpload";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -565,22 +567,39 @@ const StoreCheckout = () => {
                       Realiza tu pago por transferencia bancaria con los siguientes datos:
                     </p>
                     {bankInfo ? (
-                      <div className="bg-muted/50 rounded-lg p-4 space-y-2">
+                      <div className="bg-muted/50 rounded-lg p-4 space-y-3">
                         {bankInfo.bank_name && (
-                          <p><span className="text-muted-foreground">Banco:</span> <span className="font-semibold">{bankInfo.bank_name}</span></p>
+                          <div className="flex items-center justify-between">
+                            <p><span className="text-muted-foreground">Banco:</span> <span className="font-semibold">{bankInfo.bank_name}</span></p>
+                          </div>
                         )}
                         {bankInfo.account_holder && (
-                          <p><span className="text-muted-foreground">Titular:</span> <span className="font-semibold">{bankInfo.account_holder}</span></p>
+                          <div className="flex items-center justify-between">
+                            <p><span className="text-muted-foreground">Titular:</span> <span className="font-semibold">{bankInfo.account_holder}</span></p>
+                            <CopyButton text={bankInfo.account_holder} label="Titular" primaryColor={primaryColor} />
+                          </div>
                         )}
                         {bankInfo.clabe && (
-                          <p><span className="text-muted-foreground">CLABE:</span> <span className="font-mono font-semibold">{bankInfo.clabe}</span></p>
+                          <div className="flex items-center justify-between">
+                            <p><span className="text-muted-foreground">CLABE:</span> <span className="font-mono font-semibold">{bankInfo.clabe}</span></p>
+                            <CopyButton text={bankInfo.clabe} label="CLABE" primaryColor={primaryColor} />
+                          </div>
                         )}
                         {bankInfo.account_number && (
-                          <p><span className="text-muted-foreground">Número de cuenta:</span> <span className="font-mono font-semibold">{bankInfo.account_number}</span></p>
+                          <div className="flex items-center justify-between">
+                            <p><span className="text-muted-foreground">No. cuenta:</span> <span className="font-mono font-semibold">{bankInfo.account_number}</span></p>
+                            <CopyButton text={bankInfo.account_number} label="Cuenta" primaryColor={primaryColor} />
+                          </div>
                         )}
                         <Separator className="my-3" />
-                        <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
-                        <p><span className="text-muted-foreground">Referencia:</span> <span className="font-mono font-semibold">{completedOrder.id.slice(0, 8).toUpperCase()}</span></p>
+                        <div className="flex items-center justify-between">
+                          <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                          <CopyButton text={completedOrder.total.toFixed(2)} label="Monto" primaryColor={primaryColor} />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <p><span className="text-muted-foreground">Referencia:</span> <span className="font-mono font-semibold">{completedOrder.id.slice(0, 8).toUpperCase()}</span></p>
+                          <CopyButton text={completedOrder.id.slice(0, 8).toUpperCase()} label="Referencia" primaryColor={primaryColor} />
+                        </div>
                       </div>
                     ) : (
                       <div className="bg-muted/50 rounded-lg p-4">
@@ -588,11 +607,18 @@ const StoreCheckout = () => {
                           El vendedor te contactará con los datos bancarios para realizar el pago.
                         </p>
                         <Separator className="my-3" />
-                        <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                        <div className="flex items-center justify-between">
+                          <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                          <CopyButton text={completedOrder.total.toFixed(2)} label="Monto" primaryColor={primaryColor} />
+                        </div>
                       </div>
                     )}
+                    
+                    {/* Payment Proof Upload */}
+                    <PaymentProofUpload orderId={completedOrder.id} primaryColor={primaryColor} />
+                    
                     <p className="text-sm text-muted-foreground mt-4">
-                      Una vez realizado el pago, envía tu comprobante para agilizar el proceso.
+                      📸 Sube tu comprobante arriba para agilizar la verificación de tu pago.
                     </p>
                   </>
                 )}
