@@ -378,7 +378,7 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
                   </a>
                 </div>
               )}
-              {selectedOrder.payment_method === 'transfer' && !(selectedOrder as any).payment_proof_url && (
+              {selectedOrder.payment_method === 'transfer' && !selectedOrder.payment_proof_url && (
                 <div className="border rounded-lg p-3 bg-yellow-50 dark:bg-yellow-900/10">
                   <p className="text-sm text-yellow-700 dark:text-yellow-400 flex items-center gap-2">
                     <Clock className="w-4 h-4" />
