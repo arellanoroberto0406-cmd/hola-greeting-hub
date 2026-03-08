@@ -56,7 +56,7 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
     try {
       console.log('Creating PayPal recurring subscription:', { storeId, planId, billingCycle });
 
-      const { data, error: invokeError } = await supabase.functions.invoke('paypal-subscription', {
+      const { data, error: invokeError } = await supabase.functions.invoke<PayPalFunctionResponse>('paypal-subscription', {
         body: {
           action: 'create-subscription',
           storeId,
