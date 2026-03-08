@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.paypal-store-payment]
 verify_jwt = false
+
+[functions.payment-reminder]
+verify_jwt = false
