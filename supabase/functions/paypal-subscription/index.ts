@@ -444,18 +444,43 @@ Deno.serve(async (req) => {
       // Check if we already have a PayPal billing plan for this plan+cycle
       let { data: billingPlan } = await supabase
         .from('paypal_billing_plans')
-        .select('paypal_plan_id')
+        .select('id, paypal_plan_id')
         .eq('subscription_plan_id', planId)
         .eq('billing_cycle', billingCycle)
         .eq('is_active', true)
         .single()
 
       let paypalPlanId: string
+      let shouldCreateNewPlan = false
 
-      if (billingPlan) {
-        paypalPlanId = billingPlan.paypal_plan_id
-        console.log(`Using existing PayPal plan: ${paypalPlanId}`)
+      if (billingPlan?.paypal_plan_id) {
+        const planDetails = await getPayPalBillingPlan(accessToken, billingPlan.paypal_plan_id)
+        const existingStatus = planDetails?.status
+        const existingPrice = planDetails?.billing_cycles?.[0]?.pricing_scheme?.fixed_price?.value
+        const existingCurrency = planDetails?.billing_cycles?.[0]?.pricing_scheme?.fixed_price?.currency_code
+        const expectedPrice = amount.toFixed(2)
+
+        if (!planDetails || existingStatus !== 'ACTIVE' || existingPrice !== expectedPrice || existingCurrency !== currency) {
+          console.log(
+            `Stored PayPal plan invalid for reuse (status=${existingStatus ?? 'unknown'}, price=${existingPrice ?? 'unknown'}, currency=${existingCurrency ?? 'unknown'}). Creating a new plan.`
+          )
+          shouldCreateNewPlan = true
+
+          if (billingPlan.id) {
+            await supabase
+              .from('paypal_billing_plans')
+              .update({ is_active: false, updated_at: new Date().toISOString() })
+              .eq('id', billingPlan.id)
+          }
+        } else {
+          paypalPlanId = billingPlan.paypal_plan_id
+          console.log(`Using existing valid PayPal plan: ${paypalPlanId}`)
+        }
       } else {
+        shouldCreateNewPlan = true
+      }
+
+      if (shouldCreateNewPlan) {
         // Create product and billing plan on PayPal
         const productId = await ensurePayPalProduct(accessToken)
         paypalPlanId = await createPayPalBillingPlan(accessToken, productId, plan.name, amount, currency, billingCycle)
