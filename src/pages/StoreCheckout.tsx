@@ -89,6 +89,7 @@ const StoreCheckout = () => {
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
   const { createPreference, isProcessing: isMPProcessing } = useMercadoPagoPayment();
+  const { createPayPalOrder, isProcessing: isPayPalProcessing } = usePayPalStorePayment();
 
   // Check for payment status from URL (MercadoPago redirect)
   useEffect(() => {
