@@ -450,7 +450,7 @@ Deno.serve(async (req) => {
         .eq('is_active', true)
         .single()
 
-      let paypalPlanId: string
+      let paypalPlanId = ''
       let shouldCreateNewPlan = false
 
       if (billingPlan?.paypal_plan_id) {
