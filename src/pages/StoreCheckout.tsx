@@ -636,14 +636,15 @@ const StoreCheckout = () => {
                   <>
                     <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
                       <Wallet className="w-5 h-5" style={{ color: primaryColor }} />
-                      Pago con PayPal
+                      Pago con PayPal - Completado
                     </h2>
                     <div className="bg-muted/50 rounded-lg p-4">
                       <p className="text-muted-foreground mb-4">
-                        Tu pedido ha sido registrado. El vendedor te contactará con el link de pago de PayPal.
+                        Tu pago ha sido procesado exitosamente a través de PayPal. 
+                        Recibirás un correo de confirmación.
                       </p>
                       <Separator className="my-3" />
-                      <p><span className="text-muted-foreground">Monto a pagar:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span></p>
+                      <p><span className="text-muted-foreground">Monto pagado:</span> <span className="font-bold text-lg" style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()}</span></p>
                     </div>
                   </>
                 )}
