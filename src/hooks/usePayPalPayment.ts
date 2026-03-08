@@ -56,21 +56,25 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
         console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
         const approvalUrl = data.approvalUrl as string;
 
-        // PayPal approval can fail in embedded previews/webviews, so prefer top-level navigation
-        const isEmbedded = window.self !== window.top;
-        if (isEmbedded && window.top) {
-          try {
-            window.top.location.href = approvalUrl;
+        // PayPal fails in embedded browsers/webviews (common in mobile in-app previews)
+        const userAgent = navigator.userAgent || '';
+        const isEmbeddedBrowser = window.self !== window.top || /FBAN|FBAV|Instagram|Line|wv|WebView/i.test(userAgent);
+
+        if (isEmbeddedBrowser) {
+          const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
+
+          if (!popup) {
+            const msg = 'Tu navegador embebido bloqueó PayPal. Abre esta app en Safari o Chrome y vuelve a intentar.';
+            setError(msg);
+            setIsProcessing(false);
+            toast.error(msg);
             return;
-          } catch (navigationError) {
-            console.warn('Top-level navigation blocked, trying popup fallback', navigationError);
           }
+
+          return;
         }
 
-        const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
-        if (!popup) {
-          window.location.href = approvalUrl;
-        }
+        window.location.href = approvalUrl;
       } else {
         throw new Error('No se recibió la URL de aprobación de PayPal');
       }
