@@ -89,6 +89,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
   const handlePayWithPayPal = () => {
     if (!selectedPlan) return;
+    clearManualApprovalUrl();
     createPayPalSubscription(storeId, selectedPlan.id, billingCycle);
   };
 
