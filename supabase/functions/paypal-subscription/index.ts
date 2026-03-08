@@ -114,6 +114,27 @@ async function createPayPalBillingPlan(
   return plan.id
 }
 
+// Validate an existing PayPal Billing Plan before reusing it
+async function getPayPalBillingPlan(
+  accessToken: string,
+  paypalPlanId: string
+): Promise<{ status?: string; billing_cycles?: Array<{ pricing_scheme?: { fixed_price?: { value?: string; currency_code?: string } } }> } | null> {
+  const res = await fetch(`${PAYPAL_API_URL}/v1/billing/plans/${paypalPlanId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!res.ok) {
+    const err = await res.text()
+    console.warn(`Could not validate PayPal plan ${paypalPlanId} (${res.status}):`, err)
+    return null
+  }
+
+  return await res.json()
+}
+
 // Create a PayPal Subscription
 async function createPayPalSubscription(
   accessToken: string,
