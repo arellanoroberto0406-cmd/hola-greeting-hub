@@ -12,7 +12,7 @@ const PAYPAL_API_URL = PAYPAL_MODE === 'sandbox'
   ? 'https://api-m.sandbox.paypal.com'
   : 'https://api-m.paypal.com'
 
-console.log('PayPal mode:', PAYPAL_MODE, '| API URL:', PAYPAL_API_URL)
+console.log('PayPal environment selected:', PAYPAL_MODE === 'sandbox' ? 'sandbox' : 'live')
 
 async function getPayPalAccessToken(): Promise<string> {
   const auth = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)
