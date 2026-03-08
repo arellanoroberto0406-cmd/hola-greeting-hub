@@ -43,7 +43,23 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
 
       if (data?.approvalUrl) {
         console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
-        window.location.href = data.approvalUrl;
+        const approvalUrl = data.approvalUrl as string;
+
+        // PayPal approval can fail in embedded previews/webviews, so prefer top-level navigation
+        const isEmbedded = window.self !== window.top;
+        if (isEmbedded && window.top) {
+          try {
+            window.top.location.href = approvalUrl;
+            return;
+          } catch (navigationError) {
+            console.warn('Top-level navigation blocked, trying popup fallback', navigationError);
+          }
+        }
+
+        const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
+        if (!popup) {
+          window.location.href = approvalUrl;
+        }
       } else {
         throw new Error('No se recibió la URL de aprobación de PayPal');
       }
