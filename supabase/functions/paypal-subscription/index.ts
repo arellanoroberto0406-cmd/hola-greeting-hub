@@ -394,8 +394,10 @@ Deno.serve(async (req) => {
         .eq('id', storeId)
         .single()
 
-      const currency = store?.currency || 'USD'
+      // Always use USD for PayPal subscriptions (most universally supported)
+      const currency = 'USD'
       const amount = billingCycle === 'yearly' && plan.price_yearly ? plan.price_yearly : plan.price_monthly
+      console.log(`Creating plan with currency: ${currency}, amount: ${amount}`)
 
       const accessToken = await getPayPalAccessToken()
 
