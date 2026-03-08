@@ -355,7 +355,7 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
               </div>
 
               {/* Payment Proof */}
-              {(selectedOrder as any).payment_proof_url && (
+              {selectedOrder.payment_proof_url && (
                 <div className="border rounded-lg p-4 bg-muted/30">
                   <h4 className="font-medium mb-2 flex items-center gap-2">
                     <ImageIcon className="w-4 h-4" />
