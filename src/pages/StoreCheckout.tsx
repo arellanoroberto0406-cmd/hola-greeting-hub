@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { useMercadoPagoPayment } from "@/hooks/useMercadoPagoPayment";
+import { usePayPalStorePayment } from "@/hooks/usePayPalStorePayment";
 import {
   Form,
   FormControl,
