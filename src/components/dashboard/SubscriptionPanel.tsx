@@ -39,7 +39,14 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const { data: plans, isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
   const { subscription, isActive, status, daysLeft, plan: currentPlan } = useSubscriptionStatus(storeId);
   const createSubscription = useCreateSubscription();
-  const { createSubscription: createPayPalSubscription, cancelSubscription, isProcessing, error: paymentError } = usePayPalPayment();
+  const { 
+    createSubscription: createPayPalSubscription, 
+    cancelSubscription, 
+    isProcessing, 
+    error: paymentError,
+    manualApprovalUrl,
+    clearManualApprovalUrl,
+  } = usePayPalPayment();
   
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
