@@ -7,9 +7,12 @@ const corsHeaders = {
 
 const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID')!
 const PAYPAL_CLIENT_SECRET = Deno.env.get('PAYPAL_CLIENT_SECRET')!
-const PAYPAL_API_URL = Deno.env.get('PAYPAL_MODE') === 'sandbox'
+const PAYPAL_MODE = Deno.env.get('PAYPAL_MODE') || 'live'
+const PAYPAL_API_URL = PAYPAL_MODE === 'sandbox'
   ? 'https://api-m.sandbox.paypal.com'
   : 'https://api-m.paypal.com'
+
+console.log('PayPal mode:', PAYPAL_MODE, '| API URL:', PAYPAL_API_URL)
 
 async function getPayPalAccessToken(): Promise<string> {
   const auth = btoa(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`)
@@ -139,10 +142,16 @@ async function createPayPalSubscription(
   })
   if (!res.ok) {
     const err = await res.text()
+    console.error(`PayPal subscription creation failed (${res.status}):`, err)
     throw new Error(`Failed to create PayPal subscription: ${err}`)
   }
   const sub = await res.json()
-  const approvalUrl = sub.links.find((l: { rel: string }) => l.rel === 'approve')?.href
+  console.log('PayPal subscription created:', sub.id, 'Status:', sub.status)
+  const approvalUrl = sub.links?.find((l: { rel: string }) => l.rel === 'approve')?.href
+  if (!approvalUrl) {
+    console.error('No approval URL in response:', JSON.stringify(sub.links))
+    throw new Error('PayPal did not return an approval URL')
+  }
   return { subscriptionId: sub.id, approvalUrl }
 }
 
@@ -391,8 +400,10 @@ Deno.serve(async (req) => {
         .eq('id', storeId)
         .single()
 
-      const currency = store?.currency || 'USD'
+      // Always use USD for PayPal subscriptions (most universally supported)
+      const currency = 'USD'
       const amount = billingCycle === 'yearly' && plan.price_yearly ? plan.price_yearly : plan.price_monthly
+      console.log(`Creating plan with currency: ${currency}, amount: ${amount}`)
 
       const accessToken = await getPayPalAccessToken()
 
