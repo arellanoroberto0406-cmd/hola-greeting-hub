@@ -915,8 +915,8 @@ const StoreCheckout = () => {
                               >
                                 <RadioGroupItem value="paypal" id="paypal" />
                                 <Label htmlFor="paypal" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">PayPal</div>
-                                  <div className="text-sm text-muted-foreground">Pago seguro con PayPal</div>
+                                  <div className="font-medium">PayPal / Tarjeta</div>
+                                  <div className="text-sm text-muted-foreground">Paga con tarjeta o saldo PayPal de forma segura</div>
                                 </Label>
                                 <Wallet className="w-5 h-5 text-muted-foreground" />
                               </div>
