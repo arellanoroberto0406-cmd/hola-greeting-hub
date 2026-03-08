@@ -1,0 +1,1 @@
+DELETE FROM paypal_billing_plans WHERE paypal_plan_id = 'P-5SG07290TJ158143GNGV6I3I';
