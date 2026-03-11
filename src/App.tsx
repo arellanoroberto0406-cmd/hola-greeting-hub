@@ -19,6 +19,7 @@ import StoreFront from "./pages/StoreFront";
 import StoreCheckout from "./pages/StoreCheckout";
 import CustomerAccount from "./pages/CustomerAccount";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
                 <Routes>
                   <Route path="/" element={<Auth />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/inicio" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/tienda/:slug" element={<StoreFront />} />
