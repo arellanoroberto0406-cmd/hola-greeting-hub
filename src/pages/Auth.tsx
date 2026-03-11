@@ -123,7 +123,22 @@ const Auth = () => {
     }
   };
 
-  if (loading) {
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setErrors({ email: "Ingresa tu email" });
+      return;
+    }
+    setIsSubmitting(true);
+    const { error } = await resetPasswordForEmail(email);
+    setIsSubmitting(false);
+    if (error) {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    } else {
+      setResetEmailSent(true);
+    }
+  };
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="text-center">
