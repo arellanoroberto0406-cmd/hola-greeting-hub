@@ -316,7 +316,7 @@ const Auth = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5 }}
-            className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-2xl shadow-2xl shadow-black/20 overflow-hidden"
+            className="rounded-2xl border border-border/60 bg-card/70 backdrop-blur-2xl shadow-2xl shadow-black/20 overflow-hidden relative"
           >
             {/* Desktop Card Header */}
             <div className="hidden lg:block px-7 pt-7 pb-4">
