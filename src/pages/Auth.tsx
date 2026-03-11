@@ -541,6 +541,7 @@ const Auth = () => {
 
                     <button
                       type="button"
+                      onClick={() => { setShowForgotPassword(true); setResetEmailSent(false); }}
                       className="w-full text-center text-sm text-primary hover:text-primary/80 transition-colors pt-1"
                     >
                       ¿Olvidaste tu contraseña?
