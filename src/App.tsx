@@ -19,6 +19,7 @@ import StoreFront from "./pages/StoreFront";
 import StoreCheckout from "./pages/StoreCheckout";
 import CustomerAccount from "./pages/CustomerAccount";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
