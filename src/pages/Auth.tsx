@@ -549,6 +549,83 @@ const Auth = () => {
                   </motion.form>
                 )}
               </AnimatePresence>
+
+              {/* Forgot Password Overlay */}
+              <AnimatePresence>
+                {showForgotPassword && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="absolute inset-0 bg-card/95 backdrop-blur-sm rounded-2xl z-20 flex flex-col items-center justify-center px-7"
+                  >
+                    {resetEmailSent ? (
+                      <div className="text-center space-y-4 w-full">
+                        <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                          <CheckCircle2 className="h-7 w-7 text-primary" />
+                        </div>
+                        <h3 className="text-lg font-bold font-heading">¡Email enviado!</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Revisa tu bandeja de entrada en <strong className="text-foreground">{email}</strong> y sigue las instrucciones para restablecer tu contraseña.
+                        </p>
+                        <Button
+                          onClick={() => { setShowForgotPassword(false); setResetEmailSent(false); }}
+                          className="w-full h-11 rounded-xl"
+                        >
+                          Volver al inicio de sesión
+                        </Button>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleForgotPassword} className="w-full space-y-4">
+                        <div className="text-center mb-2">
+                          <div className="mx-auto w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
+                            <Shield className="h-7 w-7 text-primary" />
+                          </div>
+                          <h3 className="text-lg font-bold font-heading">Recuperar contraseña</h3>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Te enviaremos un enlace para restablecer tu contraseña
+                          </p>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            Email
+                          </Label>
+                          <div className="relative">
+                            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <Input
+                              type="email"
+                              placeholder="tu@email.com"
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="h-12 pl-10 bg-background/50 border-border/60 focus:border-primary/50 rounded-xl"
+                            />
+                          </div>
+                          {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
+                        </div>
+
+                        <Button
+                          type="submit"
+                          className="w-full h-12 rounded-xl shadow-lg shadow-primary/25 font-semibold"
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Enviar enlace de recuperación"}
+                        </Button>
+
+                        <button
+                          type="button"
+                          onClick={() => setShowForgotPassword(false)}
+                          className="w-full text-center text-sm text-muted-foreground hover:text-foreground transition-colors pt-1"
+                        >
+                          ← Volver
+                        </button>
+                      </form>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
