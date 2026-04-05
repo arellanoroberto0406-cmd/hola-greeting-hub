@@ -206,7 +206,7 @@ Deno.serve(async (req) => {
 
         console.log(`Payment captured and plan activated for store ${pendingOrder.store_id}`)
 
-        const baseUrl = Deno.env.get('SITE_URL') || 'https://apptienda.lovable.app'
+        const baseUrl = Deno.env.get('SITE_URL') || req.headers.get('origin') || 'https://apptienda.lovable.app'
         return new Response(null, {
           status: 302,
           headers: { ...corsHeaders, 'Location': `${baseUrl}/dashboard?payment=success` },
