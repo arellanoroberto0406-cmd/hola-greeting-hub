@@ -388,30 +388,34 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
           </div>
 
           {manualApprovalUrl && (
-            <div className="rounded-lg border border-border bg-muted/40 p-3 space-y-2">
-              <p className="text-sm font-medium">Si PayPal no se abrió, continúa manualmente:</p>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button asChild variant="secondary" className="w-full sm:w-auto">
+            <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
+              <p className="text-sm font-medium text-center">✅ Enlace de pago generado correctamente</p>
+              <div className="flex flex-col gap-2">
+                <Button asChild className="w-full">
                   <a href={manualApprovalUrl} target="_blank" rel="noopener noreferrer">
-                    Abrir PayPal
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Ir a PayPal para pagar
                   </a>
                 </Button>
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full sm:w-auto"
+                  className="w-full"
                   onClick={async () => {
                     try {
                       await navigator.clipboard.writeText(manualApprovalUrl);
-                      toast.success('Enlace de PayPal copiado. Ábrelo en Safari/Chrome.');
+                      toast.success('Enlace copiado. Ábrelo en tu navegador.');
                     } catch {
                       toast.error('No se pudo copiar el enlace.');
                     }
                   }}
                 >
-                  Copiar enlace
+                  Copiar enlace de pago
                 </Button>
               </div>
+              <p className="text-xs text-muted-foreground text-center">
+                Si no se abrió automáticamente, haz clic en el botón de arriba
+              </p>
             </div>
           )}
 

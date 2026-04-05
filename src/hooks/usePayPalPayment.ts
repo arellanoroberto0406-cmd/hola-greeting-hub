@@ -31,30 +31,8 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
     setError(null);
     setManualApprovalUrl(null);
 
-    // Detect preview/embedded contexts where PayPal commonly fails in-place
-    const userAgent = navigator.userAgent || '';
-    const isInIframe = (() => {
-      try {
-        return window.self !== window.top;
-      } catch {
-        return true;
-      }
-    })();
-    const isPreviewHost = /lovableproject\.com|lovable\.dev|id-preview--.*\.lovable\.app/i.test(window.location.hostname);
-    const isEmbeddedWebView = /FBAN|FBAV|Instagram|Line|wv|WebView/i.test(userAgent);
-    const shouldUsePopupFlow = isInIframe || isPreviewHost || isEmbeddedWebView;
-
-    // Try to pre-open popup synchronously from user click (best chance to avoid blockers)
-    let checkoutWindow: Window | null = null;
-    if (shouldUsePopupFlow) {
-      checkoutWindow = window.open('', '_blank', 'noopener,noreferrer');
-      if (checkoutWindow) {
-        checkoutWindow.document.write('<p style="font-family: sans-serif; padding: 16px;">Redirigiendo a PayPal...</p>');
-      }
-    }
-
     try {
-      console.log('Creating PayPal recurring subscription:', { storeId, planId, billingCycle });
+      console.log('Creating PayPal payment:', { storeId, planId, billingCycle });
 
       const { data, error: invokeError } = await supabase.functions.invoke<PayPalFunctionResponse>('paypal-subscription', {
         body: {
@@ -102,41 +80,33 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
         throw new Error('No se recibió la URL de aprobación de PayPal');
       }
 
-      console.log('Redirecting to PayPal subscription approval:', data.approvalUrl);
       const approvalUrl = data.approvalUrl as string;
+      console.log('PayPal approval URL received:', approvalUrl);
 
-      if (checkoutWindow && !checkoutWindow.closed) {
+      // Always show the manual link as fallback - popups are unreliable in iframes/webviews
+      setManualApprovalUrl(approvalUrl);
+
+      // Try to open in a new tab
+      const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
+      
+      if (popup && !popup.closed) {
+        toast.success('Se abrió PayPal en una nueva pestaña. Completa el pago allí.');
+      } else {
+        // Try top-level navigation for iframe contexts
         try {
-          checkoutWindow.location.href = approvalUrl;
-          toast.info('Se abrió PayPal en una nueva pestaña para completar el pago.');
-          setIsProcessing(false);
-          return;
-        } catch (windowError) {
-          console.warn('Could not redirect pre-opened PayPal window:', windowError);
+          if (window.self !== window.top && window.top) {
+            window.top.location.href = approvalUrl;
+            return;
+          }
+        } catch {
+          // Cross-origin iframe, can't navigate top
         }
+        
+        toast.warning('No se pudo abrir PayPal automáticamente. Usa el botón de abajo para continuar.');
       }
 
-      if (shouldUsePopupFlow) {
-        const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
-        if (popup) {
-          toast.info('Se abrió PayPal en una nueva pestaña para completar el pago.');
-          setIsProcessing(false);
-          return;
-        }
-
-        const msg = 'No se pudo abrir PayPal automáticamente. Usa el botón "Abrir PayPal" para continuar el pago.';
-        setError(msg);
-        setManualApprovalUrl(approvalUrl);
-        toast.warning(msg);
-        setIsProcessing(false);
-        return;
-      }
-
-      window.location.href = approvalUrl;
+      setIsProcessing(false);
     } catch (err) {
-      if (checkoutWindow && !checkoutWindow.closed) {
-        checkoutWindow.close();
-      }
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
       console.error('PayPal subscription error:', err);
       setError(errorMessage);
