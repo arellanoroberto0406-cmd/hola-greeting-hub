@@ -224,7 +224,7 @@ Deno.serve(async (req) => {
       if (token) {
         await supabase.from('paypal_pending_orders').delete().eq('paypal_order_id', token)
       }
-      const baseUrl = Deno.env.get('SITE_URL') || 'https://apptienda.lovable.app'
+      const baseUrl = Deno.env.get('SITE_URL') || req.headers.get('origin') || 'https://apptienda.lovable.app'
       return new Response(null, {
         status: 302,
         headers: { ...corsHeaders, 'Location': `${baseUrl}/dashboard?payment=cancelled` },
