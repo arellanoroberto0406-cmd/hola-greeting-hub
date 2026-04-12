@@ -1143,6 +1143,60 @@ export type Database = {
           },
         ]
       }
+      subscription_payment_proofs: {
+        Row: {
+          amount: number
+          billing_cycle: string
+          created_at: string
+          id: string
+          notes: string | null
+          plan_id: string
+          proof_url: string
+          status: string
+          store_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan_id: string
+          proof_url: string
+          status?: string
+          store_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plan_id?: string
+          proof_url?: string
+          status?: string
+          store_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_payment_proofs_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscription_payment_proofs_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_plans: {
         Row: {
           can_customize_theme: boolean | null
