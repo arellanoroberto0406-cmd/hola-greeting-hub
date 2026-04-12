@@ -9,6 +9,7 @@ interface UsePayPalPaymentOptions {
 
 type PayPalFunctionResponse = {
   approvalUrl?: string;
+  subscriptionId?: string;
   error?: string;
   errorCode?: string;
   debugId?: string | null;
@@ -20,13 +21,21 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
   const [error, setError] = useState<string | null>(null);
   const [manualApprovalUrl, setManualApprovalUrl] = useState<string | null>(null);
 
-  const clearManualApprovalUrl = () => setManualApprovalUrl(null);
+  const clearManualApprovalUrl = () => {
+    setManualApprovalUrl(null);
+    setError(null);
+  };
 
   const createSubscription = async (
     storeId: string,
     planId: string,
     billingCycle: 'monthly' | 'yearly' = 'monthly'
   ) => {
+    if (!storeId || !planId) {
+      toast.error('Datos incompletos. Selecciona un plan válido.');
+      return;
+    }
+
     setIsProcessing(true);
     setError(null);
     setManualApprovalUrl(null);
@@ -44,31 +53,17 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       });
 
       if (invokeError) {
-        const invokeDetails = invokeError as { message?: string; context?: unknown };
-        const contextText = typeof invokeDetails.context === 'string'
-          ? invokeDetails.context
-          : invokeDetails.context
-            ? JSON.stringify(invokeDetails.context)
-            : '';
-
-        console.error('Function invoke error:', invokeError, 'Context:', invokeDetails.context);
-        throw new Error(
-          contextText
-            ? `${invokeDetails.message || 'Error al conectar con PayPal'}: ${contextText}`
-            : (invokeDetails.message || 'Error al conectar con PayPal')
-        );
+        console.error('Function invoke error:', invokeError);
+        throw new Error(invokeError.message || 'Error al conectar con el servidor de pagos');
       }
 
+      // The function always returns 200 but may have an error in the body
       if (data?.error) {
-        console.error('PayPal API error:', data.errorCode, data.technicalDetails || data.error);
+        console.error('PayPal API error:', data.errorCode, data.error);
 
         if (data.errorCode === 'PAYEE_ACCOUNT_RESTRICTED') {
-          const msg = data.debugId
-            ? `Tu cuenta de PayPal está restringida. Resuélvelo en PayPal y comparte este código si te lo piden: ${data.debugId}`
-            : 'Tu cuenta de PayPal está restringida. Resuélvelo en PayPal para poder cobrar.';
-
+          const msg = 'La cuenta de PayPal está restringida. Es necesario resolverlo desde PayPal.';
           setError(msg);
-          toast.error(msg);
           setIsProcessing(false);
           return;
         }
@@ -77,32 +72,34 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       }
 
       if (!data?.approvalUrl) {
-        throw new Error('No se recibió la URL de aprobación de PayPal');
+        throw new Error('No se recibió el enlace de pago de PayPal');
       }
 
-      const approvalUrl = data.approvalUrl as string;
+      const approvalUrl = data.approvalUrl;
       console.log('PayPal approval URL received:', approvalUrl);
 
-      // Always show the manual link as fallback - popups are unreliable in iframes/webviews
+      // Always show the manual link
       setManualApprovalUrl(approvalUrl);
 
       // Try to open in a new tab
-      const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
-      
-      if (popup && !popup.closed) {
-        toast.success('Se abrió PayPal en una nueva pestaña. Completa el pago allí.');
-      } else {
-        // Try top-level navigation for iframe contexts
-        try {
-          if (window.self !== window.top && window.top) {
-            window.top.location.href = approvalUrl;
-            return;
+      try {
+        const popup = window.open(approvalUrl, '_blank', 'noopener,noreferrer');
+        if (popup && !popup.closed) {
+          toast.success('PayPal se abrió en una nueva pestaña. Completa el pago allí.');
+        } else {
+          // Try top-level navigation for iframe contexts
+          try {
+            if (window.self !== window.top && window.top) {
+              window.top.location.href = approvalUrl;
+              return;
+            }
+          } catch {
+            // Cross-origin iframe
           }
-        } catch {
-          // Cross-origin iframe, can't navigate top
+          toast.info('Haz clic en "Ir a PayPal" para completar el pago.');
         }
-        
-        toast.warning('No se pudo abrir PayPal automáticamente. Usa el botón de abajo para continuar.');
+      } catch {
+        toast.info('Haz clic en "Ir a PayPal" para completar el pago.');
       }
 
       setIsProcessing(false);
@@ -110,7 +107,7 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
       const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
       console.error('PayPal subscription error:', err);
       setError(errorMessage);
-      toast.error('Error al procesar la suscripción: ' + errorMessage);
+      toast.error(errorMessage);
       options.onError?.(err as Error);
       setIsProcessing(false);
     }
@@ -148,7 +145,6 @@ export const usePayPalPayment = (options: UsePayPalPaymentOptions = {}) => {
     cancelSubscription,
     clearManualApprovalUrl,
     manualApprovalUrl,
-    // Keep legacy name for backward compat
     createOrder: createSubscription,
     isProcessing,
     error,

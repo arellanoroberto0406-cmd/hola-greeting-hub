@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2 } from "lucide-react";
+import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
 import { 
   useSubscriptionPlans, 
@@ -36,7 +36,7 @@ const PlanIcon = ({ slug }: { slug: string }) => {
 
 const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { data: plans, isLoading: plansLoading, error: plansError } = useSubscriptionPlans();
+  const { data: plans, isLoading: plansLoading } = useSubscriptionPlans();
   const { subscription, isActive, status, daysLeft, plan: currentPlan } = useSubscriptionStatus(storeId);
   const createSubscription = useCreateSubscription();
   const { 
@@ -58,17 +58,16 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
     if (paymentStatus === 'success') {
       toast.success('¡Pago completado exitosamente! Tu plan ha sido activado.');
       searchParams.delete('payment');
-      setSearchParams(searchParams);
+      setSearchParams(searchParams, { replace: true });
     } else if (paymentStatus === 'cancelled') {
-      toast.info('El pago fue cancelado');
+      toast.info('El pago fue cancelado. Puedes intentarlo de nuevo.');
       searchParams.delete('payment');
-      setSearchParams(searchParams);
+      setSearchParams(searchParams, { replace: true });
     }
   }, [searchParams, setSearchParams]);
 
   const handleSelectPlan = (plan: SubscriptionPlan) => {
     if (!subscription) {
-      // Start trial with this plan
       createSubscription.mutate(
         { storeId, planId: plan.id },
         {
@@ -81,8 +80,8 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
         }
       );
     } else {
-      // Show upgrade dialog
       setSelectedPlan(plan);
+      clearManualApprovalUrl();
       setShowUpgradeDialog(true);
     }
   };
@@ -96,6 +95,28 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const handleCancelSubscription = () => {
     cancelSubscription(storeId);
   };
+
+  const handleCopyLink = async (url: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success('Enlace copiado al portapapeles');
+    } catch {
+      // Fallback for environments where clipboard API fails
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        toast.success('Enlace copiado al portapapeles');
+      } catch {
+        toast.error('No se pudo copiar. Copia el enlace manualmente.');
+      }
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const isAccountRestricted = paymentError?.includes('restringida') || paymentError?.includes('RESTRICTED');
 
   const getStatusBadge = () => {
     switch (status) {
@@ -139,20 +160,25 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
     return (
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <div className="flex items-center justify-center gap-3">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <span className="text-muted-foreground">Cargando planes...</span>
           </div>
         </CardContent>
       </Card>
     );
   }
 
+  const selectedPrice = billingCycle === 'yearly' && selectedPlan?.price_yearly 
+    ? selectedPlan.price_yearly 
+    : selectedPlan?.price_monthly;
+
   return (
     <div className="space-y-6">
       {/* Current Status */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <CreditCard className="h-5 w-5" />
@@ -173,7 +199,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 <div>
                   <p className="font-medium">Tu suscripción está por vencer</p>
                   <p className="text-sm mt-1">
-                    Tu suscripción expira pronto. Renueva ahora para mantener acceso a todas las funciones.
+                    Renueva ahora para mantener acceso a todas las funciones de tu tienda.
                   </p>
                 </div>
               </div>
@@ -188,7 +214,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 <div>
                   <p className="font-medium">Tu suscripción ha expirado</p>
                   <p className="text-sm mt-1">
-                    Actualiza tu plan para seguir disfrutando de todas las funciones de tu tienda.
+                    Actualiza tu plan para seguir disfrutando de todas las funciones.
                   </p>
                 </div>
               </div>
@@ -238,11 +264,14 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 <div>
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-bold">${plan.price_monthly}</span>
-                    <span className="text-muted-foreground">/mes</span>
+                    <span className="text-muted-foreground text-sm">USD/mes</span>
                   </div>
                   {plan.price_yearly && (
                     <p className="text-sm text-muted-foreground">
-                      o ${plan.price_yearly}/año (ahorra {Math.round((1 - plan.price_yearly / (plan.price_monthly * 12)) * 100)}%)
+                      o ${plan.price_yearly} USD/año 
+                      <Badge variant="secondary" className="ml-1 text-xs">
+                        -{Math.round((1 - plan.price_yearly / (plan.price_monthly * 12)) * 100)}%
+                      </Badge>
                     </p>
                   )}
                 </div>
@@ -265,6 +294,9 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                   onClick={() => handleSelectPlan(plan)}
                   style={!isCurrentPlan ? { backgroundColor: primaryColor || undefined } : {}}
                 >
+                  {createSubscription.isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : null}
                   {isCurrentPlan 
                     ? "Plan actual" 
                     : !subscription 
@@ -281,30 +313,32 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
       {/* Payment Info */}
       <Card>
         <CardHeader>
-          <CardTitle>Información de Pago</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CreditCard className="h-5 w-5" />
+            Información de Pago
+          </CardTitle>
           <CardDescription>
-            Cobro automático mensual/anual con PayPal. El dinero llega directo a tu cuenta PayPal.
+            Pago único por período (mensual o anual) vía PayPal. Seguro y rápido.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="border rounded-lg p-4 flex items-center gap-4">
-            <div className="bg-[#0070ba] text-white p-3 rounded-lg">
+            <div className="bg-[#0070ba] text-white p-3 rounded-lg flex-shrink-0">
               <CreditCard className="h-6 w-6" />
             </div>
             <div>
-              <h4 className="font-medium">💳 PayPal - Cobro Recurrente</h4>
+              <h4 className="font-medium">PayPal</h4>
               <p className="text-sm text-muted-foreground">
-                Se cobra automáticamente cada mes (o año). Los pagos se depositan directamente en tu cuenta PayPal.
-                El cliente puede cancelar en cualquier momento.
+                Paga con tu cuenta PayPal o tarjeta de crédito/débito. El pago se procesa de forma segura.
               </p>
             </div>
           </div>
-          {subscription?.paypal_subscription_id && status === 'active' && (
+          {subscription?.payment_reference && status === 'active' && (
             <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/30">
               <div>
-                <p className="text-sm font-medium">Suscripción activa con cobro automático</p>
+                <p className="text-sm font-medium">Suscripción activa</p>
                 <p className="text-xs text-muted-foreground">
-                  ID: {subscription.paypal_subscription_id}
+                  Ref: {subscription.payment_reference.slice(0, 16)}...
                 </p>
               </div>
               <Button 
@@ -313,7 +347,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 onClick={handleCancelSubscription}
                 disabled={isProcessing}
               >
-                {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cancelar suscripción'}
+                {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cancelar'}
               </Button>
             </div>
           )}
@@ -321,129 +355,168 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
       </Card>
 
       {/* Upgrade Dialog */}
-      <Dialog open={showUpgradeDialog} onOpenChange={setShowUpgradeDialog}>
-        <DialogContent className="sm:max-w-[500px]">
+      <Dialog open={showUpgradeDialog} onOpenChange={(open) => {
+        setShowUpgradeDialog(open);
+        if (!open) clearManualApprovalUrl();
+      }}>
+        <DialogContent className="sm:max-w-[480px]">
           <DialogHeader>
-            <DialogTitle>Activar Plan {selectedPlan?.name}</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Activar Plan {selectedPlan?.name}
+            </DialogTitle>
             <DialogDescription>
-              Selecciona el ciclo de facturación y procede al pago con PayPal.
+              Selecciona el ciclo de facturación y procede al pago.
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-4 py-4">
+          <div className="space-y-4 py-2">
             <div className="bg-muted/50 rounded-lg p-4">
               <div className="flex justify-between items-center">
-                <span>Plan seleccionado:</span>
+                <span className="text-sm text-muted-foreground">Plan seleccionado</span>
                 <span className="font-bold">{selectedPlan?.name}</span>
               </div>
             </div>
             
             <div className="space-y-3">
-              <Label>Ciclo de facturación</Label>
+              <Label className="font-medium">Ciclo de facturación</Label>
               <RadioGroup 
                 value={billingCycle} 
                 onValueChange={(v) => setBillingCycle(v as 'monthly' | 'yearly')}
-                className="grid grid-cols-2 gap-4"
+                className="grid grid-cols-2 gap-3"
               >
-                <div className="flex items-center space-x-2">
+                <label 
+                  htmlFor="monthly"
+                  className={`flex items-center gap-2 border rounded-lg p-3 cursor-pointer transition-colors ${
+                    billingCycle === 'monthly' ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                  }`}
+                >
                   <RadioGroupItem value="monthly" id="monthly" />
-                  <Label htmlFor="monthly" className="cursor-pointer">
+                  <div>
+                    <p className="font-medium text-sm">Mensual</p>
+                    <p className="text-xs text-muted-foreground">
+                      ${selectedPlan?.price_monthly} USD/mes
+                    </p>
+                  </div>
+                </label>
+                {selectedPlan?.price_yearly && (
+                  <label 
+                    htmlFor="yearly"
+                    className={`flex items-center gap-2 border rounded-lg p-3 cursor-pointer transition-colors ${
+                      billingCycle === 'yearly' ? 'border-primary bg-primary/5' : 'hover:bg-muted/50'
+                    }`}
+                  >
+                    <RadioGroupItem value="yearly" id="yearly" />
                     <div>
-                      <p className="font-medium">Mensual</p>
-                      <p className="text-sm text-muted-foreground">
-                        ${selectedPlan?.price_monthly}/mes
+                      <p className="font-medium text-sm">Anual</p>
+                      <p className="text-xs text-muted-foreground">
+                        ${selectedPlan.price_yearly} USD/año
                       </p>
                     </div>
-                  </Label>
-                </div>
-                {selectedPlan?.price_yearly && (
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yearly" id="yearly" />
-                    <Label htmlFor="yearly" className="cursor-pointer">
-                      <div>
-                        <p className="font-medium">Anual</p>
-                        <p className="text-sm text-muted-foreground">
-                          ${selectedPlan.price_yearly}/año
-                          <Badge variant="secondary" className="ml-2 text-xs">
-                            Ahorra {Math.round((1 - selectedPlan.price_yearly / (selectedPlan.price_monthly * 12)) * 100)}%
-                          </Badge>
-                        </p>
-                      </div>
-                    </Label>
-                  </div>
+                  </label>
                 )}
               </RadioGroup>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
               <div className="flex justify-between items-center">
                 <span className="font-medium">Total a pagar:</span>
-                <span className="text-xl font-bold">
-                  ${billingCycle === 'yearly' && selectedPlan?.price_yearly 
-                    ? selectedPlan.price_yearly 
-                    : selectedPlan?.price_monthly}
-                </span>
+                <span className="text-2xl font-bold">${selectedPrice} USD</span>
               </div>
+              {billingCycle === 'yearly' && selectedPlan?.price_yearly && (
+                <p className="text-xs text-green-600 mt-1 text-right">
+                  Ahorras ${(selectedPlan.price_monthly * 12 - selectedPlan.price_yearly).toFixed(0)} USD al año
+                </p>
+              )}
             </div>
           </div>
 
+          {/* PayPal Link Generated */}
           {manualApprovalUrl && (
-            <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
-              <p className="text-sm font-medium text-center">✅ Enlace de pago generado correctamente</p>
-              <div className="flex flex-col gap-2">
-                <Button asChild className="w-full">
-                  <a href={manualApprovalUrl} target="_blank" rel="noopener noreferrer">
-                    <CreditCard className="mr-2 h-4 w-4" />
-                    Ir a PayPal para pagar
-                  </a>
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={async () => {
-                    try {
-                      await navigator.clipboard.writeText(manualApprovalUrl);
-                      toast.success('Enlace copiado. Ábrelo en tu navegador.');
-                    } catch {
-                      toast.error('No se pudo copiar el enlace.');
-                    }
-                  }}
-                >
-                  Copiar enlace de pago
-                </Button>
-              </div>
+            <div className="rounded-lg border-2 border-green-300 bg-green-50 p-4 space-y-3">
+              <p className="text-sm font-medium text-green-800 text-center flex items-center justify-center gap-2">
+                <Check className="h-4 w-4" />
+                Enlace de pago listo
+              </p>
+              <Button asChild className="w-full bg-[#0070ba] hover:bg-[#005ea6]">
+                <a href={manualApprovalUrl} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 h-4 w-4" />
+                  Ir a PayPal para pagar
+                </a>
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => handleCopyLink(manualApprovalUrl)}
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                Copiar enlace de pago
+              </Button>
               <p className="text-xs text-muted-foreground text-center">
-                Si no se abrió automáticamente, haz clic en el botón de arriba
+                Al completar el pago en PayPal serás redirigido de vuelta automáticamente.
               </p>
             </div>
           )}
 
-          {paymentError && !manualApprovalUrl && (
-            <p className="text-sm text-destructive">{paymentError}</p>
+          {/* Account Restricted Error */}
+          {isAccountRestricted && (
+            <div className="rounded-lg border border-red-300 bg-red-50 p-4 space-y-2">
+              <div className="flex items-start gap-2">
+                <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-red-800">Cuenta PayPal restringida</p>
+                  <p className="text-xs text-red-700 mt-1">
+                    La cuenta de PayPal asociada tiene restricciones. Para resolverlo:
+                  </p>
+                  <ol className="text-xs text-red-700 mt-1 list-decimal ml-4 space-y-1">
+                    <li>Inicia sesión en <a href="https://www.paypal.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">paypal.com</a></li>
+                    <li>Ve al Centro de Resoluciones</li>
+                    <li>Sigue los pasos para eliminar la restricción</li>
+                    <li>Vuelve aquí e intenta de nuevo</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Generic Error */}
+          {paymentError && !isAccountRestricted && !manualApprovalUrl && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+              <p className="text-sm text-red-700">{paymentError}</p>
+              <Button 
+                variant="link" 
+                className="text-xs p-0 h-auto text-red-600"
+                onClick={handlePayWithPayPal}
+              >
+                Reintentar
+              </Button>
+            </div>
           )}
           
           <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setShowUpgradeDialog(false)}>
               Cancelar
             </Button>
-            <Button 
-              onClick={handlePayWithPayPal}
-              disabled={isProcessing}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground"
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Redirigiendo a PayPal...
-                </>
-              ) : (
-                <>
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Pagar con PayPal
-                </>
-              )}
-            </Button>
+            {!manualApprovalUrl && (
+              <Button 
+                onClick={handlePayWithPayPal}
+                disabled={isProcessing}
+                className="bg-[#0070ba] hover:bg-[#005ea6] text-white"
+              >
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Conectando con PayPal...
+                  </>
+                ) : (
+                  <>
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Pagar con PayPal
+                  </>
+                )}
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
