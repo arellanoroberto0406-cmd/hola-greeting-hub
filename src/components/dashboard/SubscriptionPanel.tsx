@@ -493,7 +493,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                       <input
                         ref={fileInputRef}
                         type="file"
-                        accept="image/*,.pdf"
+                        accept="image/jpeg,image/png,image/webp,application/pdf"
                         className="hidden"
                         onChange={handleFileChange}
                       />
