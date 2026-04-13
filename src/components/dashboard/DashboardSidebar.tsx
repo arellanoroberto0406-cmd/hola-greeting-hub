@@ -19,7 +19,8 @@ import {
   ChevronRight,
   Crown,
   Lock,
-  X
+  X,
+  FileCheck
 } from "lucide-react";
 import { useState } from "react";
 import { PlanTier } from "@/hooks/useStorePlanTier";
@@ -48,6 +49,7 @@ const tabs = [
   { id: "editor", label: "Editor Visual", icon: Layers, group: "configuración", minPlan: "basic" as PlanTier },
   { id: "settings", label: "Configuración", icon: Settings, group: "configuración", minPlan: "basic" as PlanTier },
   { id: "subscription", label: "Mi Plan", icon: CreditCard, group: "configuración", minPlan: "basic" as PlanTier },
+  { id: "payment-proofs", label: "Comprobantes", icon: FileCheck, group: "configuración", minPlan: "basic" as PlanTier },
 ];
 
 const groups = [

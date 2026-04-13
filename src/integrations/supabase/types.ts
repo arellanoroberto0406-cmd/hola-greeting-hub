@@ -1148,10 +1148,13 @@ export type Database = {
           amount: number
           billing_cycle: string
           created_at: string
+          file_hash: string | null
           id: string
           notes: string | null
           plan_id: string
           proof_url: string
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: string
           store_id: string
           updated_at: string
@@ -1160,10 +1163,13 @@ export type Database = {
           amount: number
           billing_cycle?: string
           created_at?: string
+          file_hash?: string | null
           id?: string
           notes?: string | null
           plan_id: string
           proof_url: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           store_id: string
           updated_at?: string
@@ -1172,10 +1178,13 @@ export type Database = {
           amount?: number
           billing_cycle?: string
           created_at?: string
+          file_hash?: string | null
           id?: string
           notes?: string | null
           plan_id?: string
           proof_url?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: string
           store_id?: string
           updated_at?: string

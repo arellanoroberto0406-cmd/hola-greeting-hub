@@ -1,0 +1,202 @@
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { CheckCircle2, XCircle, Clock, Eye, Loader2, FileCheck, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+
+const PaymentProofsPanel = () => {
+  const queryClient = useQueryClient();
+  const [selectedProof, setSelectedProof] = useState<any>(null);
+  const [reviewNotes, setReviewNotes] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const { data: proofs, isLoading } = useQuery({
+    queryKey: ["admin-payment-proofs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subscription_payment_proofs")
+        .select("*, stores(name, slug), subscription_plans:plan_id(name, slug)")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const handleReview = async (decision: "approved" | "rejected") => {
+    if (!selectedProof) return;
+    setIsProcessing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "activate-transfer-subscription?action=review",
+        {
+          body: {
+            proofId: selectedProof.id,
+            decision,
+            notes: reviewNotes || undefined,
+          },
+        }
+      );
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+
+      toast.success(decision === "approved" ? "Plan activado exitosamente" : "Comprobante rechazado");
+      setSelectedProof(null);
+      setReviewNotes("");
+      queryClient.invalidateQueries({ queryKey: ["admin-payment-proofs"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al procesar");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const statusBadge = (status: string) => {
+    switch (status) {
+      case "pending":
+        return <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300"><Clock className="h-3 w-3 mr-1" />Pendiente</Badge>;
+      case "approved":
+        return <Badge className="bg-green-500"><CheckCircle2 className="h-3 w-3 mr-1" />Aprobado</Badge>;
+      case "rejected":
+        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Rechazado</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const pendingCount = proofs?.filter((p: any) => p.status === "pending").length || 0;
+
+  if (isLoading) {
+    return (
+      <Card><CardContent className="p-6 flex items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin" />
+      </CardContent></Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileCheck className="h-5 w-5" />
+            Comprobantes de Pago
+            {pendingCount > 0 && (
+              <Badge variant="destructive" className="ml-2">{pendingCount} pendiente{pendingCount > 1 ? "s" : ""}</Badge>
+            )}
+          </CardTitle>
+          <CardDescription>Revisa y aprueba los comprobantes de transferencia para activar planes.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!proofs?.length ? (
+            <p className="text-sm text-muted-foreground text-center py-8">No hay comprobantes registrados.</p>
+          ) : (
+            <div className="space-y-3">
+              {proofs.map((proof: any) => (
+                <div key={proof.id} className={`border rounded-lg p-4 flex items-center justify-between gap-4 ${proof.status === "pending" ? "border-amber-300 bg-amber-50/50" : ""}`}>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-medium text-sm truncate">{proof.stores?.name || "Tienda"}</span>
+                      {statusBadge(proof.status)}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Plan: {(proof as any).subscription_plans?.name || "—"} · 
+                      ${proof.amount} MXN · 
+                      {proof.billing_cycle === "yearly" ? "Anual" : "Mensual"} · 
+                      {new Date(proof.created_at).toLocaleDateString("es-MX")}
+                    </p>
+                    {proof.notes && <p className="text-xs text-muted-foreground mt-1 italic">Nota: {proof.notes}</p>}
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <Button variant="outline" size="sm" onClick={() => setPreviewUrl(proof.proof_url)}>
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    {proof.status === "pending" && (
+                      <Button size="sm" onClick={() => { setSelectedProof(proof); setReviewNotes(""); }}>
+                        Revisar
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Comprobante de pago</DialogTitle>
+          </DialogHeader>
+          {previewUrl && (
+            <div className="space-y-3">
+              {previewUrl.endsWith(".pdf") ? (
+                <div className="text-center py-8">
+                  <Button asChild><a href={previewUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="mr-2 h-4 w-4" />Abrir PDF</a></Button>
+                </div>
+              ) : (
+                <img src={previewUrl} alt="Comprobante" className="w-full rounded-lg max-h-[60vh] object-contain" />
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Review Dialog */}
+      <Dialog open={!!selectedProof} onOpenChange={(open) => { if (!open) setSelectedProof(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Revisar comprobante</DialogTitle>
+            <DialogDescription>
+              Tienda: {selectedProof?.stores?.name} · Plan: {selectedProof?.subscription_plans?.name} · ${selectedProof?.amount} MXN
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedProof?.proof_url && (
+              <div className="border rounded-lg overflow-hidden">
+                {selectedProof.proof_url.endsWith(".pdf") ? (
+                  <div className="text-center py-4">
+                    <Button variant="outline" size="sm" asChild>
+                      <a href={selectedProof.proof_url} target="_blank" rel="noopener noreferrer"><ExternalLink className="mr-2 h-4 w-4" />Ver PDF</a>
+                    </Button>
+                  </div>
+                ) : (
+                  <img src={selectedProof.proof_url} alt="Comprobante" className="w-full max-h-48 object-contain bg-muted/20" />
+                )}
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label>Notas (opcional)</Label>
+              <Textarea
+                placeholder="Agregar nota sobre la revisión..."
+                value={reviewNotes}
+                onChange={(e) => setReviewNotes(e.target.value)}
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button variant="destructive" onClick={() => handleReview("rejected")} disabled={isProcessing}>
+              {isProcessing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <XCircle className="h-4 w-4 mr-2" />}
+              Rechazar
+            </Button>
+            <Button className="bg-green-600 hover:bg-green-700" onClick={() => handleReview("approved")} disabled={isProcessing}>
+              {isProcessing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
+              Aprobar y activar plan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default PaymentProofsPanel;
