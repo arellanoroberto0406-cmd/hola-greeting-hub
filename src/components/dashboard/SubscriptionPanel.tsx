@@ -134,8 +134,18 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Solo se aceptan imágenes (JPG, PNG, WebP) o PDF');
+      return;
+    }
     if (file.size > 5 * 1024 * 1024) {
       toast.error('El archivo no debe superar 5MB');
+      return;
+    }
+    if (file.size < 10 * 1024) {
+      toast.error('El archivo es demasiado pequeño. Sube un comprobante real.');
       return;
     }
     setProofFile(file);
