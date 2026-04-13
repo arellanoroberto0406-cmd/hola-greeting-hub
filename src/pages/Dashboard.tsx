@@ -28,6 +28,7 @@ import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
 import RefundsHistoryPanel from "@/components/dashboard/RefundsHistoryPanel";
 import StoreUrlPanel from "@/components/dashboard/StoreUrlPanel";
 import ChatPanel from "@/components/dashboard/ChatPanel";
+import PaymentProofsPanel from "@/components/dashboard/PaymentProofsPanel";
 import { useUnreadCount } from "@/hooks/useChat";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -336,6 +337,13 @@ const Dashboard = () => {
           <div className="space-y-4">
             <SectionHeader title="Chat en Vivo" tip="Responde a tus clientes en tiempo real. Los mensajes se actualizan automáticamente." />
             <ChatPanel storeId={store.id} primaryColor={store.primary_color} />
+          </div>
+        );
+      case "payment-proofs":
+        return (
+          <div className="space-y-4">
+            <SectionHeader title="Comprobantes de Pago" tip="Revisa y aprueba los comprobantes de transferencia para activar planes de suscripción." />
+            <PaymentProofsPanel />
           </div>
         );
       default:
