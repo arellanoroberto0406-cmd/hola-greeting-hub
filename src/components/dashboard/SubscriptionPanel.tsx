@@ -183,7 +183,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
       if (data?.error) throw new Error(data.error);
 
       setTransferSuccess(true);
-      toast.success('¡Plan activado exitosamente!');
+      toast.success(data?.message || '¡Comprobante enviado! Será revisado pronto.');
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al procesar');
     } finally {
@@ -373,12 +373,12 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
           {transferSuccess ? (
             <div className="py-6 text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
+              <div className="mx-auto w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center">
+                <Clock className="h-8 w-8 text-amber-600" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-green-700">¡Plan activado!</h3>
-                <p className="text-sm text-muted-foreground mt-1">Tu plan {selectedPlan?.name} está activo. Disfruta de todas las funciones.</p>
+                <h3 className="text-lg font-bold text-amber-700">Comprobante enviado</h3>
+                <p className="text-sm text-muted-foreground mt-1">Tu comprobante está siendo verificado. Tu plan {selectedPlan?.name} se activará una vez aprobado.</p>
               </div>
               <Button onClick={() => setShowUpgradeDialog(false)} className="w-full">Cerrar</Button>
             </div>
