@@ -716,6 +716,13 @@ const StoreFront = () => {
 
       {/* Premium Footer */}
       <PremiumFooterSection store={store} planTier={planTier} />
+
+      {/* Mobile sticky cart bar - conversion booster */}
+      <MobileCartBar
+        slug={slug || ""}
+        primaryColor={store.primary_color}
+        freeShippingThreshold={freeShippingThreshold}
+      />
     </div>
   );
 };
