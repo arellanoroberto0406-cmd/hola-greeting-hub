@@ -17,6 +17,15 @@
   animation: slide-up 0.4s ease-out forwards;
 }
 
+/* Hide scrollbar but keep functionality (used in trust bar mobile scroll) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here.
 All colors MUST be HSL.
 */
