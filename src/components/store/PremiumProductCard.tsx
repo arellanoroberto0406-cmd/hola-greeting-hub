@@ -98,6 +98,9 @@ export const PremiumProductCard = ({
         <img
           src={product.image}
           alt={product.name}
+          loading={index < 4 ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={index < 2 ? "high" : "auto"}
           className={cn(
             "w-full h-full object-cover transition-transform duration-700 ease-out",
             isHovered && "scale-110"
@@ -109,6 +112,8 @@ export const PremiumProductCard = ({
           <img
             src={product.images[0]}
             alt={product.name}
+            loading="lazy"
+            decoding="async"
             className={cn(
               "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
               isHovered ? "opacity-100" : "opacity-0"

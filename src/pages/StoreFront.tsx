@@ -61,6 +61,8 @@ import { PremiumProductsGridSection } from "@/components/store/sections/PremiumP
 import { PremiumProductModal } from "@/components/store/PremiumProductModal";
 import SectionWrapper from "@/components/store/SectionWrapper";
 import SEOHead from "@/components/SEOHead";
+import TrustBar from "@/components/store/TrustBar";
+import MobileCartBar from "@/components/store/MobileCartBar";
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -370,8 +372,11 @@ const StoreFront = () => {
         selectedCollection={filters.collection}
       />
 
-
-
+      {/* Trust signals - boosts conversion */}
+      <TrustBar
+        primaryColor={store.primary_color}
+        freeShippingThreshold={freeShippingThreshold}
+      />
 
 
       {/* Dynamic Sections */}
@@ -711,6 +716,13 @@ const StoreFront = () => {
 
       {/* Premium Footer */}
       <PremiumFooterSection store={store} planTier={planTier} />
+
+      {/* Mobile sticky cart bar - conversion booster */}
+      <MobileCartBar
+        slug={slug || ""}
+        primaryColor={store.primary_color}
+        freeShippingThreshold={freeShippingThreshold}
+      />
     </div>
   );
 };
