@@ -142,6 +142,36 @@ const StoreCheckout = () => {
     },
   });
 
+  const isMobile = useIsMobile();
+  const [wizardStep, setWizardStep] = useState(0); // 0=datos, 1=envío, 2=pago
+
+  const wizardSteps = [
+    { label: "Datos", icon: User, fields: ["firstName", "lastName", "email", "phone"] as const },
+    { label: "Envío", icon: MapPin, fields: ["address", "city", "state", "zipCode"] as const },
+    { label: "Pago", icon: CreditCard, fields: ["paymentMethod"] as const },
+  ];
+
+  const validateCurrentStep = useCallback(async () => {
+    const currentFields = wizardSteps[wizardStep].fields;
+    const result = await form.trigger(currentFields as any);
+    return result;
+  }, [wizardStep, form]);
+
+  const handleNextStep = useCallback(async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid && wizardStep < 2) {
+      setWizardStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [validateCurrentStep, wizardStep]);
+
+  const handlePrevStep = useCallback(() => {
+    if (wizardStep > 0) {
+      setWizardStep(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [wizardStep]);
+
   // Apply store colors
   useEffect(() => {
     if (store) {
