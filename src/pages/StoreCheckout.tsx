@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useParams, Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet, AlertCircle, Clock } from "lucide-react";
+import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet, AlertCircle, Clock, User, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 import CopyButton from "@/components/store/CopyButton";
 import PaymentProofUpload from "@/components/store/PaymentProofUpload";
 import { z } from "zod";
@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/context/CartContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
@@ -140,6 +141,36 @@ const StoreCheckout = () => {
       paymentMethod: availablePaymentMethods[0] || "card",
     },
   });
+
+  const isMobile = useIsMobile();
+  const [wizardStep, setWizardStep] = useState(0); // 0=datos, 1=envío, 2=pago
+
+  const wizardSteps = [
+    { label: "Datos", icon: User, fields: ["firstName", "lastName", "email", "phone"] as const },
+    { label: "Envío", icon: MapPin, fields: ["address", "city", "state", "zipCode"] as const },
+    { label: "Pago", icon: CreditCard, fields: ["paymentMethod"] as const },
+  ];
+
+  const validateCurrentStep = useCallback(async () => {
+    const currentFields = wizardSteps[wizardStep].fields;
+    const result = await form.trigger(currentFields as any);
+    return result;
+  }, [wizardStep, form]);
+
+  const handleNextStep = useCallback(async () => {
+    const isValid = await validateCurrentStep();
+    if (isValid && wizardStep < 2) {
+      setWizardStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [validateCurrentStep, wizardStep]);
+
+  const handlePrevStep = useCallback(() => {
+    if (wizardStep > 0) {
+      setWizardStep(prev => prev - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [wizardStep]);
 
   // Apply store colors
   useEffect(() => {
@@ -735,102 +766,78 @@ const StoreCheckout = () => {
         </div>
       </header>
       
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-heading mb-8" style={{ color: primaryColor }}>
-          Finalizar Compra
+      <div className="container mx-auto px-4 py-6 lg:py-8">
+        {/* Mobile Wizard Progress Bar */}
+        {isMobile && (
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-3">
+              {wizardSteps.map((step, i) => {
+                const Icon = step.icon;
+                const isActive = i === wizardStep;
+                const isDone = i < wizardStep;
+                return (
+                  <button
+                    key={step.label}
+                    type="button"
+                    onClick={() => i < wizardStep && setWizardStep(i)}
+                    className={`flex flex-col items-center gap-1 flex-1 transition-all ${i < wizardStep ? 'cursor-pointer' : 'cursor-default'}`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                        isActive ? 'scale-110 shadow-lg' : ''
+                      }`}
+                      style={{
+                        backgroundColor: isActive || isDone ? primaryColor : 'transparent',
+                        border: `2px solid ${isActive || isDone ? primaryColor : 'hsl(var(--border))'}`,
+                        color: isActive || isDone ? 'white' : 'hsl(var(--muted-foreground))',
+                      }}
+                    >
+                      {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
+                    </div>
+                    <span className={`text-xs font-medium ${isActive ? '' : 'text-muted-foreground'}`}
+                      style={isActive ? { color: primaryColor } : undefined}
+                    >
+                      {step.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            {/* Progress line */}
+            <div className="relative h-1 bg-muted rounded-full overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-full rounded-full transition-all duration-500"
+                style={{ width: `${((wizardStep) / 2) * 100}%`, backgroundColor: primaryColor }}
+              />
+            </div>
+          </div>
+        )}
+
+        <h1 className="text-2xl lg:text-4xl font-heading mb-6 lg:mb-8" style={{ color: primaryColor }}>
+          {isMobile ? wizardSteps[wizardStep].label : 'Finalizar Compra'}
         </h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Shipping Form */}
-          <div className="lg:col-span-2 space-y-8">
+          {/* Form */}
+          <div className="lg:col-span-2 space-y-6 lg:space-y-8">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                {/* Contact Info */}
-                <div className="bg-card rounded-xl p-6 border border-border/50">
-                  <h2 className="text-xl font-heading mb-6 flex items-center gap-2">
-                    <Truck className="w-5 h-5" style={{ color: primaryColor }} />
-                    Información de Envío
-                  </h2>
-                  
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="firstName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Nombre</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Juan" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="lastName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Apellido</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Pérez" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="email"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Correo electrónico</FormLabel>
-                          <FormControl>
-                            <Input type="email" placeholder="juan@ejemplo.com" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="phone"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Teléfono</FormLabel>
-                          <FormControl>
-                            <Input type="tel" placeholder="55 1234 5678" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="mt-4 space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="address"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Dirección</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Calle, número, colonia" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <div className="grid sm:grid-cols-3 gap-4">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:space-y-8">
+                {/* Step 1: Datos personales */}
+                {(!isMobile || wizardStep === 0) && (
+                  <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50">
+                    <h2 className="text-lg lg:text-xl font-heading mb-5 flex items-center gap-2">
+                      <User className="w-5 h-5" style={{ color: primaryColor }} />
+                      Datos Personales
+                    </h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <FormField
                         control={form.control}
-                        name="city"
+                        name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Ciudad</FormLabel>
+                            <FormLabel>Nombre</FormLabel>
                             <FormControl>
-                              <Input placeholder="Ciudad" {...field} />
+                              <Input placeholder="Juan" className="h-12 lg:h-10" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -838,36 +845,38 @@ const StoreCheckout = () => {
                       />
                       <FormField
                         control={form.control}
-                        name="state"
+                        name="lastName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Estado</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                              <FormControl>
-                                <SelectTrigger>
-                                  <SelectValue placeholder="Seleccionar" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                {mexicanStates.map((state) => (
-                                  <SelectItem key={state} value={state}>
-                                    {state}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <FormLabel>Apellido</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Pérez" className="h-12 lg:h-10" {...field} />
+                            </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
                       <FormField
                         control={form.control}
-                        name="zipCode"
+                        name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>C.P.</FormLabel>
+                            <FormLabel>Correo electrónico</FormLabel>
                             <FormControl>
-                              <Input placeholder="12345" {...field} />
+                              <Input type="email" placeholder="juan@ejemplo.com" className="h-12 lg:h-10" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="phone"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Teléfono</FormLabel>
+                            <FormControl>
+                              <Input type="tel" placeholder="55 1234 5678" className="h-12 lg:h-10" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -875,218 +884,357 @@ const StoreCheckout = () => {
                       />
                     </div>
                   </div>
-                </div>
+                )}
 
-                {/* Payment Method */}
-                <div className="bg-card rounded-xl p-6 border border-border/50">
-                  <h2 className="text-xl font-heading mb-6 flex items-center gap-2">
-                    <CreditCard className="w-5 h-5" style={{ color: primaryColor }} />
-                    Método de Pago
-                  </h2>
-                  
-                  <FormField
-                    control={form.control}
-                    name="paymentMethod"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                            className="space-y-3"
-                          >
-                            {availablePaymentMethods.includes("card") && (
-                              <div 
-                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                                style={{ borderColor: field.value === "card" ? primaryColor : undefined }}
-                              >
-                                <RadioGroupItem value="card" id="card" />
-                                <Label htmlFor="card" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">Tarjeta de crédito/débito</div>
-                                  <div className="text-sm text-muted-foreground">Visa, Mastercard, Amex</div>
-                                </Label>
-                                <CreditCard className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                            )}
-                            {availablePaymentMethods.includes("transfer") && (
-                              <div 
-                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                                style={{ borderColor: field.value === "transfer" ? primaryColor : undefined }}
-                              >
-                                <RadioGroupItem value="transfer" id="transfer" />
-                                <Label htmlFor="transfer" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">Transferencia bancaria</div>
-                                  <div className="text-sm text-muted-foreground">SPEI o depósito bancario</div>
-                                </Label>
-                                <Building2 className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                            )}
-                            {availablePaymentMethods.includes("cash") && (
-                              <div 
-                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                                style={{ borderColor: field.value === "cash" ? primaryColor : undefined }}
-                              >
-                                <RadioGroupItem value="cash" id="cash" />
-                                <Label htmlFor="cash" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">Pago en efectivo</div>
-                                  <div className="text-sm text-muted-foreground">{store?.cash_instructions || "Pago contra entrega"}</div>
-                                </Label>
-                                <Banknote className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                            )}
-                            {availablePaymentMethods.includes("paypal") && (
-                              <div 
-                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                                style={{ borderColor: field.value === "paypal" ? primaryColor : undefined }}
-                              >
-                                <RadioGroupItem value="paypal" id="paypal" />
-                                <Label htmlFor="paypal" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">PayPal / Tarjeta</div>
-                                  <div className="text-sm text-muted-foreground">Paga con tarjeta o saldo PayPal de forma segura</div>
-                                </Label>
-                                <Wallet className="w-5 h-5 text-muted-foreground" />
-                              </div>
-                            )}
-                            {availablePaymentMethods.includes("mercadopago") && (
-                              <div 
-                                className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
-                                style={{ borderColor: field.value === "mercadopago" ? primaryColor : undefined }}
-                              >
-                                <RadioGroupItem value="mercadopago" id="mercadopago" />
-                                <Label htmlFor="mercadopago" className="flex-1 cursor-pointer">
-                                  <div className="font-medium">MercadoPago</div>
-                                  <div className="text-sm text-muted-foreground">Tarjeta, OXXO y más</div>
-                                </Label>
-                                <div className="w-5 h-5 bg-[#00b1ea] rounded flex items-center justify-center text-white text-xs font-bold">MP</div>
-                              </div>
-                            )}
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                {/* Step 2: Envío */}
+                {(!isMobile || wizardStep === 1) && (
+                  <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50">
+                    <h2 className="text-lg lg:text-xl font-heading mb-5 flex items-center gap-2">
+                      <Truck className="w-5 h-5" style={{ color: primaryColor }} />
+                      Información de Envío
+                    </h2>
+                    <div className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="address"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Dirección</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Calle, número, colonia" className="h-12 lg:h-10" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="city"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Ciudad</FormLabel>
+                              <FormControl>
+                                <Input placeholder="Ciudad" className="h-12 lg:h-10" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="state"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Estado</FormLabel>
+                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                  <SelectTrigger className="h-12 lg:h-10">
+                                    <SelectValue placeholder="Seleccionar" />
+                                  </SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                  {mexicanStates.map((state) => (
+                                    <SelectItem key={state} value={state}>
+                                      {state}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name="zipCode"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>C.P.</FormLabel>
+                              <FormControl>
+                                <Input placeholder="12345" className="h-12 lg:h-10" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+                    {/* Shipping cost preview */}
+                    <div className="mt-4 p-3 rounded-lg bg-muted/40 text-sm flex items-center justify-between">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Truck className="w-4 h-4" /> Envío
+                      </span>
+                      <span className={shippingCost === 0 ? "text-green-500 font-semibold" : "font-medium"}>
+                        {shippingCost === 0 ? "GRATIS ✨" : `$${shippingCost}`}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Pago */}
+                {(!isMobile || wizardStep === 2) && (
+                  <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50">
+                    <h2 className="text-lg lg:text-xl font-heading mb-5 flex items-center gap-2">
+                      <CreditCard className="w-5 h-5" style={{ color: primaryColor }} />
+                      Método de Pago
+                    </h2>
+                    <FormField
+                      control={form.control}
+                      name="paymentMethod"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <RadioGroup
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                              className="space-y-3"
+                            >
+                              {availablePaymentMethods.includes("card") && (
+                                <div 
+                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  style={{ borderColor: field.value === "card" ? primaryColor : undefined }}
+                                >
+                                  <RadioGroupItem value="card" id="card" />
+                                  <Label htmlFor="card" className="flex-1 cursor-pointer">
+                                    <div className="font-medium">Tarjeta de crédito/débito</div>
+                                    <div className="text-sm text-muted-foreground">Visa, Mastercard, Amex</div>
+                                  </Label>
+                                  <CreditCard className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                              )}
+                              {availablePaymentMethods.includes("transfer") && (
+                                <div 
+                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  style={{ borderColor: field.value === "transfer" ? primaryColor : undefined }}
+                                >
+                                  <RadioGroupItem value="transfer" id="transfer" />
+                                  <Label htmlFor="transfer" className="flex-1 cursor-pointer">
+                                    <div className="font-medium">Transferencia bancaria</div>
+                                    <div className="text-sm text-muted-foreground">SPEI o depósito bancario</div>
+                                  </Label>
+                                  <Building2 className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                              )}
+                              {availablePaymentMethods.includes("cash") && (
+                                <div 
+                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  style={{ borderColor: field.value === "cash" ? primaryColor : undefined }}
+                                >
+                                  <RadioGroupItem value="cash" id="cash" />
+                                  <Label htmlFor="cash" className="flex-1 cursor-pointer">
+                                    <div className="font-medium">Pago en efectivo</div>
+                                    <div className="text-sm text-muted-foreground">{store?.cash_instructions || "Pago contra entrega"}</div>
+                                  </Label>
+                                  <Banknote className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                              )}
+                              {availablePaymentMethods.includes("paypal") && (
+                                <div 
+                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  style={{ borderColor: field.value === "paypal" ? primaryColor : undefined }}
+                                >
+                                  <RadioGroupItem value="paypal" id="paypal" />
+                                  <Label htmlFor="paypal" className="flex-1 cursor-pointer">
+                                    <div className="font-medium">PayPal / Tarjeta</div>
+                                    <div className="text-sm text-muted-foreground">Paga con tarjeta o saldo PayPal de forma segura</div>
+                                  </Label>
+                                  <Wallet className="w-5 h-5 text-muted-foreground" />
+                                </div>
+                              )}
+                              {availablePaymentMethods.includes("mercadopago") && (
+                                <div 
+                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  style={{ borderColor: field.value === "mercadopago" ? primaryColor : undefined }}
+                                >
+                                  <RadioGroupItem value="mercadopago" id="mercadopago" />
+                                  <Label htmlFor="mercadopago" className="flex-1 cursor-pointer">
+                                    <div className="font-medium">MercadoPago</div>
+                                    <div className="text-sm text-muted-foreground">Tarjeta, OXXO y más</div>
+                                  </Label>
+                                  <div className="w-5 h-5 bg-[#00b1ea] rounded flex items-center justify-center text-white text-xs font-bold">MP</div>
+                                </div>
+                              )}
+                            </RadioGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Security Badge */}
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 rounded-lg p-3 mt-4">
+                      <Shield className="w-5 h-5 text-green-500 shrink-0" />
+                      <span>Tus datos están protegidos con encriptación SSL</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Mobile Wizard Navigation */}
+                {isMobile && (
+                  <div className="flex gap-3">
+                    {wizardStep > 0 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="lg"
+                        className="flex-1 h-14"
+                        onClick={handlePrevStep}
+                      >
+                        <ChevronLeft className="w-5 h-5 mr-1" />
+                        Atrás
+                      </Button>
                     )}
-                  />
-                </div>
-
-                {/* Security Badge */}
-                <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 rounded-lg p-4">
-                  <Shield className="w-5 h-5 text-green-500" />
-                  <span>Tus datos están protegidos con encriptación SSL de 256 bits</span>
-                </div>
-
-                {/* Submit Button - Mobile */}
-                <div className="lg:hidden">
-                  <Button 
-                    type="submit" 
-                    size="lg" 
-                    className="w-full"
-                    style={{ backgroundColor: primaryColor }}
-                    disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
-                  >
-                    {isSubmitting || isMPProcessing || isPayPalProcessing ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {isMPProcessing ? 'Redirigiendo a MercadoPago...' : isPayPalProcessing ? 'Redirigiendo a PayPal...' : 'Procesando...'}
-                      </>
+                    {wizardStep < 2 ? (
+                      <Button
+                        type="button"
+                        size="lg"
+                        className="flex-1 h-14 text-base font-semibold"
+                        style={{ backgroundColor: primaryColor }}
+                        onClick={handleNextStep}
+                      >
+                        Continuar
+                        <ChevronRight className="w-5 h-5 ml-1" />
+                      </Button>
                     ) : (
-                      `Pagar $${finalTotal.toLocaleString()}`
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="flex-1 h-14 text-base font-semibold"
+                        style={{ backgroundColor: primaryColor }}
+                        disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
+                      >
+                        {isSubmitting || isMPProcessing || isPayPalProcessing ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                            {isMPProcessing ? 'MercadoPago...' : isPayPalProcessing ? 'PayPal...' : 'Procesando...'}
+                          </>
+                        ) : (
+                          `Pagar $${finalTotal.toLocaleString()}`
+                        )}
+                      </Button>
                     )}
-                  </Button>
-                </div>
+                  </div>
+                )}
+
+                {/* Desktop submit (hidden on mobile, handled by wizard) */}
+                {!isMobile && (
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground bg-muted/30 rounded-lg p-4">
+                    <Shield className="w-5 h-5 text-green-500" />
+                    <span>Tus datos están protegidos con encriptación SSL de 256 bits</span>
+                  </div>
+                )}
               </form>
             </Form>
           </div>
 
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-card rounded-xl p-6 border border-border/50 sticky top-24">
-              <h2 className="text-xl font-heading mb-6">Resumen del Pedido</h2>
-              
-              <div className="space-y-4 mb-6">
-                {items.map((item) => (
-                  <div key={`${item.id}-${item.selectedColor}`} className="flex gap-3">
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded-lg"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{item.name}</p>
-                      {item.selectedColor && (
-                        <p className="text-xs text-muted-foreground">Color: {item.selectedColor}</p>
-                      )}
-                      <p className="text-xs text-muted-foreground">Cantidad: {item.quantity}</p>
+          {/* Order Summary - visible on mobile step 2 and always on desktop */}
+          {(!isMobile || wizardStep === 2) && (
+            <div className="lg:col-span-1">
+              <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50 sticky top-24">
+                <h2 className="text-lg lg:text-xl font-heading mb-4 lg:mb-6">Resumen del Pedido</h2>
+                
+                <div className="space-y-3 mb-4 lg:mb-6">
+                  {items.map((item) => (
+                    <div key={`${item.id}-${item.selectedColor}`} className="flex gap-3">
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-14 h-14 lg:w-16 lg:h-16 object-cover rounded-lg"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{item.name}</p>
+                        {item.selectedColor && (
+                          <p className="text-xs text-muted-foreground">Color: {item.selectedColor}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">Cantidad: {item.quantity}</p>
+                      </div>
+                      <p className="font-semibold text-sm">
+                        ${(item.price * item.quantity).toLocaleString()}
+                      </p>
                     </div>
-                    <p className="font-semibold text-sm">
-                      ${(item.price * item.quantity).toLocaleString()}
-                    </p>
+                  ))}
+                </div>
+
+                <Separator className="my-3 lg:my-4" />
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>${totalPrice.toLocaleString()}</span>
                   </div>
-                ))}
-              </div>
-
-              <Separator className="my-4" />
-
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span>${totalPrice.toLocaleString()}</span>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Envío</span>
+                    <span className={shippingCost === 0 ? "text-green-500 font-semibold" : ""}>
+                      {shippingCost === 0 ? "GRATIS" : `$${shippingCost}`}
+                    </span>
+                  </div>
+                  {shippingCost > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Envío gratis en compras mayores a ${store.free_shipping_threshold || 999}
+                    </p>
+                  )}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted-foreground">Envío</span>
-                  <span className={shippingCost === 0 ? "text-green-500 font-semibold" : ""}>
-                    {shippingCost === 0 ? "GRATIS" : `$${shippingCost}`}
-                  </span>
+
+                <Separator className="my-3 lg:my-4" />
+
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span style={{ color: primaryColor }}>${finalTotal.toLocaleString()}</span>
                 </div>
-                {shippingCost > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Envío gratis en compras mayores a ${store.free_shipping_threshold || 999}
-                  </p>
+
+                {/* Desktop Submit Button */}
+                {!isMobile && (
+                  <div className="mt-6">
+                    <Button 
+                      type="submit" 
+                      size="lg" 
+                      className="w-full"
+                      style={{ backgroundColor: primaryColor }}
+                      disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
+                      onClick={form.handleSubmit(onSubmit)}
+                    >
+                      {isSubmitting || isMPProcessing || isPayPalProcessing ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          {isMPProcessing ? 'Redirigiendo a MercadoPago...' : isPayPalProcessing ? 'Redirigiendo a PayPal...' : 'Procesando...'}
+                        </>
+                      ) : (
+                        "Confirmar Pedido"
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+                {/* Store contact info */}
+                {(store.phone || store.email) && (
+                  <div className="mt-4 lg:mt-6 pt-4 border-t text-center">
+                    <p className="text-xs text-muted-foreground mb-2">¿Necesitas ayuda?</p>
+                    {store.phone && (
+                      <p className="text-sm font-medium">{store.phone}</p>
+                    )}
+                    {store.email && (
+                      <p className="text-sm text-muted-foreground">{store.email}</p>
+                    )}
+                  </div>
                 )}
               </div>
+            </div>
+          )}
+        </div>
 
-              <Separator className="my-4" />
-
-              <div className="flex justify-between text-lg font-bold">
-                <span>Total</span>
-                <span style={{ color: primaryColor }}>${finalTotal.toLocaleString()}</span>
-              </div>
-
-              {/* Submit Button - Desktop */}
-              <div className="hidden lg:block mt-6">
-                <Button 
-                  type="submit" 
-                  size="lg" 
-                  className="w-full"
-                  style={{ backgroundColor: primaryColor }}
-                  disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
-                  onClick={form.handleSubmit(onSubmit)}
-                >
-                  {isSubmitting || isMPProcessing || isPayPalProcessing ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      {isMPProcessing ? 'Redirigiendo a MercadoPago...' : isPayPalProcessing ? 'Redirigiendo a PayPal...' : 'Procesando...'}
-                    </>
-                  ) : (
-                    "Confirmar Pedido"
-                  )}
-                </Button>
-              </div>
-
-              {/* Store contact info */}
-              {(store.phone || store.email) && (
-                <div className="mt-6 pt-4 border-t text-center">
-                  <p className="text-xs text-muted-foreground mb-2">¿Necesitas ayuda?</p>
-                  {store.phone && (
-                    <p className="text-sm font-medium">{store.phone}</p>
-                  )}
-                  {store.email && (
-                    <p className="text-sm text-muted-foreground">{store.email}</p>
-                  )}
-                </div>
-              )}
+        {/* Mobile mini-summary on steps 0 and 1 */}
+        {isMobile && wizardStep < 2 && (
+          <div className="mt-4 p-4 bg-card rounded-xl border border-border/50 flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">{items.length} producto{items.length > 1 ? 's' : ''}</p>
+              <p className="font-bold" style={{ color: primaryColor }}>${finalTotal.toLocaleString()}</p>
+            </div>
+            <div className="text-xs text-muted-foreground">
+              Paso {wizardStep + 1} de 3
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
