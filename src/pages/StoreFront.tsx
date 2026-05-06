@@ -705,12 +705,18 @@ const StoreFront = () => {
         primaryColor={store.primary_color}
       />
 
-      {/* WhatsApp Button */}
+      {/* WhatsApp Button — context-aware */}
       {(store as any).whatsapp_number && (
         <WhatsAppButton 
           phone={(store as any).whatsapp_number} 
           storeName={store.name}
           primaryColor={store.primary_color}
+          message={
+            selectedProduct
+              ? `¡Hola! Estoy viendo el producto "${selectedProduct.name}" ($${selectedProduct.price.toLocaleString()}) en ${store.name} y me gustaría más información.`
+              : undefined
+          }
+          productName={selectedProduct?.name}
         />
       )}
 
