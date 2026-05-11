@@ -725,6 +725,9 @@ const StoreFront = () => {
       {/* Compra Segura - garantías de confianza */}
       <SafePurchaseSection primaryColor={store.primary_color} storeName={store.name} />
 
+      {/* FAQ - reduce dudas antes de pagar */}
+      <PurchaseFAQSection primaryColor={store.primary_color} storeName={store.name} />
+
       {/* Premium Footer */}
       <PremiumFooterSection store={store} planTier={planTier} />
 
