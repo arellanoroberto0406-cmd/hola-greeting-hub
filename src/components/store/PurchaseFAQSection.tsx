@@ -32,7 +32,15 @@ const DEFAULTS = {
     "Puedes escribirnos por WhatsApp o usar el chat en vivo de la tienda. Respondemos rápido en horario laboral y siempre te asignamos a una persona real, no a un bot automatizado.",
 };
 
-export const PurchaseFAQSection = ({ primaryColor, storeName }: PurchaseFAQSectionProps) => {
+export const PurchaseFAQSection = ({ primaryColor, storeName, policies }: PurchaseFAQSectionProps) => {
+  const get = (k: keyof typeof DEFAULTS) => (policies?.[k]?.trim() ? policies![k]!.trim() : DEFAULTS[k]);
+  const faqs = [
+    { q: "¿Puedo devolver un producto si no me convence?", a: get("faq_returns") },
+    { q: "¿Cuánto tarda en llegar mi pedido?", a: get("faq_shipping") },
+    { q: "¿Cómo funcionan los reembolsos?", a: get("faq_refunds") },
+    { q: "¿Qué métodos de pago aceptan y son seguros?", a: get("faq_payments") },
+    { q: "¿Cómo puedo contactarlos si tengo un problema?", a: get("faq_support") },
+  ];
   return (
     <section
       className="relative py-16 md:py-24 px-4 overflow-hidden"
