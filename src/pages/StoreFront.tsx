@@ -63,6 +63,7 @@ import SectionWrapper from "@/components/store/SectionWrapper";
 import SEOHead from "@/components/SEOHead";
 import TrustBar from "@/components/store/TrustBar";
 import SafePurchaseSection from "@/components/store/SafePurchaseSection";
+import PurchaseFAQSection from "@/components/store/PurchaseFAQSection";
 import MobileCartBar from "@/components/store/MobileCartBar";
 
 const mapDbProduct = (dbProduct: any): Product => ({
