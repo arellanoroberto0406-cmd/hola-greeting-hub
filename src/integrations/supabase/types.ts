@@ -1016,6 +1016,11 @@ export type Database = {
           description: string | null
           email: string | null
           facebook_url: string | null
+          faq_payments: string | null
+          faq_refunds: string | null
+          faq_returns: string | null
+          faq_shipping: string | null
+          faq_support: string | null
           free_shipping_threshold: number | null
           id: string
           instagram_url: string | null
@@ -1060,6 +1065,11 @@ export type Database = {
           description?: string | null
           email?: string | null
           facebook_url?: string | null
+          faq_payments?: string | null
+          faq_refunds?: string | null
+          faq_returns?: string | null
+          faq_shipping?: string | null
+          faq_support?: string | null
           free_shipping_threshold?: number | null
           id?: string
           instagram_url?: string | null
@@ -1104,6 +1114,11 @@ export type Database = {
           description?: string | null
           email?: string | null
           facebook_url?: string | null
+          faq_payments?: string | null
+          faq_refunds?: string | null
+          faq_returns?: string | null
+          faq_shipping?: string | null
+          faq_support?: string | null
           free_shipping_threshold?: number | null
           id?: string
           instagram_url?: string | null
