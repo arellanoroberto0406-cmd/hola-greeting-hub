@@ -10,30 +10,27 @@ import {
 interface PurchaseFAQSectionProps {
   primaryColor: string;
   storeName: string;
+  policies?: {
+    faq_returns?: string | null;
+    faq_shipping?: string | null;
+    faq_refunds?: string | null;
+    faq_payments?: string | null;
+    faq_support?: string | null;
+  };
 }
 
-const faqs = [
-  {
-    q: "¿Puedo devolver un producto si no me convence?",
-    a: "Sí. Tienes hasta 30 días desde la recepción para solicitar la devolución. El producto debe estar en buen estado y con su empaque original. Una vez recibido y revisado, procesamos el reembolso completo.",
-  },
-  {
-    q: "¿Cuánto tarda en llegar mi pedido?",
-    a: "Los envíos estándar tardan entre 3 y 7 días hábiles según tu ubicación. Recibirás un número de seguimiento por correo y WhatsApp para rastrear tu pedido en tiempo real.",
-  },
-  {
-    q: "¿Cómo funcionan los reembolsos?",
-    a: "Una vez aprobada la devolución, el reembolso se procesa en 3-5 días hábiles por el mismo método de pago que usaste. Si pagaste por transferencia, te pediremos los datos bancarios para devolver el importe.",
-  },
-  {
-    q: "¿Qué métodos de pago aceptan y son seguros?",
-    a: "Aceptamos PayPal y transferencia bancaria. Todos los pagos viajan cifrados con SSL de 256 bits y nunca almacenamos datos de tu tarjeta. Las transferencias se validan manualmente para mayor seguridad.",
-  },
-  {
-    q: "¿Cómo puedo contactarlos si tengo un problema?",
-    a: "Puedes escribirnos por WhatsApp o usar el chat en vivo de la tienda. Respondemos rápido en horario laboral y siempre te asignamos a una persona real, no a un bot automatizado.",
-  },
-];
+const DEFAULTS = {
+  faq_returns:
+    "Tienes hasta 30 días desde la recepción para solicitar la devolución. El producto debe estar en buen estado y con su empaque original. Una vez recibido y revisado, procesamos el reembolso completo.",
+  faq_shipping:
+    "Los envíos estándar tardan entre 3 y 7 días hábiles según tu ubicación. Recibirás un número de seguimiento por correo y WhatsApp para rastrear tu pedido en tiempo real.",
+  faq_refunds:
+    "Una vez aprobada la devolución, el reembolso se procesa en 3-5 días hábiles por el mismo método de pago que usaste. Si pagaste por transferencia, te pediremos los datos bancarios para devolver el importe.",
+  faq_payments:
+    "Aceptamos PayPal y transferencia bancaria. Todos los pagos viajan cifrados con SSL de 256 bits y nunca almacenamos datos de tu tarjeta. Las transferencias se validan manualmente para mayor seguridad.",
+  faq_support:
+    "Puedes escribirnos por WhatsApp o usar el chat en vivo de la tienda. Respondemos rápido en horario laboral y siempre te asignamos a una persona real, no a un bot automatizado.",
+};
 
 export const PurchaseFAQSection = ({ primaryColor, storeName }: PurchaseFAQSectionProps) => {
   return (
