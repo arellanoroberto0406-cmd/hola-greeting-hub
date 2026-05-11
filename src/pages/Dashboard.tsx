@@ -20,6 +20,7 @@ import LowStockAlert from "@/components/dashboard/LowStockAlert";
 import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
 import CouponsPanel from "@/components/dashboard/CouponsPanel";
 import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel";
+import FAQPoliciesPanel from "@/components/dashboard/FAQPoliciesPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
 import { TutorialOverlay } from "@/components/dashboard/TutorialOverlay";
