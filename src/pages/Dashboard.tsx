@@ -593,6 +593,18 @@ const Dashboard = () => {
           tiktok_url: (store as any).tiktok_url || "", website_url: (store as any).website_url || "",
           return_policy: (store as any).return_policy || "", shipping_info: (store as any).shipping_info || "",
         }} primaryColor={store.primary_color} />
+
+        <FAQPoliciesPanel
+          storeId={store.id}
+          primaryColor={store.primary_color}
+          initial={{
+            faq_returns: (store as any).faq_returns,
+            faq_shipping: (store as any).faq_shipping,
+            faq_refunds: (store as any).faq_refunds,
+            faq_payments: (store as any).faq_payments,
+            faq_support: (store as any).faq_support,
+          }}
+        />
       </div>
     );
   };
