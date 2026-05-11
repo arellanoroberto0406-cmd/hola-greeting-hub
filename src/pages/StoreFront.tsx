@@ -63,6 +63,7 @@ import SectionWrapper from "@/components/store/SectionWrapper";
 import SEOHead from "@/components/SEOHead";
 import TrustBar from "@/components/store/TrustBar";
 import SafePurchaseSection from "@/components/store/SafePurchaseSection";
+import PurchaseFAQSection from "@/components/store/PurchaseFAQSection";
 import MobileCartBar from "@/components/store/MobileCartBar";
 
 const mapDbProduct = (dbProduct: any): Product => ({
@@ -723,6 +724,9 @@ const StoreFront = () => {
 
       {/* Compra Segura - garantías de confianza */}
       <SafePurchaseSection primaryColor={store.primary_color} storeName={store.name} />
+
+      {/* FAQ - reduce dudas antes de pagar */}
+      <PurchaseFAQSection primaryColor={store.primary_color} storeName={store.name} />
 
       {/* Premium Footer */}
       <PremiumFooterSection store={store} planTier={planTier} />
