@@ -62,6 +62,7 @@ import { PremiumProductModal } from "@/components/store/PremiumProductModal";
 import SectionWrapper from "@/components/store/SectionWrapper";
 import SEOHead from "@/components/SEOHead";
 import TrustBar from "@/components/store/TrustBar";
+import SafePurchaseSection from "@/components/store/SafePurchaseSection";
 import MobileCartBar from "@/components/store/MobileCartBar";
 
 const mapDbProduct = (dbProduct: any): Product => ({
