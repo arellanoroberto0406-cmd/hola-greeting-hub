@@ -20,6 +20,7 @@ import LowStockAlert from "@/components/dashboard/LowStockAlert";
 import AnalyticsPanel from "@/components/dashboard/AnalyticsPanel";
 import CouponsPanel from "@/components/dashboard/CouponsPanel";
 import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel";
+import FAQPoliciesPanel from "@/components/dashboard/FAQPoliciesPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
 import { TutorialOverlay } from "@/components/dashboard/TutorialOverlay";
@@ -592,6 +593,18 @@ const Dashboard = () => {
           tiktok_url: (store as any).tiktok_url || "", website_url: (store as any).website_url || "",
           return_policy: (store as any).return_policy || "", shipping_info: (store as any).shipping_info || "",
         }} primaryColor={store.primary_color} />
+
+        <FAQPoliciesPanel
+          storeId={store.id}
+          primaryColor={store.primary_color}
+          initial={{
+            faq_returns: (store as any).faq_returns,
+            faq_shipping: (store as any).faq_shipping,
+            faq_refunds: (store as any).faq_refunds,
+            faq_payments: (store as any).faq_payments,
+            faq_support: (store as any).faq_support,
+          }}
+        />
       </div>
     );
   };

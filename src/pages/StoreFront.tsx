@@ -726,7 +726,17 @@ const StoreFront = () => {
       <SafePurchaseSection primaryColor={store.primary_color} storeName={store.name} />
 
       {/* FAQ - reduce dudas antes de pagar */}
-      <PurchaseFAQSection primaryColor={store.primary_color} storeName={store.name} />
+      <PurchaseFAQSection
+        primaryColor={store.primary_color}
+        storeName={store.name}
+        policies={{
+          faq_returns: (store as any).faq_returns,
+          faq_shipping: (store as any).faq_shipping,
+          faq_refunds: (store as any).faq_refunds,
+          faq_payments: (store as any).faq_payments,
+          faq_support: (store as any).faq_support,
+        }}
+      />
 
       {/* Premium Footer */}
       <PremiumFooterSection store={store} planTier={planTier} />
