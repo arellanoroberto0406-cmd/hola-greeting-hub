@@ -203,7 +203,7 @@ const Auth = () => {
           </motion.div>
 
           {/* Store Preview Mockup */}
-          <StorePreviewMockup />
+          <StorePreviewMockup viewMode={previewMode} onViewModeChange={setPreviewMode} />
 
           {/* Stats Row */}
           <motion.div
