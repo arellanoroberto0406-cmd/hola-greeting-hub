@@ -29,6 +29,7 @@ const Auth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; fullName?: string }>({});
+  const [previewMode, setPreviewMode] = useState<"desktop" | "mobile">("desktop");
   
   const redirectTo = searchParams.get("redirect") || "/dashboard";
 
