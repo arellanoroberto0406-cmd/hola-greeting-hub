@@ -12,6 +12,7 @@ import {
   Globe, TrendingUp, Users, Rocket, Lock, Mail
 } from "lucide-react";
 import { signInSchema, signUpSchema } from "@/lib/validation";
+import { StorePreviewMockup } from "@/components/StorePreviewMockup";
 
 const Auth = () => {
   const navigate = useNavigate();
