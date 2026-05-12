@@ -12,6 +12,7 @@ import {
   Globe, TrendingUp, Users, Rocket, Lock, Mail
 } from "lucide-react";
 import { signInSchema, signUpSchema } from "@/lib/validation";
+import { StorePreviewMockup } from "@/components/StorePreviewMockup";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -143,14 +144,14 @@ const Auth = () => {
         <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.03)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      {/* === LEFT PANEL — BRANDING (desktop) === */}
+      {/* === LEFT PANEL — STORE PREVIEW (desktop) === */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="hidden lg:flex lg:w-[55%] relative items-center justify-center p-12 xl:p-20"
+        className="hidden lg:flex lg:w-[55%] relative items-center justify-center p-8 xl:p-14"
       >
-        <div className="max-w-xl w-full relative z-10 space-y-12">
+        <div className="max-w-xl w-full relative z-10 space-y-6">
           {/* Logo */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
@@ -176,7 +177,7 @@ const Auth = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.35, duration: 0.7 }}
-            className="space-y-6"
+            className="space-y-3"
           >
             <motion.div 
               initial={{ opacity: 0, scale: 0.9 }}
@@ -188,60 +189,27 @@ const Auth = () => {
               Prueba gratis por 14 días
             </motion.div>
             
-            <h1 className="text-[3.5rem] xl:text-6xl font-bold font-heading leading-[1.05] tracking-tight">
-              Crea tu tienda{" "}
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">
-                  en minutos
-                </span>
-                <motion.span 
-                  className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-primary via-orange-400 to-gold rounded-full"
-                  initial={{ scaleX: 0 }}
-                  animate={{ scaleX: 1 }}
-                  transition={{ delay: 1.2, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ originX: 0 }}
-                />
+            <h1 className="text-3xl xl:text-4xl font-bold font-heading leading-tight tracking-tight">
+              Así se vería{" "}
+              <span className="bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">
+                tu tienda online
               </span>
             </h1>
             
-            <p className="text-lg text-muted-foreground/80 leading-relaxed max-w-md">
-              Sin código, sin complicaciones. La plataforma más intuitiva para emprendedores que quieren vender online.
+            <p className="text-base text-muted-foreground/80 leading-relaxed max-w-md">
+              Diseño profesional, pagos integrados y gestión de pedidos. Todo listo para que empieces a vender.
             </p>
           </motion.div>
 
-          {/* Feature Grid */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="grid grid-cols-2 gap-3"
-          >
-            {features.map((f, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + i * 0.07, duration: 0.5 }}
-                whileHover={{ y: -2, transition: { duration: 0.2 } }}
-                className="flex items-center gap-3 p-3.5 rounded-2xl bg-card/30 border border-border/30 backdrop-blur-sm hover:bg-card/50 hover:border-primary/20 transition-all duration-300 group/feat"
-              >
-                <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 group-hover/feat:from-primary/25 group-hover/feat:to-primary/10 transition-all duration-300">
-                  <f.icon className="h-4.5 w-4.5 text-primary" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold leading-tight">{f.label}</p>
-                  <p className="text-xs text-muted-foreground/70 truncate">{f.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+          {/* Store Preview Mockup */}
+          <StorePreviewMockup />
 
-          {/* Stats + Rating */}
+          {/* Stats Row */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.3 }}
-            className="flex items-center gap-10 pt-2"
+            transition={{ delay: 1.0 }}
+            className="flex items-center gap-8 pt-2"
           >
             {[
               { value: "500+", label: "Tiendas activas" },
@@ -249,8 +217,8 @@ const Auth = () => {
               { value: "99.9%", label: "Uptime" },
             ].map((s, i) => (
               <div key={i}>
-                <p className="text-2xl font-bold font-heading text-foreground">{s.value}</p>
-                <p className="text-xs text-muted-foreground/60 mt-0.5 font-medium">{s.label}</p>
+                <p className="text-xl font-bold font-heading text-foreground">{s.value}</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5 font-medium">{s.label}</p>
               </div>
             ))}
             <div className="ml-auto flex items-center gap-1">

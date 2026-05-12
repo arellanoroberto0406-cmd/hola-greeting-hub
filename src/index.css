@@ -421,6 +421,10 @@ All colors MUST be HSL.
   }
 
   /* Shimmer effect para skeleton loading */
+  .animate-shimmer {
+    animation: shimmer 3s linear infinite;
+  }
+
   .shimmer {
     background: linear-gradient(
       90deg,
