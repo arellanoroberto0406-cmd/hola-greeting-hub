@@ -562,30 +562,26 @@ const Auth = () => {
             </div>
           </motion.div>
 
-          {/* Mobile Feature Pills */}
+          {/* Mobile Store Preview */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
-            className="lg:hidden flex flex-wrap justify-center gap-2 mt-6"
+            className="lg:hidden mt-8"
           >
-            {[
-              { icon: ShoppingBag, text: "Ilimitado" },
-              { icon: CreditCard, text: "Pagos seguros" },
-              { icon: BarChart3, text: "Analytics" },
-              { icon: Globe, text: "Tu dominio" },
-            ].map((chip, i) => (
-              <motion.span 
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.6 + i * 0.08 }}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-card/40 border border-border/30 text-xs font-medium text-muted-foreground/80 backdrop-blur-sm"
-              >
-                <chip.icon className="h-3 w-3 text-primary/50" />
-                {chip.text}
-              </motion.span>
-            ))}
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-semibold text-primary mb-2">
+                <Sparkles className="h-3 w-3" />
+                Vista previa
+              </div>
+              <h3 className="text-lg font-bold font-heading">
+                Así se verá <span className="bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">tu tienda</span>
+              </h3>
+              <p className="text-xs text-muted-foreground/70 mt-1 px-4">
+                Explora cada paso que vivirá tu cliente
+              </p>
+            </div>
+            <StorePreviewMockup viewMode={previewMode} onViewModeChange={setPreviewMode} />
           </motion.div>
 
           {/* Bottom legal */}
