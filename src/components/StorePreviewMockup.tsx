@@ -661,12 +661,14 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 </div>
 
                 <motion.button
+                  type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={addToCart}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30 relative overflow-hidden group"
+                  aria-label={`Agregar ${featured.name} al carrito por ${fmt(featured.price)}`}
+                  className={`${focusRing} w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30 relative overflow-hidden group`}
                 >
-                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <ShoppingCart className="h-3.5 w-3.5" />
+                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700" aria-hidden="true" />
+                  <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
                   Agregar al carrito · {fmt(featured.price)}
                 </motion.button>
               </motion.div>
