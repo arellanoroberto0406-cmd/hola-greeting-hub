@@ -762,12 +762,14 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
                 {/* Coupon */}
                 <div className="flex gap-1.5 items-center p-2 rounded-xl bg-gradient-to-r from-primary/10 to-gold/10 border border-primary/20">
-                  <Tag className="h-3 w-3 text-primary shrink-0" />
+                  <Tag className="h-3 w-3 text-primary shrink-0" aria-hidden="true" />
+                  <label htmlFor="demo-coupon" className="sr-only">Código de descuento</label>
                   <input
+                    id="demo-coupon"
                     placeholder="Código de descuento"
-                    className="flex-1 bg-transparent text-[10px] outline-none placeholder:text-muted-foreground/50"
+                    className={`${focusRing} flex-1 bg-transparent text-[10px] outline-none placeholder:text-muted-foreground/50 rounded`}
                   />
-                  <button className="px-2 py-0.5 rounded-md bg-primary text-primary-foreground text-[9px] font-bold">Aplicar</button>
+                  <button type="button" className={`${focusRing} px-2 py-0.5 rounded-md bg-primary text-primary-foreground text-[9px] font-bold`}>Aplicar</button>
                 </div>
 
                 {/* Summary */}
@@ -778,16 +780,18 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                     {shipping === 0 ? <span className="font-semibold text-emerald-600">GRATIS</span> : <span className="font-semibold">{fmt(shipping)}</span>}
                   </div>
                   <div className="flex justify-between text-[10px]">
-                    <span className="text-muted-foreground flex items-center gap-1"><Award className="h-2.5 w-2.5 text-gold" /> Ganarás</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><Award className="h-2.5 w-2.5 text-gold" aria-hidden="true" /> Ganarás</span>
                     <span className="font-semibold text-gold">+{loyaltyPoints} pts</span>
                   </div>
                   <div className="flex justify-between text-xs font-bold pt-1 border-t border-border/30"><span>Total</span><span className="text-primary">{fmt(total)}</span></div>
                 </div>
 
                 <motion.button
+                  type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setScene("checkout")}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30"
+                  aria-label={`Continuar al pago, total ${fmt(total)}`}
+                  className={`${focusRing} w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30`}
                 >
                   Continuar al pago <ArrowRightSmall />
                 </motion.button>
