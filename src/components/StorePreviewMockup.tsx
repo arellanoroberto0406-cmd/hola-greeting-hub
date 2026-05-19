@@ -44,6 +44,10 @@ interface StorePreviewMockupProps {
   onViewModeChange?: (mode: "desktop" | "mobile") => void;
 }
 
+// Reusable focus-visible ring (use design tokens, never raw colors)
+const focusRing =
+  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: StorePreviewMockupProps) => {
   const isMobile = viewMode === "mobile";
   const [activeCategory, setActiveCategory] = useState(0);
@@ -60,6 +64,23 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
   const [viewers, setViewers] = useState(23);
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const goToScene = (id: Scene) => { setScene(id); setAutoplay(false); };
+
+  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const order = scenes.map(s => s.id);
+    const idx = order.indexOf(scene);
+    let next = idx;
+    if (e.key === "ArrowRight") next = (idx + 1) % order.length;
+    else if (e.key === "ArrowLeft") next = (idx - 1 + order.length) % order.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = order.length - 1;
+    else return;
+    e.preventDefault();
+    goToScene(order[next]);
+    tabRefs.current[next]?.focus();
+  };
 
   // Autoplay scene cycle
   useEffect(() => {
