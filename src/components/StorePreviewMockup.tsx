@@ -874,6 +874,10 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "confirmation" && (
               <motion.div
                 key="confirmation"
+                role="tabpanel"
+                id="scene-panel-confirmation"
+                aria-labelledby="scene-tab-confirmation"
+                aria-live="polite"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
