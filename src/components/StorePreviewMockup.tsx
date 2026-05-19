@@ -149,48 +149,68 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="relative w-full"
+      role="region"
+      aria-label="Vista previa interactiva de tienda demostrativa"
     >
       {/* Controls Row */}
       <div className="flex flex-wrap justify-center items-center gap-2 mb-3">
         {/* View Mode Toggle */}
-        <div className="inline-flex bg-muted/40 rounded-xl p-1 gap-1 border border-border/30">
+        <div
+          className="inline-flex bg-muted/40 rounded-xl p-1 gap-1 border border-border/30"
+          role="group"
+          aria-label="Cambiar vista del dispositivo"
+        >
           <button
+            type="button"
             onClick={() => onViewModeChange?.("desktop")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            aria-pressed={!isMobile}
+            aria-label="Ver maqueta en escritorio"
+            className={`${focusRing} flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               !isMobile ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Monitor className="h-3.5 w-3.5" />
+            <Monitor className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Escritorio</span>
           </button>
           <button
+            type="button"
             onClick={() => onViewModeChange?.("mobile")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            aria-pressed={isMobile}
+            aria-label="Ver maqueta en móvil"
+            className={`${focusRing} flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               isMobile ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Smartphone className="h-3.5 w-3.5" />
+            <Smartphone className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Móvil</span>
           </button>
         </div>
 
         {/* Autoplay Toggle */}
         <button
+          type="button"
           onClick={() => setAutoplay(a => !a)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+          aria-pressed={autoplay}
+          aria-label={autoplay ? "Pausar recorrido automático" : "Reanudar recorrido automático"}
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
             autoplay
               ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
               : "bg-muted/40 border-border/30 text-muted-foreground hover:text-foreground"
           }`}
         >
-          {autoplay ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          {autoplay ? <Pause className="h-3 w-3" aria-hidden="true" /> : <Play className="h-3 w-3" aria-hidden="true" />}
           {autoplay ? "Auto-tour" : "Pausado"}
-          {autoplay && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+          {autoplay && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />}
         </button>
 
         {/* Live viewers */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-600">
-          <Users className="h-3 w-3" />
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-600"
+          role="status"
+          aria-live="polite"
+          aria-label={`${viewers} personas viendo la tienda en vivo`}
+        >
+          <Users className="h-3 w-3" aria-hidden="true" />
           <motion.span key={viewers} initial={{ y: -4, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{viewers}</motion.span>
           <span className="hidden sm:inline">en vivo</span>
         </div>
@@ -198,21 +218,34 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
       {/* Scene Selector */}
       <div className="flex justify-center mb-4 px-2">
-        <div className="inline-flex flex-wrap justify-center gap-1 bg-muted/30 rounded-xl p-1 border border-border/30 max-w-full">
+        <div
+          role="tablist"
+          aria-label="Escenas del recorrido de compra"
+          onKeyDown={onTabsKeyDown}
+          className="inline-flex flex-wrap justify-center gap-1 bg-muted/30 rounded-xl p-1 border border-border/30 max-w-full"
+        >
           {scenes.map((s, idx) => {
             const Icon = s.icon;
             const active = scene === s.id;
             return (
               <button
                 key={s.id}
-                onClick={() => { setScene(s.id); setAutoplay(false); }}
-                className={`relative flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
+                ref={el => (tabRefs.current[idx] = el)}
+                type="button"
+                role="tab"
+                id={`scene-tab-${s.id}`}
+                aria-selected={active}
+                aria-controls={`scene-panel-${s.id}`}
+                tabIndex={active ? 0 : -1}
+                onClick={() => goToScene(s.id)}
+                className={`${focusRing} relative flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
                   active ? "bg-card text-foreground shadow-md ring-1 ring-primary/30" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[9px] ${active ? "bg-primary text-primary-foreground" : "bg-muted-foreground/15"}`}>{idx + 1}</span>
-                <Icon className={`h-3 w-3 ${active ? "text-primary" : ""}`} />
+                <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[9px] ${active ? "bg-primary text-primary-foreground" : "bg-muted-foreground/15"}`} aria-hidden="true">{idx + 1}</span>
+                <Icon className={`h-3 w-3 ${active ? "text-primary" : ""}`} aria-hidden="true" />
                 <span className="hidden sm:inline">{s.label}</span>
+                <span className="sr-only">Paso {idx + 1}: {s.label}</span>
               </button>
             );
           })}
@@ -220,7 +253,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       </div>
 
       {/* Glow */}
-      <div className={`absolute -inset-4 bg-gradient-to-r from-primary/20 via-orange-400/10 to-gold/20 rounded-[2.5rem] blur-2xl opacity-40 ${isMobile ? 'top-12' : ''}`} />
+      <div className={`absolute -inset-4 bg-gradient-to-r from-primary/20 via-orange-400/10 to-gold/20 rounded-[2.5rem] blur-2xl opacity-40 pointer-events-none ${isMobile ? 'top-12' : ''}`} aria-hidden="true" />
 
       {/* Device Frame */}
       <div className={`relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -230,7 +263,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       }`}>
         {/* Mobile Status Bar */}
         {isMobile && (
-          <div className="h-7 bg-gradient-to-b from-muted/50 to-transparent flex items-center justify-between px-6 pt-1 relative">
+          <div className="h-7 bg-gradient-to-b from-muted/50 to-transparent flex items-center justify-between px-6 pt-1 relative" aria-hidden="true">
             <span className="text-[10px] font-semibold text-muted-foreground">9:41</span>
             <div className="absolute left-1/2 -translate-x-1/2 top-1.5 w-16 h-3.5 rounded-full bg-black/80" />
             <div className="flex gap-1 items-center">
