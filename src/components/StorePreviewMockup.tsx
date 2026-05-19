@@ -655,6 +655,9 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "cart" && (
               <motion.div
                 key="cart"
+                role="tabpanel"
+                id="scene-panel-cart"
+                aria-labelledby="scene-tab-cart"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
