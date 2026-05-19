@@ -841,62 +841,76 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 </div>
 
                 {/* Payment Methods */}
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold">Método de pago</span>
+                <div className="space-y-1.5" role="radiogroup" aria-labelledby="payment-label">
+                  <span className="text-[10px] font-bold" id="payment-label">Método de pago</span>
                   <button
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedPayment === "paypal"}
                     onClick={() => setSelectedPayment("paypal")}
-                    className={`w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                    className={`${focusRing} w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
                       selectedPayment === "paypal" ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/30 bg-card/40"
                     }`}
                   >
-                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "paypal" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`}>
+                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "paypal" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`} aria-hidden="true">
                       {selectedPayment === "paypal" && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
                     </div>
-                    <div className="w-7 h-5 rounded bg-[#003087] flex items-center justify-center text-[7px] font-bold text-white">PP</div>
+                    <div className="w-7 h-5 rounded bg-[#003087] flex items-center justify-center text-[7px] font-bold text-white" aria-hidden="true">PP</div>
                     <span className="text-[10px] font-semibold flex-1 text-left">PayPal</span>
-                    <ShieldCheck className="h-3 w-3 text-emerald-500" />
+                    <ShieldCheck className="h-3 w-3 text-emerald-500" aria-hidden="true" />
                   </button>
                   <button
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedPayment === "transfer"}
                     onClick={() => setSelectedPayment("transfer")}
-                    className={`w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                    className={`${focusRing} w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
                       selectedPayment === "transfer" ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/30 bg-card/40"
                     }`}
                   >
-                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "transfer" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`}>
+                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "transfer" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`} aria-hidden="true">
                       {selectedPayment === "transfer" && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
                     </div>
-                    <CreditCard className="h-4 w-4 text-primary" />
+                    <CreditCard className="h-4 w-4 text-primary" aria-hidden="true" />
                     <span className="text-[10px] font-semibold flex-1 text-left">Transferencia bancaria</span>
                   </button>
                 </div>
 
                 {/* Gift wrap */}
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20">
-                  <Gift className="h-3.5 w-3.5 text-pink-500" />
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={false}
+                  aria-label="Activar empaque de regalo gratis"
+                  className={`${focusRing} w-full flex items-center gap-2 p-2 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 text-left`}
+                >
+                  <Gift className="h-3.5 w-3.5 text-pink-500" aria-hidden="true" />
                   <div className="flex-1">
                     <p className="text-[10px] font-semibold">¿Es un regalo?</p>
                     <p className="text-[8px] text-muted-foreground">Empaque de regalo gratis</p>
                   </div>
-                  <div className="w-7 h-4 rounded-full bg-muted-foreground/20 relative">
+                  <div className="w-7 h-4 rounded-full bg-muted-foreground/20 relative" aria-hidden="true">
                     <div className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white" />
                   </div>
-                </div>
+                </button>
 
                 {/* Total */}
                 <div className="flex justify-between items-center p-2 rounded-xl bg-gradient-to-r from-primary/10 to-gold/10 border border-primary/20">
                   <div>
                     <span className="text-[10px] font-bold block">Total a pagar</span>
-                    <span className="text-[8px] text-gold flex items-center gap-0.5"><Award className="h-2 w-2" /> +{loyaltyPoints} puntos</span>
+                    <span className="text-[8px] text-gold flex items-center gap-0.5"><Award className="h-2 w-2" aria-hidden="true" /> +{loyaltyPoints} puntos</span>
                   </div>
                   <span className="text-base font-bold text-primary">{fmt(total)}</span>
                 </div>
 
                 <motion.button
+                  type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setScene("confirmation")}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/30"
+                  aria-label={`Pagar de forma segura ${fmt(total)} con ${selectedPayment === "paypal" ? "PayPal" : "transferencia bancaria"}`}
+                  className={`${focusRing} w-full h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/30`}
                 >
-                  <Lock className="h-3 w-3" />
+                  <Lock className="h-3 w-3" aria-hidden="true" />
                   Pagar de forma segura
                 </motion.button>
                 <div className="flex items-center justify-center gap-3 text-[9px] text-muted-foreground/60">
