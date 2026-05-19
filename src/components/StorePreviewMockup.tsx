@@ -382,7 +382,12 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
         {/* Live Notification Toast */}
         {scene !== "confirmation" && (
-          <div className="px-3 mt-2 h-7 relative overflow-hidden">
+          <div
+            className="px-3 mt-2 h-7 relative overflow-hidden"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={notifIndex}
@@ -392,14 +397,14 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 transition={{ duration: 0.4 }}
                 className="absolute inset-x-3 flex items-center gap-2 px-2.5 py-1 rounded-lg bg-card/70 border border-border/30 backdrop-blur-sm shadow-sm"
               >
-                <div className={`w-4 h-4 rounded-full ${liveNotifications[notifIndex].color} flex items-center justify-center shrink-0`}>
+                <div className={`w-4 h-4 rounded-full ${liveNotifications[notifIndex].color} flex items-center justify-center shrink-0`} aria-hidden="true">
                   {(() => {
                     const Ic = liveNotifications[notifIndex].icon;
                     return <Ic className="h-2.5 w-2.5 text-white" />;
                   })()}
                 </div>
                 <span className="text-[9px] font-medium text-foreground/80 truncate">{liveNotifications[notifIndex].text}</span>
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" aria-hidden="true" />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -412,6 +417,9 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "catalog" && (
               <motion.div
                 key="catalog"
+                role="tabpanel"
+                id="scene-panel-catalog"
+                aria-labelledby="scene-tab-catalog"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
