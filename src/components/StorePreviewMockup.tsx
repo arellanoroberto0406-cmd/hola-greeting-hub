@@ -465,32 +465,39 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                     <motion.div
                       key={i}
                       whileHover={{ y: -2 }}
-                      onClick={() => { setAutoplay(false); setScene("product"); }}
-                      className="rounded-xl border border-border/30 bg-card/50 p-2 space-y-1.5 cursor-pointer group"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${product.name}, ${product.rating} estrellas, ${fmt(product.price)}. Ver detalle`}
+                      onClick={() => goToScene("product")}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goToScene("product"); } }}
+                      className={`${focusRing} rounded-xl border border-border/30 bg-card/50 p-2 space-y-1.5 cursor-pointer group`}
                     >
                       <div className={`relative rounded-lg bg-gradient-to-br ${product.color} flex items-center justify-center overflow-hidden ${isMobile ? 'h-14' : 'h-16'}`}>
-                        <div className="text-2xl opacity-50 select-none group-hover:scale-110 transition-transform duration-300">{product.emoji}</div>
+                        <div className="text-2xl opacity-50 select-none group-hover:scale-110 transition-transform duration-300" aria-hidden="true">{product.emoji}</div>
                         <div className="absolute top-1.5 left-1.5">
                           <span className="px-1.5 py-0.5 rounded-md bg-primary/90 text-[8px] font-bold text-primary-foreground">{product.tag}</span>
                         </div>
                         {product.stock <= 5 && (
                           <div className="absolute bottom-1 left-1.5">
                             <span className="px-1 py-0.5 rounded bg-rose-500/95 text-[7px] font-bold text-white flex items-center gap-0.5">
-                              <Flame className="h-2 w-2" /> ¡{product.stock}!
+                              <Flame className="h-2 w-2" aria-hidden="true" /> ¡{product.stock}!
                             </span>
                           </div>
                         )}
                         <button
+                          type="button"
                           onClick={(e) => { e.stopPropagation(); toggleLike(i); }}
-                          className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white/80 flex items-center justify-center hover:scale-110 transition-transform"
+                          aria-label={liked.includes(i) ? `Quitar ${product.name} de favoritos` : `Añadir ${product.name} a favoritos`}
+                          aria-pressed={liked.includes(i)}
+                          className={`${focusRing} absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white/80 flex items-center justify-center hover:scale-110 transition-transform`}
                         >
-                          <Heart className={`h-2.5 w-2.5 ${liked.includes(i) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                          <Heart className={`h-2.5 w-2.5 ${liked.includes(i) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} aria-hidden="true" />
                         </button>
                       </div>
                       <div className="space-y-0.5">
                         <p className={`font-semibold leading-tight truncate group-hover:text-primary transition-colors ${isMobile ? 'text-[10px]' : 'text-[11px]'}`}>{product.name}</p>
                         <div className="flex items-center gap-0.5">
-                          <Star className="h-2.5 w-2.5 fill-gold text-gold" />
+                          <Star className="h-2.5 w-2.5 fill-gold text-gold" aria-hidden="true" />
                           <span className="text-[9px] font-medium">{product.rating}</span>
                           <span className="text-[9px] text-muted-foreground/50">({product.reviews})</span>
                         </div>
