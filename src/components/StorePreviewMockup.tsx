@@ -44,6 +44,10 @@ interface StorePreviewMockupProps {
   onViewModeChange?: (mode: "desktop" | "mobile") => void;
 }
 
+// Reusable focus-visible ring (use design tokens, never raw colors)
+const focusRing =
+  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+
 export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: StorePreviewMockupProps) => {
   const isMobile = viewMode === "mobile";
   const [activeCategory, setActiveCategory] = useState(0);
@@ -60,6 +64,23 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
   const [viewers, setViewers] = useState(23);
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  const goToScene = (id: Scene) => { setScene(id); setAutoplay(false); };
+
+  const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const order = scenes.map(s => s.id);
+    const idx = order.indexOf(scene);
+    let next = idx;
+    if (e.key === "ArrowRight") next = (idx + 1) % order.length;
+    else if (e.key === "ArrowLeft") next = (idx - 1 + order.length) % order.length;
+    else if (e.key === "Home") next = 0;
+    else if (e.key === "End") next = order.length - 1;
+    else return;
+    e.preventDefault();
+    goToScene(order[next]);
+    tabRefs.current[next]?.focus();
+  };
 
   // Autoplay scene cycle
   useEffect(() => {
@@ -128,48 +149,68 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className="relative w-full"
+      role="region"
+      aria-label="Vista previa interactiva de tienda demostrativa"
     >
       {/* Controls Row */}
       <div className="flex flex-wrap justify-center items-center gap-2 mb-3">
         {/* View Mode Toggle */}
-        <div className="inline-flex bg-muted/40 rounded-xl p-1 gap-1 border border-border/30">
+        <div
+          className="inline-flex bg-muted/40 rounded-xl p-1 gap-1 border border-border/30"
+          role="group"
+          aria-label="Cambiar vista del dispositivo"
+        >
           <button
+            type="button"
             onClick={() => onViewModeChange?.("desktop")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            aria-pressed={!isMobile}
+            aria-label="Ver maqueta en escritorio"
+            className={`${focusRing} flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               !isMobile ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Monitor className="h-3.5 w-3.5" />
+            <Monitor className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Escritorio</span>
           </button>
           <button
+            type="button"
             onClick={() => onViewModeChange?.("mobile")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+            aria-pressed={isMobile}
+            aria-label="Ver maqueta en móvil"
+            className={`${focusRing} flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               isMobile ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25" : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <Smartphone className="h-3.5 w-3.5" />
+            <Smartphone className="h-3.5 w-3.5" aria-hidden="true" />
             <span className="hidden sm:inline">Móvil</span>
           </button>
         </div>
 
         {/* Autoplay Toggle */}
         <button
+          type="button"
           onClick={() => setAutoplay(a => !a)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
+          aria-pressed={autoplay}
+          aria-label={autoplay ? "Pausar recorrido automático" : "Reanudar recorrido automático"}
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
             autoplay
               ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600"
               : "bg-muted/40 border-border/30 text-muted-foreground hover:text-foreground"
           }`}
         >
-          {autoplay ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+          {autoplay ? <Pause className="h-3 w-3" aria-hidden="true" /> : <Play className="h-3 w-3" aria-hidden="true" />}
           {autoplay ? "Auto-tour" : "Pausado"}
-          {autoplay && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+          {autoplay && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />}
         </button>
 
         {/* Live viewers */}
-        <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-600">
-          <Users className="h-3 w-3" />
+        <div
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-600"
+          role="status"
+          aria-live="polite"
+          aria-label={`${viewers} personas viendo la tienda en vivo`}
+        >
+          <Users className="h-3 w-3" aria-hidden="true" />
           <motion.span key={viewers} initial={{ y: -4, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{viewers}</motion.span>
           <span className="hidden sm:inline">en vivo</span>
         </div>
@@ -177,21 +218,34 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
       {/* Scene Selector */}
       <div className="flex justify-center mb-4 px-2">
-        <div className="inline-flex flex-wrap justify-center gap-1 bg-muted/30 rounded-xl p-1 border border-border/30 max-w-full">
+        <div
+          role="tablist"
+          aria-label="Escenas del recorrido de compra"
+          onKeyDown={onTabsKeyDown}
+          className="inline-flex flex-wrap justify-center gap-1 bg-muted/30 rounded-xl p-1 border border-border/30 max-w-full"
+        >
           {scenes.map((s, idx) => {
             const Icon = s.icon;
             const active = scene === s.id;
             return (
               <button
                 key={s.id}
-                onClick={() => { setScene(s.id); setAutoplay(false); }}
-                className={`relative flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
+                ref={el => (tabRefs.current[idx] = el)}
+                type="button"
+                role="tab"
+                id={`scene-tab-${s.id}`}
+                aria-selected={active}
+                aria-controls={`scene-panel-${s.id}`}
+                tabIndex={active ? 0 : -1}
+                onClick={() => goToScene(s.id)}
+                className={`${focusRing} relative flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
                   active ? "bg-card text-foreground shadow-md ring-1 ring-primary/30" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[9px] ${active ? "bg-primary text-primary-foreground" : "bg-muted-foreground/15"}`}>{idx + 1}</span>
-                <Icon className={`h-3 w-3 ${active ? "text-primary" : ""}`} />
+                <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[9px] ${active ? "bg-primary text-primary-foreground" : "bg-muted-foreground/15"}`} aria-hidden="true">{idx + 1}</span>
+                <Icon className={`h-3 w-3 ${active ? "text-primary" : ""}`} aria-hidden="true" />
                 <span className="hidden sm:inline">{s.label}</span>
+                <span className="sr-only">Paso {idx + 1}: {s.label}</span>
               </button>
             );
           })}
@@ -199,7 +253,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       </div>
 
       {/* Glow */}
-      <div className={`absolute -inset-4 bg-gradient-to-r from-primary/20 via-orange-400/10 to-gold/20 rounded-[2.5rem] blur-2xl opacity-40 ${isMobile ? 'top-12' : ''}`} />
+      <div className={`absolute -inset-4 bg-gradient-to-r from-primary/20 via-orange-400/10 to-gold/20 rounded-[2.5rem] blur-2xl opacity-40 pointer-events-none ${isMobile ? 'top-12' : ''}`} aria-hidden="true" />
 
       {/* Device Frame */}
       <div className={`relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -209,7 +263,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       }`}>
         {/* Mobile Status Bar */}
         {isMobile && (
-          <div className="h-7 bg-gradient-to-b from-muted/50 to-transparent flex items-center justify-between px-6 pt-1 relative">
+          <div className="h-7 bg-gradient-to-b from-muted/50 to-transparent flex items-center justify-between px-6 pt-1 relative" aria-hidden="true">
             <span className="text-[10px] font-semibold text-muted-foreground">9:41</span>
             <div className="absolute left-1/2 -translate-x-1/2 top-1.5 w-16 h-3.5 rounded-full bg-black/80" />
             <div className="flex gap-1 items-center">
@@ -250,47 +304,70 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
               <div className="relative flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {(scene === "product" || scene === "cart" || scene === "checkout") ? (
-                    <button onClick={() => { setAutoplay(false); setScene(scene === "product" ? "catalog" : scene === "cart" ? "product" : "cart"); }} className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                      <ArrowLeft className="h-3.5 w-3.5" />
+                    <button
+                      type="button"
+                      onClick={() => goToScene(scene === "product" ? "catalog" : scene === "cart" ? "product" : "cart")}
+                      aria-label="Volver a la pantalla anterior"
+                      className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors`}
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
                   ) : (
-                    <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm font-bold backdrop-blur-sm">M</div>
+                    <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm font-bold backdrop-blur-sm" aria-hidden="true">M</div>
                   )}
                   <div>
                     <span className="font-bold text-sm leading-tight block">Moda Urbana</span>
-                    <span className="text-[8px] text-white/70 flex items-center gap-1"><BadgeCheck className="h-2 w-2" /> Tienda verificada</span>
+                    <span className="text-[8px] text-white/70 flex items-center gap-1"><BadgeCheck className="h-2 w-2" aria-hidden="true" /> Tienda verificada</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20">
-                    <Search className="h-3.5 w-3.5" />
-                  </div>
-                  <div
-                    className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center cursor-pointer relative hover:bg-white/20"
-                    onClick={() => { setAutoplay(false); setScene("cart"); }}
+                  <button
+                    type="button"
+                    aria-label="Buscar productos"
+                    className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20`}
                   >
-                    <ShoppingCart className="h-3.5 w-3.5" />
+                    <Search className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Ver carrito, ${cartCount} artículos`}
+                    className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center relative hover:bg-white/20`}
+                    onClick={() => goToScene("cart")}
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
                     <motion.span
                       key={cartCount}
                       initial={{ scale: 1.6, rotate: -15 }}
                       animate={{ scale: 1, rotate: 0 }}
+                      aria-hidden="true"
                       className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold text-[9px] font-bold flex items-center justify-center text-black ring-2 ring-primary"
                     >
                       {cartCount}
                     </motion.span>
-                  </div>
-                  <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20">
-                    <Menu className="h-3.5 w-3.5" />
-                  </div>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Abrir menú"
+                    className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20`}
+                  >
+                    <Menu className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
                 </div>
               </div>
               {scene === "catalog" && (
-                <div className={`flex gap-1 relative ${isMobile ? 'overflow-x-auto scrollbar-hide' : 'overflow-hidden'}`}>
+                <div
+                  role="tablist"
+                  aria-label="Categorías"
+                  className={`flex gap-1 relative ${isMobile ? 'overflow-x-auto scrollbar-hide' : 'overflow-hidden'}`}
+                >
                   {categories.map((cat, i) => (
                     <button
                       key={cat}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeCategory === i}
                       onClick={() => setActiveCategory(i)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all shrink-0 ${
+                      className={`${focusRing} px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all shrink-0 ${
                         activeCategory === i ? "bg-white/20 backdrop-blur-sm" : "bg-transparent hover:bg-white/10"
                       }`}
                     >
@@ -305,7 +382,12 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
         {/* Live Notification Toast */}
         {scene !== "confirmation" && (
-          <div className="px-3 mt-2 h-7 relative overflow-hidden">
+          <div
+            className="px-3 mt-2 h-7 relative overflow-hidden"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             <AnimatePresence mode="wait">
               <motion.div
                 key={notifIndex}
@@ -315,14 +397,14 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 transition={{ duration: 0.4 }}
                 className="absolute inset-x-3 flex items-center gap-2 px-2.5 py-1 rounded-lg bg-card/70 border border-border/30 backdrop-blur-sm shadow-sm"
               >
-                <div className={`w-4 h-4 rounded-full ${liveNotifications[notifIndex].color} flex items-center justify-center shrink-0`}>
+                <div className={`w-4 h-4 rounded-full ${liveNotifications[notifIndex].color} flex items-center justify-center shrink-0`} aria-hidden="true">
                   {(() => {
                     const Ic = liveNotifications[notifIndex].icon;
                     return <Ic className="h-2.5 w-2.5 text-white" />;
                   })()}
                 </div>
                 <span className="text-[9px] font-medium text-foreground/80 truncate">{liveNotifications[notifIndex].text}</span>
-                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" aria-hidden="true" />
               </motion.div>
             </AnimatePresence>
           </div>
@@ -335,6 +417,9 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "catalog" && (
               <motion.div
                 key="catalog"
+                role="tabpanel"
+                id="scene-panel-catalog"
+                aria-labelledby="scene-tab-catalog"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -380,32 +465,39 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                     <motion.div
                       key={i}
                       whileHover={{ y: -2 }}
-                      onClick={() => { setAutoplay(false); setScene("product"); }}
-                      className="rounded-xl border border-border/30 bg-card/50 p-2 space-y-1.5 cursor-pointer group"
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`${product.name}, ${product.rating} estrellas, ${fmt(product.price)}. Ver detalle`}
+                      onClick={() => goToScene("product")}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goToScene("product"); } }}
+                      className={`${focusRing} rounded-xl border border-border/30 bg-card/50 p-2 space-y-1.5 cursor-pointer group`}
                     >
                       <div className={`relative rounded-lg bg-gradient-to-br ${product.color} flex items-center justify-center overflow-hidden ${isMobile ? 'h-14' : 'h-16'}`}>
-                        <div className="text-2xl opacity-50 select-none group-hover:scale-110 transition-transform duration-300">{product.emoji}</div>
+                        <div className="text-2xl opacity-50 select-none group-hover:scale-110 transition-transform duration-300" aria-hidden="true">{product.emoji}</div>
                         <div className="absolute top-1.5 left-1.5">
                           <span className="px-1.5 py-0.5 rounded-md bg-primary/90 text-[8px] font-bold text-primary-foreground">{product.tag}</span>
                         </div>
                         {product.stock <= 5 && (
                           <div className="absolute bottom-1 left-1.5">
                             <span className="px-1 py-0.5 rounded bg-rose-500/95 text-[7px] font-bold text-white flex items-center gap-0.5">
-                              <Flame className="h-2 w-2" /> ¡{product.stock}!
+                              <Flame className="h-2 w-2" aria-hidden="true" /> ¡{product.stock}!
                             </span>
                           </div>
                         )}
                         <button
+                          type="button"
                           onClick={(e) => { e.stopPropagation(); toggleLike(i); }}
-                          className="absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white/80 flex items-center justify-center hover:scale-110 transition-transform"
+                          aria-label={liked.includes(i) ? `Quitar ${product.name} de favoritos` : `Añadir ${product.name} a favoritos`}
+                          aria-pressed={liked.includes(i)}
+                          className={`${focusRing} absolute top-1.5 right-1.5 w-5 h-5 rounded-full bg-white/80 flex items-center justify-center hover:scale-110 transition-transform`}
                         >
-                          <Heart className={`h-2.5 w-2.5 ${liked.includes(i) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                          <Heart className={`h-2.5 w-2.5 ${liked.includes(i) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} aria-hidden="true" />
                         </button>
                       </div>
                       <div className="space-y-0.5">
                         <p className={`font-semibold leading-tight truncate group-hover:text-primary transition-colors ${isMobile ? 'text-[10px]' : 'text-[11px]'}`}>{product.name}</p>
                         <div className="flex items-center gap-0.5">
-                          <Star className="h-2.5 w-2.5 fill-gold text-gold" />
+                          <Star className="h-2.5 w-2.5 fill-gold text-gold" aria-hidden="true" />
                           <span className="text-[9px] font-medium">{product.rating}</span>
                           <span className="text-[9px] text-muted-foreground/50">({product.reviews})</span>
                         </div>
@@ -424,6 +516,9 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "product" && (
               <motion.div
                 key="product"
+                role="tabpanel"
+                id="scene-panel-product"
+                aria-labelledby="scene-tab-product"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -465,13 +560,19 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-sm leading-tight">{featured.name}</h3>
-                    <button onClick={() => toggleLike(1)} className="w-7 h-7 rounded-full bg-muted/40 flex items-center justify-center">
-                      <Heart className={`h-3.5 w-3.5 ${liked.includes(1) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                    <button
+                      type="button"
+                      onClick={() => toggleLike(1)}
+                      aria-label={liked.includes(1) ? `Quitar ${featured.name} de favoritos` : `Añadir ${featured.name} a favoritos`}
+                      aria-pressed={liked.includes(1)}
+                      className={`${focusRing} w-7 h-7 rounded-full bg-muted/40 flex items-center justify-center`}
+                    >
+                      <Heart className={`h-3.5 w-3.5 ${liked.includes(1) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} aria-hidden="true" />
                     </button>
                   </div>
                   <div className="flex items-center gap-2 text-[10px]">
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_,i) => <Star key={i} className="h-2.5 w-2.5 fill-gold text-gold" />)}
+                    <div className="flex items-center gap-0.5" aria-label={`${featured.rating} sobre 5 estrellas`}>
+                      {[...Array(5)].map((_,i) => <Star key={i} className="h-2.5 w-2.5 fill-gold text-gold" aria-hidden="true" />)}
                     </div>
                     <span className="font-semibold">{featured.rating}</span>
                     <span className="text-muted-foreground/60">({featured.reviews} reseñas)</span>
@@ -485,33 +586,41 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
                 {/* Color selector */}
                 <div className="flex items-center gap-2">
-                  <p className="text-[10px] font-semibold">Color:</p>
-                  <div className="flex gap-1.5">
+                  <p className="text-[10px] font-semibold" id="color-label">Color:</p>
+                  <div className="flex gap-1.5" role="radiogroup" aria-labelledby="color-label">
                     {productColors.map((c, i) => (
                       <button
                         key={i}
+                        type="button"
+                        role="radio"
+                        aria-checked={selectedColor === i}
                         onClick={() => setSelectedColor(i)}
+                        aria-label={`Color ${c.name}`}
                         title={c.name}
-                        className={`w-5 h-5 rounded-full border-2 transition-all ${selectedColor === i ? "border-primary scale-110 ring-2 ring-primary/30" : "border-border/40"}`}
+                        className={`${focusRing} w-5 h-5 rounded-full border-2 transition-all ${selectedColor === i ? "border-primary scale-110 ring-2 ring-primary/30" : "border-border/40"}`}
                         style={{ backgroundColor: c.hex }}
                       />
                     ))}
                   </div>
-                  <span className="text-[9px] text-muted-foreground ml-auto">{productColors[selectedColor].name}</span>
+                  <span className="text-[9px] text-muted-foreground ml-auto" aria-live="polite">{productColors[selectedColor].name}</span>
                 </div>
 
                 {/* Size selector */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-[10px] font-semibold">Talla: <span className="text-primary">{selectedSize}</span></p>
+                    <p className="text-[10px] font-semibold" id="size-label">Talla: <span className="text-primary">{selectedSize}</span></p>
                     <span className="text-[9px] text-primary underline cursor-pointer">Guía de tallas</span>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5" role="radiogroup" aria-labelledby="size-label">
                     {["S", "M", "L", "XL"].map(s => (
                       <button
                         key={s}
+                        type="button"
+                        role="radio"
+                        aria-checked={selectedSize === s}
+                        aria-label={`Talla ${s}`}
                         onClick={() => setSelectedSize(s)}
-                        className={`w-8 h-8 rounded-lg text-[10px] font-bold border transition-all ${
+                        className={`${focusRing} w-8 h-8 rounded-lg text-[10px] font-bold border transition-all ${
                           selectedSize === s ? "bg-primary text-primary-foreground border-primary shadow-md scale-105" : "bg-card border-border/40 hover:border-primary/50"
                         }`}
                       >
@@ -552,12 +661,14 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 </div>
 
                 <motion.button
+                  type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={addToCart}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30 relative overflow-hidden group"
+                  aria-label={`Agregar ${featured.name} al carrito por ${fmt(featured.price)}`}
+                  className={`${focusRing} w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30 relative overflow-hidden group`}
                 >
-                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                  <ShoppingCart className="h-3.5 w-3.5" />
+                  <div className="absolute inset-0 bg-white/10 -translate-x-full group-hover:translate-x-full transition-transform duration-700" aria-hidden="true" />
+                  <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
                   Agregar al carrito · {fmt(featured.price)}
                 </motion.button>
               </motion.div>
@@ -567,6 +678,9 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "cart" && (
               <motion.div
                 key="cart"
+                role="tabpanel"
+                id="scene-panel-cart"
+                aria-labelledby="scene-tab-cart"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -607,13 +721,23 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                       <p className="text-[11px] font-bold text-primary mt-0.5">{fmt(p.price)}</p>
                     </div>
                     <div className="flex flex-col items-end justify-between">
-                      <div className="flex items-center gap-1 bg-muted/40 rounded-md p-0.5">
-                        <button onClick={() => i === 0 && setQty(Math.max(1, qty - 1))} className="w-4 h-4 flex items-center justify-center hover:bg-card rounded">
-                          <Minus className="h-2 w-2" />
+                      <div className="flex items-center gap-1 bg-muted/40 rounded-md p-0.5" role="group" aria-label={`Cantidad de ${p.name}`}>
+                        <button
+                          type="button"
+                          onClick={() => i === 0 && setQty(Math.max(1, qty - 1))}
+                          aria-label="Disminuir cantidad"
+                          className={`${focusRing} w-4 h-4 flex items-center justify-center hover:bg-card rounded`}
+                        >
+                          <Minus className="h-2 w-2" aria-hidden="true" />
                         </button>
-                        <span className="text-[10px] font-bold w-4 text-center">{i === 0 ? qty : 1}</span>
-                        <button onClick={() => i === 0 && setQty(qty + 1)} className="w-4 h-4 flex items-center justify-center hover:bg-card rounded">
-                          <Plus className="h-2 w-2" />
+                        <span className="text-[10px] font-bold w-4 text-center" aria-live="polite">{i === 0 ? qty : 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => i === 0 && setQty(qty + 1)}
+                          aria-label="Aumentar cantidad"
+                          className={`${focusRing} w-4 h-4 flex items-center justify-center hover:bg-card rounded`}
+                        >
+                          <Plus className="h-2 w-2" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
@@ -638,12 +762,14 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
                 {/* Coupon */}
                 <div className="flex gap-1.5 items-center p-2 rounded-xl bg-gradient-to-r from-primary/10 to-gold/10 border border-primary/20">
-                  <Tag className="h-3 w-3 text-primary shrink-0" />
+                  <Tag className="h-3 w-3 text-primary shrink-0" aria-hidden="true" />
+                  <label htmlFor="demo-coupon" className="sr-only">Código de descuento</label>
                   <input
+                    id="demo-coupon"
                     placeholder="Código de descuento"
-                    className="flex-1 bg-transparent text-[10px] outline-none placeholder:text-muted-foreground/50"
+                    className={`${focusRing} flex-1 bg-transparent text-[10px] outline-none placeholder:text-muted-foreground/50 rounded`}
                   />
-                  <button className="px-2 py-0.5 rounded-md bg-primary text-primary-foreground text-[9px] font-bold">Aplicar</button>
+                  <button type="button" className={`${focusRing} px-2 py-0.5 rounded-md bg-primary text-primary-foreground text-[9px] font-bold`}>Aplicar</button>
                 </div>
 
                 {/* Summary */}
@@ -654,16 +780,18 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                     {shipping === 0 ? <span className="font-semibold text-emerald-600">GRATIS</span> : <span className="font-semibold">{fmt(shipping)}</span>}
                   </div>
                   <div className="flex justify-between text-[10px]">
-                    <span className="text-muted-foreground flex items-center gap-1"><Award className="h-2.5 w-2.5 text-gold" /> Ganarás</span>
+                    <span className="text-muted-foreground flex items-center gap-1"><Award className="h-2.5 w-2.5 text-gold" aria-hidden="true" /> Ganarás</span>
                     <span className="font-semibold text-gold">+{loyaltyPoints} pts</span>
                   </div>
                   <div className="flex justify-between text-xs font-bold pt-1 border-t border-border/30"><span>Total</span><span className="text-primary">{fmt(total)}</span></div>
                 </div>
 
                 <motion.button
+                  type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setScene("checkout")}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30"
+                  aria-label={`Continuar al pago, total ${fmt(total)}`}
+                  className={`${focusRing} w-full h-9 rounded-xl bg-gradient-to-r from-primary to-primary/90 text-primary-foreground text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-primary/30`}
                 >
                   Continuar al pago <ArrowRightSmall />
                 </motion.button>
@@ -674,6 +802,9 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "checkout" && (
               <motion.div
                 key="checkout"
+                role="tabpanel"
+                id="scene-panel-checkout"
+                aria-labelledby="scene-tab-checkout"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -710,62 +841,76 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 </div>
 
                 {/* Payment Methods */}
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold">Método de pago</span>
+                <div className="space-y-1.5" role="radiogroup" aria-labelledby="payment-label">
+                  <span className="text-[10px] font-bold" id="payment-label">Método de pago</span>
                   <button
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedPayment === "paypal"}
                     onClick={() => setSelectedPayment("paypal")}
-                    className={`w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                    className={`${focusRing} w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
                       selectedPayment === "paypal" ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/30 bg-card/40"
                     }`}
                   >
-                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "paypal" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`}>
+                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "paypal" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`} aria-hidden="true">
                       {selectedPayment === "paypal" && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
                     </div>
-                    <div className="w-7 h-5 rounded bg-[#003087] flex items-center justify-center text-[7px] font-bold text-white">PP</div>
+                    <div className="w-7 h-5 rounded bg-[#003087] flex items-center justify-center text-[7px] font-bold text-white" aria-hidden="true">PP</div>
                     <span className="text-[10px] font-semibold flex-1 text-left">PayPal</span>
-                    <ShieldCheck className="h-3 w-3 text-emerald-500" />
+                    <ShieldCheck className="h-3 w-3 text-emerald-500" aria-hidden="true" />
                   </button>
                   <button
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedPayment === "transfer"}
                     onClick={() => setSelectedPayment("transfer")}
-                    className={`w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
+                    className={`${focusRing} w-full flex items-center gap-2 p-2 rounded-xl border transition-all ${
                       selectedPayment === "transfer" ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border/30 bg-card/40"
                     }`}
                   >
-                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "transfer" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`}>
+                    <div className={`w-3.5 h-3.5 rounded-full border-2 ${selectedPayment === "transfer" ? "border-primary" : "border-muted-foreground/30"} flex items-center justify-center`} aria-hidden="true">
                       {selectedPayment === "transfer" && <div className="w-1.5 h-1.5 rounded-full bg-primary" />}
                     </div>
-                    <CreditCard className="h-4 w-4 text-primary" />
+                    <CreditCard className="h-4 w-4 text-primary" aria-hidden="true" />
                     <span className="text-[10px] font-semibold flex-1 text-left">Transferencia bancaria</span>
                   </button>
                 </div>
 
                 {/* Gift wrap */}
-                <div className="flex items-center gap-2 p-2 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20">
-                  <Gift className="h-3.5 w-3.5 text-pink-500" />
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={false}
+                  aria-label="Activar empaque de regalo gratis"
+                  className={`${focusRing} w-full flex items-center gap-2 p-2 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 text-left`}
+                >
+                  <Gift className="h-3.5 w-3.5 text-pink-500" aria-hidden="true" />
                   <div className="flex-1">
                     <p className="text-[10px] font-semibold">¿Es un regalo?</p>
                     <p className="text-[8px] text-muted-foreground">Empaque de regalo gratis</p>
                   </div>
-                  <div className="w-7 h-4 rounded-full bg-muted-foreground/20 relative">
+                  <div className="w-7 h-4 rounded-full bg-muted-foreground/20 relative" aria-hidden="true">
                     <div className="absolute top-0.5 left-0.5 w-3 h-3 rounded-full bg-white" />
                   </div>
-                </div>
+                </button>
 
                 {/* Total */}
                 <div className="flex justify-between items-center p-2 rounded-xl bg-gradient-to-r from-primary/10 to-gold/10 border border-primary/20">
                   <div>
                     <span className="text-[10px] font-bold block">Total a pagar</span>
-                    <span className="text-[8px] text-gold flex items-center gap-0.5"><Award className="h-2 w-2" /> +{loyaltyPoints} puntos</span>
+                    <span className="text-[8px] text-gold flex items-center gap-0.5"><Award className="h-2 w-2" aria-hidden="true" /> +{loyaltyPoints} puntos</span>
                   </div>
                   <span className="text-base font-bold text-primary">{fmt(total)}</span>
                 </div>
 
                 <motion.button
+                  type="button"
                   whileTap={{ scale: 0.97 }}
                   onClick={() => setScene("confirmation")}
-                  className="w-full h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/30"
+                  aria-label={`Pagar de forma segura ${fmt(total)} con ${selectedPayment === "paypal" ? "PayPal" : "transferencia bancaria"}`}
+                  className={`${focusRing} w-full h-9 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/30`}
                 >
-                  <Lock className="h-3 w-3" />
+                  <Lock className="h-3 w-3" aria-hidden="true" />
                   Pagar de forma segura
                 </motion.button>
                 <div className="flex items-center justify-center gap-3 text-[9px] text-muted-foreground/60">
@@ -780,6 +925,10 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
             {scene === "confirmation" && (
               <motion.div
                 key="confirmation"
+                role="tabpanel"
+                id="scene-panel-confirmation"
+                aria-labelledby="scene-tab-confirmation"
+                aria-live="polite"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
