@@ -304,47 +304,70 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
               <div className="relative flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {(scene === "product" || scene === "cart" || scene === "checkout") ? (
-                    <button onClick={() => { setAutoplay(false); setScene(scene === "product" ? "catalog" : scene === "cart" ? "product" : "cart"); }} className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
-                      <ArrowLeft className="h-3.5 w-3.5" />
+                    <button
+                      type="button"
+                      onClick={() => goToScene(scene === "product" ? "catalog" : scene === "cart" ? "product" : "cart")}
+                      aria-label="Volver a la pantalla anterior"
+                      className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors`}
+                    >
+                      <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
                     </button>
                   ) : (
-                    <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm font-bold backdrop-blur-sm">M</div>
+                    <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center text-sm font-bold backdrop-blur-sm" aria-hidden="true">M</div>
                   )}
                   <div>
                     <span className="font-bold text-sm leading-tight block">Moda Urbana</span>
-                    <span className="text-[8px] text-white/70 flex items-center gap-1"><BadgeCheck className="h-2 w-2" /> Tienda verificada</span>
+                    <span className="text-[8px] text-white/70 flex items-center gap-1"><BadgeCheck className="h-2 w-2" aria-hidden="true" /> Tienda verificada</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20">
-                    <Search className="h-3.5 w-3.5" />
-                  </div>
-                  <div
-                    className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center cursor-pointer relative hover:bg-white/20"
-                    onClick={() => { setAutoplay(false); setScene("cart"); }}
+                  <button
+                    type="button"
+                    aria-label="Buscar productos"
+                    className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20`}
                   >
-                    <ShoppingCart className="h-3.5 w-3.5" />
+                    <Search className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Ver carrito, ${cartCount} artículos`}
+                    className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center relative hover:bg-white/20`}
+                    onClick={() => goToScene("cart")}
+                  >
+                    <ShoppingCart className="h-3.5 w-3.5" aria-hidden="true" />
                     <motion.span
                       key={cartCount}
                       initial={{ scale: 1.6, rotate: -15 }}
                       animate={{ scale: 1, rotate: 0 }}
+                      aria-hidden="true"
                       className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-gold text-[9px] font-bold flex items-center justify-center text-black ring-2 ring-primary"
                     >
                       {cartCount}
                     </motion.span>
-                  </div>
-                  <div className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center cursor-pointer hover:bg-white/20">
-                    <Menu className="h-3.5 w-3.5" />
-                  </div>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Abrir menú"
+                    className={`${focusRing} w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20`}
+                  >
+                    <Menu className="h-3.5 w-3.5" aria-hidden="true" />
+                  </button>
                 </div>
               </div>
               {scene === "catalog" && (
-                <div className={`flex gap-1 relative ${isMobile ? 'overflow-x-auto scrollbar-hide' : 'overflow-hidden'}`}>
+                <div
+                  role="tablist"
+                  aria-label="Categorías"
+                  className={`flex gap-1 relative ${isMobile ? 'overflow-x-auto scrollbar-hide' : 'overflow-hidden'}`}
+                >
                   {categories.map((cat, i) => (
                     <button
                       key={cat}
+                      type="button"
+                      role="tab"
+                      aria-selected={activeCategory === i}
                       onClick={() => setActiveCategory(i)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all shrink-0 ${
+                      className={`${focusRing} px-2.5 py-1 rounded-lg text-[10px] font-semibold transition-all shrink-0 ${
                         activeCategory === i ? "bg-white/20 backdrop-blur-sm" : "bg-transparent hover:bg-white/10"
                       }`}
                     >
