@@ -560,13 +560,19 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                 <div className="space-y-1">
                   <div className="flex items-center justify-between">
                     <h3 className="font-bold text-sm leading-tight">{featured.name}</h3>
-                    <button onClick={() => toggleLike(1)} className="w-7 h-7 rounded-full bg-muted/40 flex items-center justify-center">
-                      <Heart className={`h-3.5 w-3.5 ${liked.includes(1) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
+                    <button
+                      type="button"
+                      onClick={() => toggleLike(1)}
+                      aria-label={liked.includes(1) ? `Quitar ${featured.name} de favoritos` : `Añadir ${featured.name} a favoritos`}
+                      aria-pressed={liked.includes(1)}
+                      className={`${focusRing} w-7 h-7 rounded-full bg-muted/40 flex items-center justify-center`}
+                    >
+                      <Heart className={`h-3.5 w-3.5 ${liked.includes(1) ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} aria-hidden="true" />
                     </button>
                   </div>
                   <div className="flex items-center gap-2 text-[10px]">
-                    <div className="flex items-center gap-0.5">
-                      {[...Array(5)].map((_,i) => <Star key={i} className="h-2.5 w-2.5 fill-gold text-gold" />)}
+                    <div className="flex items-center gap-0.5" aria-label={`${featured.rating} sobre 5 estrellas`}>
+                      {[...Array(5)].map((_,i) => <Star key={i} className="h-2.5 w-2.5 fill-gold text-gold" aria-hidden="true" />)}
                     </div>
                     <span className="font-semibold">{featured.rating}</span>
                     <span className="text-muted-foreground/60">({featured.reviews} reseñas)</span>
@@ -580,33 +586,41 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
 
                 {/* Color selector */}
                 <div className="flex items-center gap-2">
-                  <p className="text-[10px] font-semibold">Color:</p>
-                  <div className="flex gap-1.5">
+                  <p className="text-[10px] font-semibold" id="color-label">Color:</p>
+                  <div className="flex gap-1.5" role="radiogroup" aria-labelledby="color-label">
                     {productColors.map((c, i) => (
                       <button
                         key={i}
+                        type="button"
+                        role="radio"
+                        aria-checked={selectedColor === i}
                         onClick={() => setSelectedColor(i)}
+                        aria-label={`Color ${c.name}`}
                         title={c.name}
-                        className={`w-5 h-5 rounded-full border-2 transition-all ${selectedColor === i ? "border-primary scale-110 ring-2 ring-primary/30" : "border-border/40"}`}
+                        className={`${focusRing} w-5 h-5 rounded-full border-2 transition-all ${selectedColor === i ? "border-primary scale-110 ring-2 ring-primary/30" : "border-border/40"}`}
                         style={{ backgroundColor: c.hex }}
                       />
                     ))}
                   </div>
-                  <span className="text-[9px] text-muted-foreground ml-auto">{productColors[selectedColor].name}</span>
+                  <span className="text-[9px] text-muted-foreground ml-auto" aria-live="polite">{productColors[selectedColor].name}</span>
                 </div>
 
                 {/* Size selector */}
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <p className="text-[10px] font-semibold">Talla: <span className="text-primary">{selectedSize}</span></p>
+                    <p className="text-[10px] font-semibold" id="size-label">Talla: <span className="text-primary">{selectedSize}</span></p>
                     <span className="text-[9px] text-primary underline cursor-pointer">Guía de tallas</span>
                   </div>
-                  <div className="flex gap-1.5">
+                  <div className="flex gap-1.5" role="radiogroup" aria-labelledby="size-label">
                     {["S", "M", "L", "XL"].map(s => (
                       <button
                         key={s}
+                        type="button"
+                        role="radio"
+                        aria-checked={selectedSize === s}
+                        aria-label={`Talla ${s}`}
                         onClick={() => setSelectedSize(s)}
-                        className={`w-8 h-8 rounded-lg text-[10px] font-bold border transition-all ${
+                        className={`${focusRing} w-8 h-8 rounded-lg text-[10px] font-bold border transition-all ${
                           selectedSize === s ? "bg-primary text-primary-foreground border-primary shadow-md scale-105" : "bg-card border-border/40 hover:border-primary/50"
                         }`}
                       >
