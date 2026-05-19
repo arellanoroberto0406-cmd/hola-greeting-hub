@@ -721,13 +721,23 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                       <p className="text-[11px] font-bold text-primary mt-0.5">{fmt(p.price)}</p>
                     </div>
                     <div className="flex flex-col items-end justify-between">
-                      <div className="flex items-center gap-1 bg-muted/40 rounded-md p-0.5">
-                        <button onClick={() => i === 0 && setQty(Math.max(1, qty - 1))} className="w-4 h-4 flex items-center justify-center hover:bg-card rounded">
-                          <Minus className="h-2 w-2" />
+                      <div className="flex items-center gap-1 bg-muted/40 rounded-md p-0.5" role="group" aria-label={`Cantidad de ${p.name}`}>
+                        <button
+                          type="button"
+                          onClick={() => i === 0 && setQty(Math.max(1, qty - 1))}
+                          aria-label="Disminuir cantidad"
+                          className={`${focusRing} w-4 h-4 flex items-center justify-center hover:bg-card rounded`}
+                        >
+                          <Minus className="h-2 w-2" aria-hidden="true" />
                         </button>
-                        <span className="text-[10px] font-bold w-4 text-center">{i === 0 ? qty : 1}</span>
-                        <button onClick={() => i === 0 && setQty(qty + 1)} className="w-4 h-4 flex items-center justify-center hover:bg-card rounded">
-                          <Plus className="h-2 w-2" />
+                        <span className="text-[10px] font-bold w-4 text-center" aria-live="polite">{i === 0 ? qty : 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => i === 0 && setQty(qty + 1)}
+                          aria-label="Aumentar cantidad"
+                          className={`${focusRing} w-4 h-4 flex items-center justify-center hover:bg-card rounded`}
+                        >
+                          <Plus className="h-2 w-2" aria-hidden="true" />
                         </button>
                       </div>
                     </div>
