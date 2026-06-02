@@ -256,7 +256,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
       <div className={`absolute -inset-4 bg-gradient-to-r from-primary/20 via-orange-400/10 to-gold/20 rounded-[2.5rem] blur-2xl opacity-40 pointer-events-none ${isMobile ? 'top-12' : ''}`} aria-hidden="true" />
 
       {/* Device Frame */}
-      <div className={`relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      <div className={`relative mx-auto transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
         isMobile
           ? "max-w-[280px] rounded-[2.5rem] border-[6px] border-border/50 bg-card/80 shadow-2xl shadow-black/40 overflow-hidden"
           : "max-w-lg rounded-3xl border border-border/40 bg-card/80 backdrop-blur-xl shadow-2xl shadow-black/30 overflow-hidden"
