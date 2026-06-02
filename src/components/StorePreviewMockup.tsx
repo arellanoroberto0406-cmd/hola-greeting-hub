@@ -1127,6 +1127,35 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                     <span className="text-[9px] font-medium leading-tight">Alertas en vivo</span>
                   </div>
                 </div>
+
+                {/* Post-purchase actions */}
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    aria-label="Calificar la experiencia de compra"
+                    className={`${focusRing} flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-gold/10 border border-gold/30 hover:bg-gold/15 transition-colors`}
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+                    <span className="text-[9px] font-bold">Calificar</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Compartir tienda con amigos"
+                    className={`${focusRing} flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/15 transition-colors`}
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                    <span className="text-[9px] font-bold">Compartir</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={restartTour}
+                    aria-label="Volver al inicio y comprar de nuevo"
+                    className={`${focusRing} flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/15 transition-colors`}
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+                    <span className="text-[9px] font-bold">Otra vez</span>
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
