@@ -2,10 +2,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart, Star, Heart, Search, Menu, ShieldCheck, Truck,
   RotateCcw, Headphones, Smartphone, Monitor, Package, CreditCard, CheckCircle2,
-  MapPin, Tag, Lock, MessageCircle, BadgeCheck, Sparkles, ArrowLeft, Plus, Minus,
-  Clock, Zap, Play, Pause, Eye, Flame, Gift, TrendingUp, Award, Bell, Users
+  MapPin, Tag, Lock, MessageCircle, BadgeCheck, Sparkles, ArrowLeft, ArrowRight, Plus, Minus,
+  Clock, Zap, Play, Pause, Eye, Flame, Gift, TrendingUp, Award, Bell, Users,
+  RefreshCw, Share2, DollarSign, BarChart3, Keyboard, ThumbsUp
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 const demoProducts = [
   { name: "Gorra Premium NY", price: 599, original: 799, rating: 4.8, reviews: 128, tag: "Más vendido", color: "from-amber-500/20 to-orange-500/10", emoji: "🧢", stock: 7 },
@@ -62,11 +63,20 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
   const [notifIndex, setNotifIndex] = useState(0);
   const [stockTime, setStockTime] = useState({ h: 2, m: 47, s: 32 });
   const [viewers, setViewers] = useState(23);
+  const [salesToday, setSalesToday] = useState(47);
+  const [revenueToday, setRevenueToday] = useState(28450);
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  const sceneOrder: Scene[] = ["catalog", "product", "cart", "checkout", "confirmation"];
+  const currentStep = sceneOrder.indexOf(scene);
+  const progress = ((currentStep + 1) / sceneOrder.length) * 100;
+
   const goToScene = (id: Scene) => { setScene(id); setAutoplay(false); };
+  const goPrev = () => { const i = sceneOrder.indexOf(scene); if (i > 0) goToScene(sceneOrder[i - 1]); };
+  const goNext = () => { const i = sceneOrder.indexOf(scene); if (i < sceneOrder.length - 1) goToScene(sceneOrder[i + 1]); };
+  const restartTour = () => { setScene("catalog"); setCartCount(2); setQty(1); setAutoplay(true); };
 
   const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const order = scenes.map(s => s.id);
@@ -102,7 +112,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
     return () => clearInterval(t);
   }, []);
 
-  // Countdown
+  // Countdown + live viewers
   useEffect(() => {
     const t = setInterval(() => {
       setStockTime(p => {
@@ -117,6 +127,37 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
     }, 1000);
     return () => clearInterval(t);
   }, []);
+
+  // Merchant live earnings — tick slowly + jump on confirmation
+  useEffect(() => {
+    const t = setInterval(() => {
+      setRevenueToday(r => r + Math.floor(Math.random() * 280) + 40);
+      if (Math.random() > 0.55) setSalesToday(s => s + 1);
+    }, 4200);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    if (scene === "confirmation") {
+      setSalesToday(s => s + 1);
+      setRevenueToday(r => r + Math.round(total));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
+
+  // Global keyboard shortcuts (← → for prev/next, space to pause)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key === "ArrowRight") { e.preventDefault(); goNext(); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); goPrev(); }
+      else if (e.code === "Space") { e.preventDefault(); setAutoplay(a => !a); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
 
   const toggleLike = (i: number) => {
     setLiked(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
@@ -203,6 +244,17 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           {autoplay && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />}
         </button>
 
+        {/* Restart tour */}
+        <button
+          type="button"
+          onClick={restartTour}
+          aria-label="Reiniciar recorrido desde el catálogo"
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-muted/40 border border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all`}
+        >
+          <RefreshCw className="h-3 w-3" aria-hidden="true" />
+          <span className="hidden sm:inline">Reiniciar</span>
+        </button>
+
         {/* Live viewers */}
         <div
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-600"
@@ -213,6 +265,17 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           <Users className="h-3 w-3" aria-hidden="true" />
           <motion.span key={viewers} initial={{ y: -4, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{viewers}</motion.span>
           <span className="hidden sm:inline">en vivo</span>
+        </div>
+
+        {/* Keyboard hint */}
+        <div
+          className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[10px] font-medium bg-muted/30 border border-border/30 text-muted-foreground"
+          aria-label="Atajos de teclado: flechas izquierda y derecha para navegar, espacio para pausar"
+        >
+          <Keyboard className="h-3 w-3" aria-hidden="true" />
+          <kbd className="px-1 rounded bg-card border border-border/40 font-mono text-[9px]">←</kbd>
+          <kbd className="px-1 rounded bg-card border border-border/40 font-mono text-[9px]">→</kbd>
+          <span>navegar</span>
         </div>
       </div>
 
@@ -249,6 +312,23 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
               </button>
             );
           })}
+        </div>
+      </div>
+
+      {/* Tour progress bar */}
+      <div className="max-w-lg mx-auto mb-3 px-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-semibold text-muted-foreground">
+            Paso {currentStep + 1} de {sceneOrder.length} · <span className="text-foreground">{scenes[currentStep].label}</span>
+          </span>
+          <span className="text-[10px] font-bold text-primary">{Math.round(progress)}%</span>
+        </div>
+        <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-primary via-orange-400 to-gold rounded-full"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          />
         </div>
       </div>
 
@@ -1047,6 +1127,35 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
                     <span className="text-[9px] font-medium leading-tight">Alertas en vivo</span>
                   </div>
                 </div>
+
+                {/* Post-purchase actions */}
+                <div className="grid grid-cols-3 gap-1.5">
+                  <button
+                    type="button"
+                    aria-label="Calificar la experiencia de compra"
+                    className={`${focusRing} flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-gold/10 border border-gold/30 hover:bg-gold/15 transition-colors`}
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5 text-gold" aria-hidden="true" />
+                    <span className="text-[9px] font-bold">Calificar</span>
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Compartir tienda con amigos"
+                    className={`${focusRing} flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-primary/10 border border-primary/30 hover:bg-primary/15 transition-colors`}
+                  >
+                    <Share2 className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                    <span className="text-[9px] font-bold">Compartir</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={restartTour}
+                    aria-label="Volver al inicio y comprar de nuevo"
+                    className={`${focusRing} flex flex-col items-center gap-0.5 p-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 hover:bg-emerald-500/15 transition-colors`}
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
+                    <span className="text-[9px] font-bold">Otra vez</span>
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -1059,6 +1168,93 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           </div>
         )}
       </div>
+
+      {/* Prev / Next tour controls */}
+      <div className="max-w-lg mx-auto mt-3 flex items-center justify-between gap-2 px-1">
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={currentStep === 0}
+          aria-label="Escena anterior"
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-card/60 border border-border/40 hover:border-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+        >
+          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+          Anterior
+        </button>
+        <div className="flex items-center gap-1" aria-hidden="true">
+          {sceneOrder.map((s, i) => (
+            <span
+              key={s}
+              className={`h-1.5 rounded-full transition-all ${i === currentStep ? "w-6 bg-primary" : i < currentStep ? "w-1.5 bg-primary/40" : "w-1.5 bg-muted-foreground/20"}`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={currentStep === sceneOrder.length - 1}
+          aria-label="Escena siguiente"
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md shadow-primary/25 hover:shadow-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+        >
+          Siguiente
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
+        </button>
+      </div>
+
+      {/* Floating merchant earnings panel (desktop) */}
+      <motion.aside
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="hidden xl:flex absolute -right-4 top-32 flex-col gap-2 w-44 p-3 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/40 shadow-xl shadow-black/20"
+        role="complementary"
+        aria-label="Panel de ganancias del vendedor en vivo"
+      >
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Tu panel</span>
+          <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> En vivo
+          </span>
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <DollarSign className="h-3 w-3 text-emerald-500" aria-hidden="true" />
+            <span className="text-[10px] text-muted-foreground">Ingresos hoy</span>
+          </div>
+          <motion.p
+            key={revenueToday}
+            initial={{ scale: 1.08 }}
+            animate={{ scale: 1 }}
+            className="text-lg font-extrabold text-foreground tracking-tight"
+            aria-live="polite"
+          >
+            {fmt(revenueToday)}
+          </motion.p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border/30">
+          <div>
+            <p className="text-[9px] text-muted-foreground flex items-center gap-1"><BarChart3 className="h-2.5 w-2.5" /> Pedidos</p>
+            <motion.p key={salesToday} initial={{ y: -4 }} animate={{ y: 0 }} className="text-sm font-bold text-primary">{salesToday}</motion.p>
+          </div>
+          <div>
+            <p className="text-[9px] text-muted-foreground flex items-center gap-1"><TrendingUp className="h-2.5 w-2.5" /> Conv.</p>
+            <p className="text-sm font-bold text-emerald-600">4.8%</p>
+          </div>
+        </div>
+        <div className="pt-1 border-t border-border/30">
+          <p className="text-[9px] text-muted-foreground mb-1">Últimas 24h</p>
+          <svg viewBox="0 0 100 28" className="w-full h-7" aria-hidden="true">
+            <defs>
+              <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d="M0,22 L12,18 L24,20 L36,12 L48,15 L60,8 L72,11 L84,5 L100,3 L100,28 L0,28 Z" fill="url(#spark)" />
+            <path d="M0,22 L12,18 L24,20 L36,12 L48,15 L60,8 L72,11 L84,5 L100,3" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
+          </svg>
+        </div>
+      </motion.aside>
 
       {/* Customer Benefits Strip */}
       <motion.div
