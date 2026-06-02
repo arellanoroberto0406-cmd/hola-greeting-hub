@@ -244,6 +244,17 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           {autoplay && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />}
         </button>
 
+        {/* Restart tour */}
+        <button
+          type="button"
+          onClick={restartTour}
+          aria-label="Reiniciar recorrido desde el catálogo"
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-muted/40 border border-border/30 text-muted-foreground hover:text-foreground hover:border-primary/40 transition-all`}
+        >
+          <RefreshCw className="h-3 w-3" aria-hidden="true" />
+          <span className="hidden sm:inline">Reiniciar</span>
+        </button>
+
         {/* Live viewers */}
         <div
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-500/10 border border-rose-500/30 text-rose-600"
@@ -254,6 +265,17 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           <Users className="h-3 w-3" aria-hidden="true" />
           <motion.span key={viewers} initial={{ y: -4, opacity: 0 }} animate={{ y: 0, opacity: 1 }}>{viewers}</motion.span>
           <span className="hidden sm:inline">en vivo</span>
+        </div>
+
+        {/* Keyboard hint */}
+        <div
+          className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[10px] font-medium bg-muted/30 border border-border/30 text-muted-foreground"
+          aria-label="Atajos de teclado: flechas izquierda y derecha para navegar, espacio para pausar"
+        >
+          <Keyboard className="h-3 w-3" aria-hidden="true" />
+          <kbd className="px-1 rounded bg-card border border-border/40 font-mono text-[9px]">←</kbd>
+          <kbd className="px-1 rounded bg-card border border-border/40 font-mono text-[9px]">→</kbd>
+          <span>navegar</span>
         </div>
       </div>
 
