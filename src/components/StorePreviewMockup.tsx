@@ -63,11 +63,20 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
   const [notifIndex, setNotifIndex] = useState(0);
   const [stockTime, setStockTime] = useState({ h: 2, m: 47, s: 32 });
   const [viewers, setViewers] = useState(23);
+  const [salesToday, setSalesToday] = useState(47);
+  const [revenueToday, setRevenueToday] = useState(28450);
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
+  const sceneOrder: Scene[] = ["catalog", "product", "cart", "checkout", "confirmation"];
+  const currentStep = sceneOrder.indexOf(scene);
+  const progress = ((currentStep + 1) / sceneOrder.length) * 100;
+
   const goToScene = (id: Scene) => { setScene(id); setAutoplay(false); };
+  const goPrev = () => { const i = sceneOrder.indexOf(scene); if (i > 0) goToScene(sceneOrder[i - 1]); };
+  const goNext = () => { const i = sceneOrder.indexOf(scene); if (i < sceneOrder.length - 1) goToScene(sceneOrder[i + 1]); };
+  const restartTour = () => { setScene("catalog"); setCartCount(2); setQty(1); setAutoplay(true); };
 
   const onTabsKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     const order = scenes.map(s => s.id);
