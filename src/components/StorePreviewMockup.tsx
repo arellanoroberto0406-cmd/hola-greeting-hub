@@ -315,6 +315,23 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
         </div>
       </div>
 
+      {/* Tour progress bar */}
+      <div className="max-w-lg mx-auto mb-3 px-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-[10px] font-semibold text-muted-foreground">
+            Paso {currentStep + 1} de {sceneOrder.length} · <span className="text-foreground">{scenes[currentStep].label}</span>
+          </span>
+          <span className="text-[10px] font-bold text-primary">{Math.round(progress)}%</span>
+        </div>
+        <div className="h-1.5 rounded-full bg-muted/40 overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-primary via-orange-400 to-gold rounded-full"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </div>
+      </div>
+
       {/* Glow */}
       <div className={`absolute -inset-4 bg-gradient-to-r from-primary/20 via-orange-400/10 to-gold/20 rounded-[2.5rem] blur-2xl opacity-40 pointer-events-none ${isMobile ? 'top-12' : ''}`} aria-hidden="true" />
 
