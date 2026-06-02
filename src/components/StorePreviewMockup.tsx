@@ -1137,8 +1137,94 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           <div className="h-6 bg-gradient-to-t from-muted/30 to-transparent flex items-center justify-center">
             <div className="w-24 h-1 rounded-full bg-muted-foreground/30" />
           </div>
-        )}
       </div>
+
+      {/* Prev / Next tour controls */}
+      <div className="max-w-lg mx-auto mt-3 flex items-center justify-between gap-2 px-1">
+        <button
+          type="button"
+          onClick={goPrev}
+          disabled={currentStep === 0}
+          aria-label="Escena anterior"
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-card/60 border border-border/40 hover:border-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+        >
+          <ArrowLeft className="h-3 w-3" aria-hidden="true" />
+          Anterior
+        </button>
+        <div className="flex items-center gap-1" aria-hidden="true">
+          {sceneOrder.map((s, i) => (
+            <span
+              key={s}
+              className={`h-1.5 rounded-full transition-all ${i === currentStep ? "w-6 bg-primary" : i < currentStep ? "w-1.5 bg-primary/40" : "w-1.5 bg-muted-foreground/20"}`}
+            />
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={goNext}
+          disabled={currentStep === sceneOrder.length - 1}
+          aria-label="Escena siguiente"
+          className={`${focusRing} inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-semibold bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-md shadow-primary/25 hover:shadow-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+        >
+          Siguiente
+          <ArrowRight className="h-3 w-3" aria-hidden="true" />
+        </button>
+      </div>
+
+      {/* Floating merchant earnings panel (desktop) */}
+      <motion.aside
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.8, duration: 0.6 }}
+        className="hidden xl:flex absolute -right-4 top-32 flex-col gap-2 w-44 p-3 rounded-2xl bg-card/80 backdrop-blur-xl border border-border/40 shadow-xl shadow-black/20"
+        role="complementary"
+        aria-label="Panel de ganancias del vendedor en vivo"
+      >
+        <div className="flex items-center justify-between">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Tu panel</span>
+          <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-600">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> En vivo
+          </span>
+        </div>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1.5">
+            <DollarSign className="h-3 w-3 text-emerald-500" aria-hidden="true" />
+            <span className="text-[10px] text-muted-foreground">Ingresos hoy</span>
+          </div>
+          <motion.p
+            key={revenueToday}
+            initial={{ scale: 1.08 }}
+            animate={{ scale: 1 }}
+            className="text-lg font-extrabold text-foreground tracking-tight"
+            aria-live="polite"
+          >
+            {fmt(revenueToday)}
+          </motion.p>
+        </div>
+        <div className="grid grid-cols-2 gap-2 pt-1 border-t border-border/30">
+          <div>
+            <p className="text-[9px] text-muted-foreground flex items-center gap-1"><BarChart3 className="h-2.5 w-2.5" /> Pedidos</p>
+            <motion.p key={salesToday} initial={{ y: -4 }} animate={{ y: 0 }} className="text-sm font-bold text-primary">{salesToday}</motion.p>
+          </div>
+          <div>
+            <p className="text-[9px] text-muted-foreground flex items-center gap-1"><TrendingUp className="h-2.5 w-2.5" /> Conv.</p>
+            <p className="text-sm font-bold text-emerald-600">4.8%</p>
+          </div>
+        </div>
+        <div className="pt-1 border-t border-border/30">
+          <p className="text-[9px] text-muted-foreground mb-1">Últimas 24h</p>
+          <svg viewBox="0 0 100 28" className="w-full h-7" aria-hidden="true">
+            <defs>
+              <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path d="M0,22 L12,18 L24,20 L36,12 L48,15 L60,8 L72,11 L84,5 L100,3 L100,28 L0,28 Z" fill="url(#spark)" />
+            <path d="M0,22 L12,18 L24,20 L36,12 L48,15 L60,8 L72,11 L84,5 L100,3" fill="none" stroke="hsl(var(--primary))" strokeWidth="1.5" />
+          </svg>
+        </div>
+      </motion.aside>
 
       {/* Customer Benefits Strip */}
       <motion.div
