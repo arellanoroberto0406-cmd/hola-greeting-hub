@@ -112,7 +112,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
     return () => clearInterval(t);
   }, []);
 
-  // Countdown
+  // Countdown + live viewers
   useEffect(() => {
     const t = setInterval(() => {
       setStockTime(p => {
@@ -127,6 +127,37 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
     }, 1000);
     return () => clearInterval(t);
   }, []);
+
+  // Merchant live earnings — tick slowly + jump on confirmation
+  useEffect(() => {
+    const t = setInterval(() => {
+      setRevenueToday(r => r + Math.floor(Math.random() * 280) + 40);
+      if (Math.random() > 0.55) setSalesToday(s => s + 1);
+    }, 4200);
+    return () => clearInterval(t);
+  }, []);
+
+  useEffect(() => {
+    if (scene === "confirmation") {
+      setSalesToday(s => s + 1);
+      setRevenueToday(r => r + Math.round(total));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
+
+  // Global keyboard shortcuts (← → for prev/next, space to pause)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      if (e.key === "ArrowRight") { e.preventDefault(); goNext(); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); goPrev(); }
+      else if (e.code === "Space") { e.preventDefault(); setAutoplay(a => !a); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scene]);
 
   const toggleLike = (i: number) => {
     setLiked(prev => prev.includes(i) ? prev.filter(x => x !== i) : [...prev, i]);
