@@ -2,10 +2,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ShoppingCart, Star, Heart, Search, Menu, ShieldCheck, Truck,
   RotateCcw, Headphones, Smartphone, Monitor, Package, CreditCard, CheckCircle2,
-  MapPin, Tag, Lock, MessageCircle, BadgeCheck, Sparkles, ArrowLeft, Plus, Minus,
-  Clock, Zap, Play, Pause, Eye, Flame, Gift, TrendingUp, Award, Bell, Users
+  MapPin, Tag, Lock, MessageCircle, BadgeCheck, Sparkles, ArrowLeft, ArrowRight, Plus, Minus,
+  Clock, Zap, Play, Pause, Eye, Flame, Gift, TrendingUp, Award, Bell, Users,
+  RefreshCw, Share2, DollarSign, BarChart3, Keyboard, ThumbsUp
 } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 const demoProducts = [
   { name: "Gorra Premium NY", price: 599, original: 799, rating: 4.8, reviews: 128, tag: "Más vendido", color: "from-amber-500/20 to-orange-500/10", emoji: "🧢", stock: 7 },
