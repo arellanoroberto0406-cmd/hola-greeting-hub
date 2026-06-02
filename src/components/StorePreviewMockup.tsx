@@ -1137,6 +1137,7 @@ export const StorePreviewMockup = ({ viewMode = "desktop", onViewModeChange }: S
           <div className="h-6 bg-gradient-to-t from-muted/30 to-transparent flex items-center justify-center">
             <div className="w-24 h-1 rounded-full bg-muted-foreground/30" />
           </div>
+        )}
       </div>
 
       {/* Prev / Next tour controls */}
