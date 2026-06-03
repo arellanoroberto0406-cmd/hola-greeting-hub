@@ -33,20 +33,37 @@ async function getPayPalAccessToken(): Promise<string> {
 }
 
 function mapPayPalErrorForClient(errorText: string) {
+  const debugIdMatch = errorText.match(/"debug_id"\s*:\s*"([^"]+)"/i)
+  const debugId = debugIdMatch?.[1] ?? null
+
   if (errorText.includes('PAYEE_ACCOUNT_RESTRICTED')) {
-    const debugIdMatch = errorText.match(/"debug_id"\s*:\s*"([^"]+)"/i)
     return {
-      error: 'Tu cuenta de PayPal está restringida. Debes resolverlo en PayPal para poder cobrar.',
+      error: 'La cuenta de PayPal del comerciante está restringida. Resuélvelo en PayPal para poder cobrar.',
       errorCode: 'PAYEE_ACCOUNT_RESTRICTED',
-      debugId: debugIdMatch?.[1] ?? null,
+      debugId,
       technicalDetails: errorText,
     }
   }
-
+  if (errorText.includes('CURRENCY_NOT_SUPPORTED') || errorText.includes('CURRENCY_NOT_SUPPORTED_FOR_RECEIVER')) {
+    return {
+      error: 'La moneda MXN no está habilitada en la cuenta de PayPal del comerciante. Habilítala desde PayPal.',
+      errorCode: 'CURRENCY_NOT_SUPPORTED',
+      debugId,
+      technicalDetails: errorText,
+    }
+  }
+  if (errorText.includes('PERMISSION_DENIED') || errorText.includes('AUTHENTICATION_FAILURE')) {
+    return {
+      error: 'Error de autenticación con PayPal. Verifica las credenciales del servidor.',
+      errorCode: 'PAYPAL_AUTH_ERROR',
+      debugId,
+      technicalDetails: errorText,
+    }
+  }
   return {
-    error: 'No se pudo procesar el pago con PayPal.',
+    error: 'No se pudo procesar el pago con PayPal. Intenta de nuevo.',
     errorCode: 'PAYPAL_API_ERROR',
-    debugId: null,
+    debugId,
     technicalDetails: errorText,
   }
 }
@@ -251,16 +268,39 @@ Deno.serve(async (req) => {
     if (bodyAction === 'create-subscription' || bodyAction === 'create-order') {
       console.log(`Creating one-time PayPal order for store ${storeId}, plan ${planId}, cycle ${billingCycle}`)
 
-      // Get plan details
+      if (!storeId || !planId) {
+        return new Response(
+          JSON.stringify({ error: 'Faltan datos: storeId o planId', errorCode: 'INVALID_REQUEST' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+
+      // Server-side price lookup — never trust client amount
       const { data: plan, error: planError } = await supabase
         .from('subscription_plans')
         .select('*')
         .eq('id', planId)
+        .eq('is_active', true)
         .single()
-      if (planError || !plan) throw new Error('Plan not found')
+      if (planError || !plan) {
+        return new Response(
+          JSON.stringify({ error: 'Plan no encontrado o inactivo', errorCode: 'PLAN_NOT_FOUND' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
 
-      const currency = 'USD'
-      const amount = billingCycle === 'yearly' && plan.price_yearly ? plan.price_yearly : plan.price_monthly
+      // Prices in DB are MXN — charge in MXN to match what the user sees
+      const currency = 'MXN'
+      const rawAmount = billingCycle === 'yearly' && plan.price_yearly
+        ? Number(plan.price_yearly)
+        : Number(plan.price_monthly)
+      if (!rawAmount || rawAmount <= 0 || !Number.isFinite(rawAmount)) {
+        return new Response(
+          JSON.stringify({ error: 'Precio del plan inválido', errorCode: 'INVALID_PRICE' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      const amount = Math.round(rawAmount * 100) / 100
       console.log(`Creating order with currency: ${currency}, amount: ${amount}`)
 
       const accessToken = await getPayPalAccessToken()
@@ -275,15 +315,19 @@ Deno.serve(async (req) => {
         `${functionsUrl}?action=cancel`
       )
 
-      // Save pending order
-      await supabase.from('paypal_pending_orders').upsert({
+      // Save pending order (idempotent upsert)
+      const { error: pendingError } = await supabase.from('paypal_pending_orders').upsert({
         paypal_order_id: orderId,
         store_id: storeId,
         plan_id: planId,
         billing_cycle: billingCycle,
         amount,
         created_at: new Date().toISOString(),
-      })
+      }, { onConflict: 'paypal_order_id' })
+
+      if (pendingError) {
+        console.error('Failed to save pending order:', pendingError)
+      }
 
       return new Response(
         JSON.stringify({ subscriptionId: orderId, approvalUrl }),
