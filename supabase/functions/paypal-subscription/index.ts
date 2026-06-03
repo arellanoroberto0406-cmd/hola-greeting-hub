@@ -33,20 +33,37 @@ async function getPayPalAccessToken(): Promise<string> {
 }
 
 function mapPayPalErrorForClient(errorText: string) {
+  const debugIdMatch = errorText.match(/"debug_id"\s*:\s*"([^"]+)"/i)
+  const debugId = debugIdMatch?.[1] ?? null
+
   if (errorText.includes('PAYEE_ACCOUNT_RESTRICTED')) {
-    const debugIdMatch = errorText.match(/"debug_id"\s*:\s*"([^"]+)"/i)
     return {
-      error: 'Tu cuenta de PayPal está restringida. Debes resolverlo en PayPal para poder cobrar.',
+      error: 'La cuenta de PayPal del comerciante está restringida. Resuélvelo en PayPal para poder cobrar.',
       errorCode: 'PAYEE_ACCOUNT_RESTRICTED',
-      debugId: debugIdMatch?.[1] ?? null,
+      debugId,
       technicalDetails: errorText,
     }
   }
-
+  if (errorText.includes('CURRENCY_NOT_SUPPORTED') || errorText.includes('CURRENCY_NOT_SUPPORTED_FOR_RECEIVER')) {
+    return {
+      error: 'La moneda MXN no está habilitada en la cuenta de PayPal del comerciante. Habilítala desde PayPal.',
+      errorCode: 'CURRENCY_NOT_SUPPORTED',
+      debugId,
+      technicalDetails: errorText,
+    }
+  }
+  if (errorText.includes('PERMISSION_DENIED') || errorText.includes('AUTHENTICATION_FAILURE')) {
+    return {
+      error: 'Error de autenticación con PayPal. Verifica las credenciales del servidor.',
+      errorCode: 'PAYPAL_AUTH_ERROR',
+      debugId,
+      technicalDetails: errorText,
+    }
+  }
   return {
-    error: 'No se pudo procesar el pago con PayPal.',
+    error: 'No se pudo procesar el pago con PayPal. Intenta de nuevo.',
     errorCode: 'PAYPAL_API_ERROR',
-    debugId: null,
+    debugId,
     technicalDetails: errorText,
   }
 }
