@@ -240,6 +240,9 @@ const PaymentProofsPanel = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <BankAccountsAdminPanel />
+      <ActivationCodesAdminPanel />
     </div>
   );
 };
