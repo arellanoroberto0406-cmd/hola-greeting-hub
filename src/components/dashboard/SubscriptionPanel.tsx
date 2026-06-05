@@ -25,11 +25,15 @@ interface SubscriptionPanelProps {
   primaryColor?: string | null;
 }
 
-const BANK_INFO = {
-  banco: 'SPIN Oxxo',
-  titular: 'GABRIEL ARELLANO',
-  clabe: '728969000161610477',
-};
+interface BankAccount {
+  id: string;
+  bank_name: string;
+  account_holder: string;
+  clabe: string | null;
+  account_number: string | null;
+  qr_image_url: string | null;
+  notes: string | null;
+}
 
 const PlanIcon = ({ slug }: { slug: string }) => {
   switch (slug) {
