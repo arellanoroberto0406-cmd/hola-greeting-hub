@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,24 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle2, XCircle, Clock, Eye, Loader2, FileCheck, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import BankAccountsAdminPanel from "./BankAccountsAdminPanel";
+import ActivationCodesAdminPanel from "./ActivationCodesAdminPanel";
+
+const playBeep = () => {
+  try {
+    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.4);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.4);
+  } catch {}
+};
 
 const PaymentProofsPanel = () => {
   const queryClient = useQueryClient();
@@ -16,6 +34,7 @@ const PaymentProofsPanel = () => {
   const [reviewNotes, setReviewNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const mountedAtRef = useRef<number>(Date.now());
 
   const { data: proofs, isLoading } = useQuery({
     queryKey: ["admin-payment-proofs"],
@@ -28,6 +47,32 @@ const PaymentProofsPanel = () => {
       return data;
     },
   });
+
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-payment-proofs-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "subscription_payment_proofs" },
+        (payload) => {
+          const createdAt = new Date((payload.new as any).created_at).getTime();
+          if (createdAt < mountedAtRef.current - 5000) return;
+          playBeep();
+          toast.info("🔔 Nuevo comprobante de pago recibido", {
+            description: "Revísalo para activar el plan del cliente.",
+            duration: 8000,
+          });
+          queryClient.invalidateQueries({ queryKey: ["admin-payment-proofs"] });
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "subscription_payment_proofs" },
+        () => queryClient.invalidateQueries({ queryKey: ["admin-payment-proofs"] })
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [queryClient]);
 
   const handleReview = async (decision: "approved" | "rejected") => {
     if (!selectedProof) return;
