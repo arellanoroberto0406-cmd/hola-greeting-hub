@@ -543,6 +543,48 @@ export type Database = {
           },
         ]
       }
+      platform_bank_accounts: {
+        Row: {
+          account_holder: string
+          account_number: string | null
+          bank_name: string
+          clabe: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          qr_image_url: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          account_holder: string
+          account_number?: string | null
+          bank_name: string
+          clabe?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          qr_image_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          account_holder?: string
+          account_number?: string | null
+          bank_name?: string
+          clabe?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          qr_image_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_variants: {
         Row: {
           created_at: string
@@ -1158,6 +1200,83 @@ export type Database = {
           },
         ]
       }
+      subscription_activation_codes: {
+        Row: {
+          billing_cycle: string
+          code: string
+          created_at: string
+          created_by: string | null
+          duration_days: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number
+          notes: string | null
+          plan_id: string
+          used_count: number
+        }
+        Insert: {
+          billing_cycle?: string
+          code: string
+          created_at?: string
+          created_by?: string | null
+          duration_days?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          notes?: string | null
+          plan_id: string
+          used_count?: number
+        }
+        Update: {
+          billing_cycle?: string
+          code?: string
+          created_at?: string
+          created_by?: string | null
+          duration_days?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number
+          notes?: string | null
+          plan_id?: string
+          used_count?: number
+        }
+        Relationships: []
+      }
+      subscription_code_redemptions: {
+        Row: {
+          code_id: string
+          id: string
+          redeemed_at: string
+          redeemed_by: string
+          store_id: string
+        }
+        Insert: {
+          code_id: string
+          id?: string
+          redeemed_at?: string
+          redeemed_by: string
+          store_id: string
+        }
+        Update: {
+          code_id?: string
+          id?: string
+          redeemed_at?: string
+          redeemed_by?: string
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscription_code_redemptions_code_id_fkey"
+            columns: ["code_id"]
+            isOneToOne: false
+            referencedRelation: "subscription_activation_codes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       subscription_payment_proofs: {
         Row: {
           amount: number
@@ -1367,6 +1486,10 @@ export type Database = {
               error: true
             } & "Could not choose the best candidate function between: public.order_exists(_order_id => text), public.order_exists(_order_id => uuid). Try renaming the parameters or the function itself in the database so function overloading can be resolved"
           }
+      redeem_subscription_code: {
+        Args: { _code: string; _store_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
