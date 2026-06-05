@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2 } from "lucide-react";
+import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -23,11 +25,15 @@ interface SubscriptionPanelProps {
   primaryColor?: string | null;
 }
 
-const BANK_INFO = {
-  banco: 'SPIN Oxxo',
-  titular: 'GABRIEL ARELLANO',
-  clabe: '728969000161610477',
-};
+interface BankAccount {
+  id: string;
+  bank_name: string;
+  account_holder: string;
+  clabe: string | null;
+  account_number: string | null;
+  qr_image_url: string | null;
+  notes: string | null;
+}
 
 const PlanIcon = ({ slug }: { slug: string }) => {
   switch (slug) {
@@ -81,15 +87,62 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
     clearManualApprovalUrl,
   } = usePayPalPayment();
   
+  const queryClient = useQueryClient();
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer'>('paypal');
+  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer' | 'code'>('paypal');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isUploadingProof, setIsUploadingProof] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
+  const [selectedBankId, setSelectedBankId] = useState<string>("");
+  const [activationCode, setActivationCode] = useState("");
+  const [redeemingCode, setRedeemingCode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: bankAccounts } = useQuery({
+    queryKey: ["platform-bank-accounts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("platform_bank_accounts")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data as BankAccount[];
+    },
+  });
+
+  useEffect(() => {
+    if (bankAccounts && bankAccounts.length > 0 && !selectedBankId) {
+      setSelectedBankId(bankAccounts[0].id);
+    }
+  }, [bankAccounts, selectedBankId]);
+
+  const selectedBank = bankAccounts?.find(b => b.id === selectedBankId) || bankAccounts?.[0];
+
+  const handleRedeemCode = async () => {
+    if (!activationCode.trim()) return toast.error("Ingresa un código");
+    setRedeemingCode(true);
+    try {
+      const { data, error } = await supabase.rpc("redeem_subscription_code", {
+        _code: activationCode.trim(),
+        _store_id: storeId,
+      });
+      if (error) throw error;
+      const result = data as any;
+      if (!result?.success) throw new Error(result?.error || "Código inválido");
+      toast.success(result.message || "¡Plan activado!");
+      setActivationCode("");
+      setShowUpgradeDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["store-subscription", storeId] });
+    } catch (err: any) {
+      toast.error(err.message || "Error al redimir código");
+    } finally {
+      setRedeemingCode(false);
+    }
+  };
 
   useEffect(() => {
     const paymentStatus = searchParams.get('payment');
@@ -423,13 +476,16 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 </div>
 
                 {/* Payment Method Tabs */}
-                <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'paypal' | 'transfer')}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="paypal" className="flex items-center gap-1.5">
-                      <CreditCard className="h-4 w-4" />PayPal
+                <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="paypal" className="flex items-center gap-1 text-xs">
+                      <CreditCard className="h-3.5 w-3.5" />PayPal
                     </TabsTrigger>
-                    <TabsTrigger value="transfer" className="flex items-center gap-1.5">
-                      <Landmark className="h-4 w-4" />Transferencia
+                    <TabsTrigger value="transfer" className="flex items-center gap-1 text-xs">
+                      <Landmark className="h-3.5 w-3.5" />Transfer
+                    </TabsTrigger>
+                    <TabsTrigger value="code" className="flex items-center gap-1 text-xs">
+                      <Ticket className="h-3.5 w-3.5" />Código
                     </TabsTrigger>
                   </TabsList>
 
@@ -448,21 +504,19 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                         <Button variant="outline" className="w-full" onClick={() => handleCopyLink(manualApprovalUrl)}>
                           <Copy className="mr-2 h-4 w-4" />Copiar enlace
                         </Button>
-                        <p className="text-xs text-muted-foreground text-center">Al completar el pago serás redirigido automáticamente.</p>
                       </div>
                     ) : (
                       <Button onClick={handlePayWithPayPal} disabled={isProcessing} className="w-full bg-[#0070ba] hover:bg-[#005ea6] text-white">
                         {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Conectando...</> : <><CreditCard className="mr-2 h-4 w-4" />Pagar con PayPal</>}
                       </Button>
                     )}
-
                     {isAccountRestricted && (
                       <div className="rounded-lg border border-red-300 bg-red-50 p-3">
                         <div className="flex items-start gap-2">
                           <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                           <div>
                             <p className="text-sm font-medium text-red-800">Cuenta PayPal restringida</p>
-                            <p className="text-xs text-red-700 mt-1">Resuelve la restricción en paypal.com e intenta de nuevo.</p>
+                            <p className="text-xs text-red-700 mt-1">Usa transferencia o un código de activación.</p>
                           </div>
                         </div>
                       </div>
@@ -476,17 +530,50 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
                   {/* Transfer Tab */}
                   <TabsContent value="transfer" className="space-y-4 mt-3">
-                    <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-                      <h4 className="font-medium text-sm flex items-center gap-2">
-                        <Landmark className="h-4 w-4" />Datos para transferencia
-                      </h4>
-                      <CopyField label="Banco" value={BANK_INFO.banco} />
-                      <CopyField label="Titular" value={BANK_INFO.titular} />
-                      <CopyField label="CLABE" value={BANK_INFO.clabe} />
-                      <p className="text-xs text-muted-foreground">
-                        Monto a transferir: <strong>${selectedPrice} MXN</strong>
-                      </p>
-                    </div>
+                    {!bankAccounts?.length ? (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                        No hay cuentas bancarias configuradas. Contacta al administrador.
+                      </div>
+                    ) : (
+                      <>
+                        {bankAccounts.length > 1 && (
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Elige el banco</Label>
+                            <RadioGroup value={selectedBankId} onValueChange={setSelectedBankId} className="space-y-2">
+                              {bankAccounts.map((b) => (
+                                <label key={b.id} htmlFor={`bank-${b.id}`} className={`flex items-center gap-2 border rounded-lg p-2 cursor-pointer ${selectedBankId === b.id ? 'border-primary bg-primary/5' : ''}`}>
+                                  <RadioGroupItem value={b.id} id={`bank-${b.id}`} />
+                                  <Landmark className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm font-medium">{b.bank_name}</span>
+                                  {b.qr_image_url && <Badge variant="secondary" className="text-xs ml-auto"><QrCode className="h-3 w-3 mr-1" />QR CoDi</Badge>}
+                                </label>
+                              ))}
+                            </RadioGroup>
+                          </div>
+                        )}
+
+                        {selectedBank && (
+                          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                            <h4 className="font-medium text-sm flex items-center gap-2">
+                              <Landmark className="h-4 w-4" />{selectedBank.bank_name}
+                            </h4>
+                            <CopyField label="Titular" value={selectedBank.account_holder} />
+                            {selectedBank.clabe && <CopyField label="CLABE" value={selectedBank.clabe} />}
+                            {selectedBank.account_number && <CopyField label="Cuenta" value={selectedBank.account_number} />}
+                            {selectedBank.qr_image_url && (
+                              <div className="bg-white rounded-md p-3 flex flex-col items-center gap-2 border">
+                                <p className="text-xs text-muted-foreground flex items-center gap-1"><QrCode className="h-3 w-3" />Escanea desde tu app bancaria (CoDi)</p>
+                                <img src={selectedBank.qr_image_url} alt="QR CoDi" className="max-w-[180px] rounded" />
+                              </div>
+                            )}
+                            {selectedBank.notes && <p className="text-xs text-muted-foreground">{selectedBank.notes}</p>}
+                            <p className="text-xs text-muted-foreground border-t pt-2">
+                              Monto: <strong>${selectedPrice} MXN</strong>
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    )}
 
                     <div className="space-y-2">
                       <Label className="font-medium text-sm">Comprobante de pago</Label>
@@ -525,8 +612,38 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                       )}
                     </Button>
                   </TabsContent>
+
+                  {/* Activation Code Tab */}
+                  <TabsContent value="code" className="space-y-3 mt-3">
+                    <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+                      <h4 className="font-medium text-sm flex items-center gap-2">
+                        <Ticket className="h-4 w-4" />Tengo un código de activación
+                      </h4>
+                      <p className="text-xs text-muted-foreground">
+                        Si recibiste un código del administrador (por WhatsApp, pago en efectivo u otro método), ingrésalo aquí para activar tu plan al instante.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Código</Label>
+                      <Input
+                        value={activationCode}
+                        onChange={(e) => setActivationCode(e.target.value.toUpperCase())}
+                        placeholder="PLAN-XXXXXXXX"
+                        className="font-mono uppercase"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleRedeemCode}
+                      disabled={!activationCode.trim() || redeemingCode}
+                      className="w-full"
+                    >
+                      {redeemingCode ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Validando...</> : <><CheckCircle2 className="mr-2 h-4 w-4" />Activar plan con código</>}
+                    </Button>
+                  </TabsContent>
                 </Tabs>
               </div>
+
+
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowUpgradeDialog(false)} className="w-full sm:w-auto">Cancelar</Button>
