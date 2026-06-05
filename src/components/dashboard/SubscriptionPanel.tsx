@@ -87,15 +87,62 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
     clearManualApprovalUrl,
   } = usePayPalPayment();
   
+  const queryClient = useQueryClient();
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer'>('paypal');
+  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer' | 'code'>('paypal');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isUploadingProof, setIsUploadingProof] = useState(false);
   const [transferSuccess, setTransferSuccess] = useState(false);
+  const [selectedBankId, setSelectedBankId] = useState<string>("");
+  const [activationCode, setActivationCode] = useState("");
+  const [redeemingCode, setRedeemingCode] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: bankAccounts } = useQuery({
+    queryKey: ["platform-bank-accounts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("platform_bank_accounts")
+        .select("*")
+        .eq("is_active", true)
+        .order("sort_order", { ascending: true });
+      if (error) throw error;
+      return data as BankAccount[];
+    },
+  });
+
+  useEffect(() => {
+    if (bankAccounts && bankAccounts.length > 0 && !selectedBankId) {
+      setSelectedBankId(bankAccounts[0].id);
+    }
+  }, [bankAccounts, selectedBankId]);
+
+  const selectedBank = bankAccounts?.find(b => b.id === selectedBankId) || bankAccounts?.[0];
+
+  const handleRedeemCode = async () => {
+    if (!activationCode.trim()) return toast.error("Ingresa un código");
+    setRedeemingCode(true);
+    try {
+      const { data, error } = await supabase.rpc("redeem_subscription_code", {
+        _code: activationCode.trim(),
+        _store_id: storeId,
+      });
+      if (error) throw error;
+      const result = data as any;
+      if (!result?.success) throw new Error(result?.error || "Código inválido");
+      toast.success(result.message || "¡Plan activado!");
+      setActivationCode("");
+      setShowUpgradeDialog(false);
+      queryClient.invalidateQueries({ queryKey: ["store-subscription", storeId] });
+    } catch (err: any) {
+      toast.error(err.message || "Error al redimir código");
+    } finally {
+      setRedeemingCode(false);
+    }
+  };
 
   useEffect(() => {
     const paymentStatus = searchParams.get('payment');
