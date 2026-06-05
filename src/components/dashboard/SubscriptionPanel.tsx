@@ -476,13 +476,16 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 </div>
 
                 {/* Payment Method Tabs */}
-                <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as 'paypal' | 'transfer')}>
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="paypal" className="flex items-center gap-1.5">
-                      <CreditCard className="h-4 w-4" />PayPal
+                <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="paypal" className="flex items-center gap-1 text-xs">
+                      <CreditCard className="h-3.5 w-3.5" />PayPal
                     </TabsTrigger>
-                    <TabsTrigger value="transfer" className="flex items-center gap-1.5">
-                      <Landmark className="h-4 w-4" />Transferencia
+                    <TabsTrigger value="transfer" className="flex items-center gap-1 text-xs">
+                      <Landmark className="h-3.5 w-3.5" />Transfer
+                    </TabsTrigger>
+                    <TabsTrigger value="code" className="flex items-center gap-1 text-xs">
+                      <Ticket className="h-3.5 w-3.5" />Código
                     </TabsTrigger>
                   </TabsList>
 
@@ -501,21 +504,19 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                         <Button variant="outline" className="w-full" onClick={() => handleCopyLink(manualApprovalUrl)}>
                           <Copy className="mr-2 h-4 w-4" />Copiar enlace
                         </Button>
-                        <p className="text-xs text-muted-foreground text-center">Al completar el pago serás redirigido automáticamente.</p>
                       </div>
                     ) : (
                       <Button onClick={handlePayWithPayPal} disabled={isProcessing} className="w-full bg-[#0070ba] hover:bg-[#005ea6] text-white">
                         {isProcessing ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Conectando...</> : <><CreditCard className="mr-2 h-4 w-4" />Pagar con PayPal</>}
                       </Button>
                     )}
-
                     {isAccountRestricted && (
                       <div className="rounded-lg border border-red-300 bg-red-50 p-3">
                         <div className="flex items-start gap-2">
                           <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                           <div>
                             <p className="text-sm font-medium text-red-800">Cuenta PayPal restringida</p>
-                            <p className="text-xs text-red-700 mt-1">Resuelve la restricción en paypal.com e intenta de nuevo.</p>
+                            <p className="text-xs text-red-700 mt-1">Usa transferencia o un código de activación.</p>
                           </div>
                         </div>
                       </div>
@@ -529,17 +530,50 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
                   {/* Transfer Tab */}
                   <TabsContent value="transfer" className="space-y-4 mt-3">
-                    <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
-                      <h4 className="font-medium text-sm flex items-center gap-2">
-                        <Landmark className="h-4 w-4" />Datos para transferencia
-                      </h4>
-                      <CopyField label="Banco" value={BANK_INFO.banco} />
-                      <CopyField label="Titular" value={BANK_INFO.titular} />
-                      <CopyField label="CLABE" value={BANK_INFO.clabe} />
-                      <p className="text-xs text-muted-foreground">
-                        Monto a transferir: <strong>${selectedPrice} MXN</strong>
-                      </p>
-                    </div>
+                    {!bankAccounts?.length ? (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                        No hay cuentas bancarias configuradas. Contacta al administrador.
+                      </div>
+                    ) : (
+                      <>
+                        {bankAccounts.length > 1 && (
+                          <div className="space-y-2">
+                            <Label className="text-sm font-medium">Elige el banco</Label>
+                            <RadioGroup value={selectedBankId} onValueChange={setSelectedBankId} className="space-y-2">
+                              {bankAccounts.map((b) => (
+                                <label key={b.id} htmlFor={`bank-${b.id}`} className={`flex items-center gap-2 border rounded-lg p-2 cursor-pointer ${selectedBankId === b.id ? 'border-primary bg-primary/5' : ''}`}>
+                                  <RadioGroupItem value={b.id} id={`bank-${b.id}`} />
+                                  <Landmark className="h-4 w-4 text-muted-foreground" />
+                                  <span className="text-sm font-medium">{b.bank_name}</span>
+                                  {b.qr_image_url && <Badge variant="secondary" className="text-xs ml-auto"><QrCode className="h-3 w-3 mr-1" />QR CoDi</Badge>}
+                                </label>
+                              ))}
+                            </RadioGroup>
+                          </div>
+                        )}
+
+                        {selectedBank && (
+                          <div className="rounded-lg border bg-muted/30 p-4 space-y-3">
+                            <h4 className="font-medium text-sm flex items-center gap-2">
+                              <Landmark className="h-4 w-4" />{selectedBank.bank_name}
+                            </h4>
+                            <CopyField label="Titular" value={selectedBank.account_holder} />
+                            {selectedBank.clabe && <CopyField label="CLABE" value={selectedBank.clabe} />}
+                            {selectedBank.account_number && <CopyField label="Cuenta" value={selectedBank.account_number} />}
+                            {selectedBank.qr_image_url && (
+                              <div className="bg-white rounded-md p-3 flex flex-col items-center gap-2 border">
+                                <p className="text-xs text-muted-foreground flex items-center gap-1"><QrCode className="h-3 w-3" />Escanea desde tu app bancaria (CoDi)</p>
+                                <img src={selectedBank.qr_image_url} alt="QR CoDi" className="max-w-[180px] rounded" />
+                              </div>
+                            )}
+                            {selectedBank.notes && <p className="text-xs text-muted-foreground">{selectedBank.notes}</p>}
+                            <p className="text-xs text-muted-foreground border-t pt-2">
+                              Monto: <strong>${selectedPrice} MXN</strong>
+                            </p>
+                          </div>
+                        )}
+                      </>
+                    )}
 
                     <div className="space-y-2">
                       <Label className="font-medium text-sm">Comprobante de pago</Label>
@@ -578,8 +612,38 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                       )}
                     </Button>
                   </TabsContent>
+
+                  {/* Activation Code Tab */}
+                  <TabsContent value="code" className="space-y-3 mt-3">
+                    <div className="rounded-lg border bg-muted/30 p-4 space-y-2">
+                      <h4 className="font-medium text-sm flex items-center gap-2">
+                        <Ticket className="h-4 w-4" />Tengo un código de activación
+                      </h4>
+                      <p className="text-xs text-muted-foreground">
+                        Si recibiste un código del administrador (por WhatsApp, pago en efectivo u otro método), ingrésalo aquí para activar tu plan al instante.
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Código</Label>
+                      <Input
+                        value={activationCode}
+                        onChange={(e) => setActivationCode(e.target.value.toUpperCase())}
+                        placeholder="PLAN-XXXXXXXX"
+                        className="font-mono uppercase"
+                      />
+                    </div>
+                    <Button
+                      onClick={handleRedeemCode}
+                      disabled={!activationCode.trim() || redeemingCode}
+                      className="w-full"
+                    >
+                      {redeemingCode ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Validando...</> : <><CheckCircle2 className="mr-2 h-4 w-4" />Activar plan con código</>}
+                    </Button>
+                  </TabsContent>
                 </Tabs>
               </div>
+
+
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowUpgradeDialog(false)} className="w-full sm:w-auto">Cancelar</Button>
