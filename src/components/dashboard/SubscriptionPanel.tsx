@@ -733,7 +733,23 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 </Tabs>
               </div>
 
-
+              {/* Security footer inside dialog */}
+              <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20 p-3">
+                <div className="flex items-start gap-2">
+                  <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">Transacción protegida</p>
+                    <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 leading-relaxed">
+                      Conexión cifrada SSL 256-bit. No guardamos datos de tarjeta. Puedes cancelar tu plan en cualquier momento desde este panel.
+                    </p>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-[10px] text-emerald-700/80 dark:text-emerald-300/70">
+                      <span className="flex items-center gap-1"><Lock className="h-2.5 w-2.5" />SSL</span>
+                      <span className="flex items-center gap-1"><BadgeCheck className="h-2.5 w-2.5" />PayPal verificado</span>
+                      <span className="flex items-center gap-1"><RefreshCw className="h-2.5 w-2.5" />Sin permanencia</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowUpgradeDialog(false)} className="w-full sm:w-auto">Cancelar</Button>
