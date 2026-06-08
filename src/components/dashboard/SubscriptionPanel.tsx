@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode } from "lucide-react";
+import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode, ShieldCheck, Lock, BadgeCheck, RefreshCw, Headphones, FileCheck2, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -383,32 +383,122 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
         })}
       </div>
 
-      {/* Payment Info */}
+      {/* Trust & Security Banner */}
+      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 via-white to-blue-50 dark:from-emerald-950/20 dark:via-background dark:to-blue-950/20">
+        <CardContent className="p-5">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="bg-emerald-600 text-white p-2 rounded-lg flex-shrink-0">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-base flex items-center gap-2 flex-wrap">
+                Pago 100% Seguro y Verificado
+                <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-300 text-[10px]">
+                  <Lock className="h-3 w-3 mr-1" />SSL 256-bit
+                </Badge>
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Tu información está protegida con cifrado de nivel bancario. Nunca almacenamos los datos de tu tarjeta.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+            <div className="flex items-center gap-2 p-2 rounded-md bg-white/60 dark:bg-background/40 border">
+              <BadgeCheck className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <span className="font-medium">PayPal verificado</span>
+            </div>
+            <div className="flex items-center gap-2 p-2 rounded-md bg-white/60 dark:bg-background/40 border">
+              <Landmark className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <span className="font-medium">Banco oficial</span>
+            </div>
+            <div className="flex items-center gap-2 p-2 rounded-md bg-white/60 dark:bg-background/40 border">
+              <RefreshCw className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <span className="font-medium">Sin permanencia</span>
+            </div>
+            <div className="flex items-center gap-2 p-2 rounded-md bg-white/60 dark:bg-background/40 border">
+              <Headphones className="h-4 w-4 text-emerald-600 flex-shrink-0" />
+              <span className="font-medium">Soporte real</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Payment Methods */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5" />Métodos de Pago</CardTitle>
-          <CardDescription>Paga con PayPal o transferencia bancaria.</CardDescription>
+          <CardTitle className="flex items-center gap-2"><CreditCard className="h-5 w-5" />Métodos de Pago Disponibles</CardTitle>
+          <CardDescription>Elige el método que prefieras. Todos son seguros y verificados.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="border rounded-lg p-4 flex items-center gap-4">
+          <div className="border rounded-lg p-4 flex items-center gap-4 hover:border-[#0070ba]/40 transition-colors">
             <div className="bg-[#0070ba] text-white p-3 rounded-lg flex-shrink-0"><CreditCard className="h-5 w-5" /></div>
-            <div>
-              <h4 className="font-medium text-sm">PayPal</h4>
-              <p className="text-xs text-muted-foreground">Paga con tu cuenta PayPal o tarjeta</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="font-semibold text-sm">PayPal</h4>
+                <Badge variant="outline" className="text-[10px] border-emerald-300 text-emerald-700">
+                  <ShieldCheck className="h-2.5 w-2.5 mr-0.5" />Protección al comprador
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">Activación automática. Cancela cuando quieras.</p>
             </div>
           </div>
-          <div className="border rounded-lg p-4 flex items-center gap-4">
+
+          <div className="border rounded-lg p-4 flex items-center gap-4 hover:border-emerald-600/40 transition-colors">
             <div className="bg-emerald-600 text-white p-3 rounded-lg flex-shrink-0"><Landmark className="h-5 w-5" /></div>
-            <div>
-              <h4 className="font-medium text-sm">Transferencia Bancaria</h4>
-              <p className="text-xs text-muted-foreground">Transfiere y sube tu comprobante</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h4 className="font-semibold text-sm">Transferencia / SPEI / CoDi</h4>
+                <Badge variant="outline" className="text-[10px] border-emerald-300 text-emerald-700">
+                  <BadgeCheck className="h-2.5 w-2.5 mr-0.5" />Cuenta verificada
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">Verificación manual del comprobante en menos de 24 h.</p>
             </div>
           </div>
+
+          <div className="border rounded-lg p-4 flex items-center gap-4 hover:border-primary/40 transition-colors">
+            <div className="bg-primary text-primary-foreground p-3 rounded-lg flex-shrink-0"><Ticket className="h-5 w-5" /></div>
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold text-sm">Código de activación</h4>
+              <p className="text-xs text-muted-foreground mt-0.5">Activación inmediata si recibiste un código del administrador.</p>
+            </div>
+          </div>
+
+          {/* How it works */}
+          <div className="border rounded-lg p-4 bg-muted/30 mt-2">
+            <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
+              <Eye className="h-4 w-4 text-primary" />
+              ¿Cómo funciona? Proceso transparente
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div className="flex gap-2">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-[11px]">1</span>
+                <div><p className="font-medium">Eliges tu plan</p><p className="text-muted-foreground">Mensual o anual, sin permanencia.</p></div>
+              </div>
+              <div className="flex gap-2">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-[11px]">2</span>
+                <div><p className="font-medium">Pagas seguro</p><p className="text-muted-foreground">PayPal, transferencia o código.</p></div>
+              </div>
+              <div className="flex gap-2">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-[11px]">3</span>
+                <div><p className="font-medium">Plan activado</p><p className="text-muted-foreground">Acceso completo al instante.</p></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Guarantees row */}
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-2 text-[11px] text-muted-foreground">
+            <span className="flex items-center gap-1.5"><Lock className="h-3.5 w-3.5 text-emerald-600" />Cifrado SSL 256-bit</span>
+            <span className="flex items-center gap-1.5"><FileCheck2 className="h-3.5 w-3.5 text-emerald-600" />Comprobante por correo</span>
+            <span className="flex items-center gap-1.5"><RefreshCw className="h-3.5 w-3.5 text-emerald-600" />Cancela cuando quieras</span>
+            <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />Datos protegidos</span>
+          </div>
+
           {subscription?.payment_reference && status === 'active' && (
-            <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/30">
+            <div className="flex items-center justify-between border rounded-lg p-4 bg-muted/30 mt-2">
               <div>
                 <p className="text-sm font-medium">Suscripción activa</p>
-                <p className="text-xs text-muted-foreground">Método: {subscription.payment_method === 'transfer' ? 'Transferencia' : 'PayPal'}</p>
+                <p className="text-xs text-muted-foreground">Método: {subscription.payment_method === 'transfer' ? 'Transferencia' : subscription.payment_method === 'activation_code' ? 'Código' : 'PayPal'}</p>
               </div>
               <Button variant="destructive" size="sm" onClick={handleCancelSubscription} disabled={isProcessing}>
                 {isProcessing ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Cancelar'}
@@ -643,7 +733,23 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 </Tabs>
               </div>
 
-
+              {/* Security footer inside dialog */}
+              <div className="mt-2 rounded-lg border border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20 p-3">
+                <div className="flex items-start gap-2">
+                  <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-xs font-semibold text-emerald-900 dark:text-emerald-200">Transacción protegida</p>
+                    <p className="text-[11px] text-emerald-800/80 dark:text-emerald-300/80 leading-relaxed">
+                      Conexión cifrada SSL 256-bit. No guardamos datos de tarjeta. Puedes cancelar tu plan en cualquier momento desde este panel.
+                    </p>
+                    <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1 text-[10px] text-emerald-700/80 dark:text-emerald-300/70">
+                      <span className="flex items-center gap-1"><Lock className="h-2.5 w-2.5" />SSL</span>
+                      <span className="flex items-center gap-1"><BadgeCheck className="h-2.5 w-2.5" />PayPal verificado</span>
+                      <span className="flex items-center gap-1"><RefreshCw className="h-2.5 w-2.5" />Sin permanencia</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
               <DialogFooter>
                 <Button variant="outline" onClick={() => setShowUpgradeDialog(false)} className="w-full sm:w-auto">Cancelar</Button>
