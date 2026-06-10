@@ -93,7 +93,19 @@ const PaymentProofsPanel = () => {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
 
-      toast.success(decision === "approved" ? "Plan activado exitosamente" : "Comprobante rechazado");
+      if (decision === "approved") {
+        toast.success("✅ Plan activado y código generado");
+        if (data?.activationCode) {
+          setReceipt({
+            code: data.activationCode,
+            storeName: selectedProof.stores?.name || "Tienda",
+            storeId: selectedProof.store_id,
+            planName: selectedProof.subscription_plans?.name || "Plan",
+          });
+        }
+      } else {
+        toast.success("Comprobante rechazado");
+      }
       setSelectedProof(null);
       setReviewNotes("");
       queryClient.invalidateQueries({ queryKey: ["admin-payment-proofs"] });
