@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle2, XCircle, Clock, Eye, Loader2, FileCheck, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, Clock, Eye, Loader2, FileCheck, ExternalLink, Copy, KeyRound, MessageCircle, PartyPopper } from "lucide-react";
+import { PLATFORM_BRAND } from "@/config/platform";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import BankAccountsAdminPanel from "./BankAccountsAdminPanel";
@@ -34,6 +35,7 @@ const PaymentProofsPanel = () => {
   const [reviewNotes, setReviewNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<{ code: string; storeName: string; planName: string; storeId: string } | null>(null);
   const mountedAtRef = useRef<number>(Date.now());
 
   const { data: proofs, isLoading } = useQuery({
@@ -91,7 +93,19 @@ const PaymentProofsPanel = () => {
       if (error) throw new Error(error.message);
       if (data?.error) throw new Error(data.error);
 
-      toast.success(decision === "approved" ? "Plan activado exitosamente" : "Comprobante rechazado");
+      if (decision === "approved") {
+        toast.success("✅ Plan activado y código generado");
+        if (data?.activationCode) {
+          setReceipt({
+            code: data.activationCode,
+            storeName: selectedProof.stores?.name || "Tienda",
+            storeId: selectedProof.store_id,
+            planName: selectedProof.subscription_plans?.name || "Plan",
+          });
+        }
+      } else {
+        toast.success("Comprobante rechazado");
+      }
       setSelectedProof(null);
       setReviewNotes("");
       queryClient.invalidateQueries({ queryKey: ["admin-payment-proofs"] });
@@ -236,6 +250,79 @@ const PaymentProofsPanel = () => {
             <Button className="bg-green-600 hover:bg-green-700" onClick={() => handleReview("approved")} disabled={isProcessing}>
               {isProcessing ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2" />}
               Aprobar y activar plan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Receipt dialog with auto-generated activation code */}
+      <Dialog open={!!receipt} onOpenChange={(o) => !o && setReceipt(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <PartyPopper className="h-5 w-5 text-emerald-600" />
+              Plan activado · Código generado
+            </DialogTitle>
+            <DialogDescription>
+              Comparte este código con el cliente como comprobante de su activación.
+            </DialogDescription>
+          </DialogHeader>
+
+          {receipt && (
+            <div className="space-y-4">
+              <div className="rounded-lg border-2 border-dashed border-emerald-300 bg-emerald-50 p-4 text-center space-y-2">
+                <p className="text-xs uppercase tracking-wider text-emerald-700 font-semibold flex items-center justify-center gap-1">
+                  <KeyRound className="h-3.5 w-3.5" />Código de activación
+                </p>
+                <p className="text-2xl font-mono font-bold tracking-wider text-emerald-900 select-all">
+                  {receipt.code}
+                </p>
+                <p className="text-xs text-emerald-700">
+                  {receipt.storeName} · {receipt.planName}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(receipt.code);
+                    toast.success("Código copiado");
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-2" />Copiar código
+                </Button>
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={() => {
+                    const msg = [
+                      `¡Pago confirmado! ✅`,
+                      ``,
+                      `Tu plan *${receipt.planName}* ha sido activado en ${PLATFORM_BRAND}.`,
+                      ``,
+                      `🔐 Código de comprobante: *${receipt.code}*`,
+                      `(Guárdalo como referencia de tu activación)`,
+                      ``,
+                      `Gracias por tu compra 🙌`,
+                    ].join('\n');
+                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+                  }}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />Enviar por WhatsApp
+                </Button>
+              </div>
+
+              <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground space-y-1">
+                <p>✔️ El plan ya está <strong>activo</strong> en la tienda del cliente — no necesita hacer nada más.</p>
+                <p>✔️ El código queda registrado en la base de datos como comprobante único.</p>
+                <p>✔️ Este código <strong>no es reutilizable</strong>; solo sirve de referencia.</p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" className="w-full" onClick={() => setReceipt(null)}>
+              Cerrar
             </Button>
           </DialogFooter>
         </DialogContent>
