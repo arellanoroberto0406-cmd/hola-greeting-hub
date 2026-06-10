@@ -35,6 +35,7 @@ const PaymentProofsPanel = () => {
   const [reviewNotes, setReviewNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [receipt, setReceipt] = useState<{ code: string; storeName: string; planName: string; storeId: string } | null>(null);
   const mountedAtRef = useRef<number>(Date.now());
 
   const { data: proofs, isLoading } = useQuery({
