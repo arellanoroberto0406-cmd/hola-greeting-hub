@@ -93,21 +93,70 @@ Deno.serve(async (req) => {
         })
         .eq('id', proofId)
 
-      // If approved, activate subscription
+      // If approved, activate subscription + generate activation code receipt
+      let activationCode: string | null = null
       if (decision === 'approved') {
         const now = new Date()
         const endDate = new Date()
+        const durationDays = proof.billing_cycle === 'yearly' ? 365 : 30
         if (proof.billing_cycle === 'yearly') {
           endDate.setFullYear(endDate.getFullYear() + 1)
         } else {
           endDate.setMonth(endDate.getMonth() + 1)
         }
 
+        // Generate unique activation code: ACT-XXXXXXXX
+        const genCode = () => {
+          const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+          let s = ''
+          for (let i = 0; i < 8; i++) s += chars[Math.floor(Math.random() * chars.length)]
+          return `ACT-${s}`
+        }
+        let code = genCode()
+        // Ensure uniqueness (retry up to 5 times)
+        for (let i = 0; i < 5; i++) {
+          const { data: exists } = await supabase
+            .from('subscription_activation_codes')
+            .select('id')
+            .eq('code', code)
+            .maybeSingle()
+          if (!exists) break
+          code = genCode()
+        }
+        activationCode = code
+
+        // Insert pre-redeemed code as receipt
+        const { data: codeRow, error: codeErr } = await supabase
+          .from('subscription_activation_codes')
+          .insert({
+            code,
+            plan_id: proof.plan_id,
+            billing_cycle: proof.billing_cycle || 'monthly',
+            duration_days: durationDays,
+            max_uses: 1,
+            used_count: 1,
+            is_active: false,
+            notes: `Auto-generado al aprobar comprobante ${proof.id}`,
+            created_by: user.id,
+          })
+          .select('id')
+          .single()
+
+        if (codeErr) console.error('Code insert error:', codeErr)
+
+        if (codeRow) {
+          await supabase.from('subscription_code_redemptions').insert({
+            code_id: codeRow.id,
+            store_id: proof.store_id,
+            redeemed_by: user.id,
+          })
+        }
+
         const subData = {
           status: 'active',
           plan_id: proof.plan_id,
           payment_method: 'transfer',
-          payment_reference: `transfer-${Date.now()}`,
+          payment_reference: activationCode || `transfer-${Date.now()}`,
           paypal_subscription_id: null,
           auto_renew: false,
           subscription_start_date: now.toISOString(),
@@ -128,13 +177,17 @@ Deno.serve(async (req) => {
           await supabase.from('store_subscriptions').insert({ store_id: proof.store_id, ...subData })
         }
 
-        console.log(`Transfer subscription approved for store ${proof.store_id}, plan ${proof.plan_id}`)
+        console.log(`Transfer subscription approved for store ${proof.store_id}, plan ${proof.plan_id}, code ${activationCode}`)
       } else {
         console.log(`Transfer subscription rejected for store ${proof.store_id}`)
       }
 
       return new Response(
-        JSON.stringify({ success: true, message: decision === 'approved' ? 'Plan activado' : 'Comprobante rechazado' }),
+        JSON.stringify({
+          success: true,
+          message: decision === 'approved' ? 'Plan activado' : 'Comprobante rechazado',
+          activationCode,
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
