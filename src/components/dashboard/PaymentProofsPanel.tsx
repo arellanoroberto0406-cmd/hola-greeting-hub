@@ -255,6 +255,79 @@ const PaymentProofsPanel = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Receipt dialog with auto-generated activation code */}
+      <Dialog open={!!receipt} onOpenChange={(o) => !o && setReceipt(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <PartyPopper className="h-5 w-5 text-emerald-600" />
+              Plan activado · Código generado
+            </DialogTitle>
+            <DialogDescription>
+              Comparte este código con el cliente como comprobante de su activación.
+            </DialogDescription>
+          </DialogHeader>
+
+          {receipt && (
+            <div className="space-y-4">
+              <div className="rounded-lg border-2 border-dashed border-emerald-300 bg-emerald-50 p-4 text-center space-y-2">
+                <p className="text-xs uppercase tracking-wider text-emerald-700 font-semibold flex items-center justify-center gap-1">
+                  <KeyRound className="h-3.5 w-3.5" />Código de activación
+                </p>
+                <p className="text-2xl font-mono font-bold tracking-wider text-emerald-900 select-all">
+                  {receipt.code}
+                </p>
+                <p className="text-xs text-emerald-700">
+                  {receipt.storeName} · {receipt.planName}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(receipt.code);
+                    toast.success("Código copiado");
+                  }}
+                >
+                  <Copy className="h-4 w-4 mr-2" />Copiar código
+                </Button>
+                <Button
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                  onClick={() => {
+                    const msg = [
+                      `¡Pago confirmado! ✅`,
+                      ``,
+                      `Tu plan *${receipt.planName}* ha sido activado en ${PLATFORM_BRAND}.`,
+                      ``,
+                      `🔐 Código de comprobante: *${receipt.code}*`,
+                      `(Guárdalo como referencia de tu activación)`,
+                      ``,
+                      `Gracias por tu compra 🙌`,
+                    ].join('\n');
+                    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank', 'noopener,noreferrer');
+                  }}
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />Enviar por WhatsApp
+                </Button>
+              </div>
+
+              <div className="rounded-md bg-muted/40 p-3 text-xs text-muted-foreground space-y-1">
+                <p>✔️ El plan ya está <strong>activo</strong> en la tienda del cliente — no necesita hacer nada más.</p>
+                <p>✔️ El código queda registrado en la base de datos como comprobante único.</p>
+                <p>✔️ Este código <strong>no es reutilizable</strong>; solo sirve de referencia.</p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" className="w-full" onClick={() => setReceipt(null)}>
+              Cerrar
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <BankAccountsAdminPanel />
       <ActivationCodesAdminPanel />
     </div>
