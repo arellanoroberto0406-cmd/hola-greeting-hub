@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode, ShieldCheck, Lock, BadgeCheck, RefreshCw, Headphones, FileCheck2, Eye } from "lucide-react";
+import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode, ShieldCheck, Lock, BadgeCheck, RefreshCw, Headphones, FileCheck2, Eye, MessageCircle, UserCheck, KeyRound } from "lucide-react";
+import { PLATFORM_WHATSAPP, PLATFORM_BRAND, PLATFORM_SUPPORT_HOURS } from "@/config/platform";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -91,7 +92,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer' | 'code'>('paypal');
+  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer' | 'code' | 'whatsapp'>('paypal');
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isUploadingProof, setIsUploadingProof] = useState(false);
@@ -567,12 +568,15 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
                 {/* Payment Method Tabs */}
                 <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
-                  <TabsList className="grid w-full grid-cols-3">
+                  <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="paypal" className="flex items-center gap-1 text-xs">
                       <CreditCard className="h-3.5 w-3.5" />PayPal
                     </TabsTrigger>
                     <TabsTrigger value="transfer" className="flex items-center gap-1 text-xs">
-                      <Landmark className="h-3.5 w-3.5" />Transfer
+                      <Landmark className="h-3.5 w-3.5" />SPEI
+                    </TabsTrigger>
+                    <TabsTrigger value="whatsapp" className="flex items-center gap-1 text-xs">
+                      <MessageCircle className="h-3.5 w-3.5" />WhatsApp
                     </TabsTrigger>
                     <TabsTrigger value="code" className="flex items-center gap-1 text-xs">
                       <Ticket className="h-3.5 w-3.5" />Código
@@ -701,6 +705,93 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                         <><CheckCircle2 className="mr-2 h-4 w-4" />Confirmar pago por transferencia</>
                       )}
                     </Button>
+                  </TabsContent>
+
+                  {/* WhatsApp Tab — pago asistido + activación manual con código seguro */}
+                  <TabsContent value="whatsapp" className="space-y-3 mt-3">
+                    <div className="rounded-lg border-2 border-emerald-200 bg-emerald-50/60 p-4 space-y-3">
+                      <div className="flex items-start gap-2">
+                        <div className="rounded-full bg-emerald-100 p-2">
+                          <MessageCircle className="h-5 w-5 text-emerald-700" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-sm text-emerald-900">Pago asistido por WhatsApp</h4>
+                          <p className="text-xs text-emerald-800/90 mt-1">
+                            Habla directo con un asesor humano de {PLATFORM_BRAND}. Te guía paso a paso y al
+                            confirmar tu pago recibes un <strong>código de activación único</strong> que activa
+                            tu plan al instante.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pasos seguros */}
+                    <div className="space-y-2">
+                      <div className="flex items-start gap-3 p-2.5 rounded-lg border bg-card">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">1</div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium flex items-center gap-1.5"><MessageCircle className="h-3.5 w-3.5 text-emerald-600" />Inicia chat con tu plan ya seleccionado</p>
+                          <p className="text-xs text-muted-foreground">Se abre WhatsApp con un mensaje listo (plan, monto, ID de tienda).</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-2.5 rounded-lg border bg-card">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">2</div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium flex items-center gap-1.5"><UserCheck className="h-3.5 w-3.5 text-emerald-600" />Confirma tu pago con el asesor</p>
+                          <p className="text-xs text-muted-foreground">Acepta el método (SPEI, OXXO, efectivo) y envía tu comprobante por el chat.</p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-3 p-2.5 rounded-lg border bg-card">
+                        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">3</div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium flex items-center gap-1.5"><KeyRound className="h-3.5 w-3.5 text-emerald-600" />Recibes tu código y lo activas aquí</p>
+                          <p className="text-xs text-muted-foreground">Pega el código en la pestaña "Código". Plan activo en segundos.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Garantías */}
+                    <div className="rounded-lg border bg-muted/30 p-3 space-y-1.5">
+                      <p className="text-xs font-semibold flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />Por qué es seguro</p>
+                      <ul className="text-xs text-muted-foreground space-y-1 pl-5 list-disc">
+                        <li>El código de activación es <strong>único y de un solo uso</strong> para tu tienda.</li>
+                        <li>Nunca compartes contraseñas ni datos de tarjeta.</li>
+                        <li>Toda la conversación queda registrada en WhatsApp como respaldo.</li>
+                        <li>Si no recibes el código en {PLATFORM_SUPPORT_HOURS.split('·')[1]?.trim() || '24h'}, se devuelve tu pago.</li>
+                      </ul>
+                    </div>
+
+                    {PLATFORM_WHATSAPP === "5215512345678" && (
+                      <div className="rounded-lg border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-800">
+                        ⚠️ Configura tu número real en <code className="bg-amber-100 px-1 rounded">src/config/platform.ts</code> antes de publicar.
+                      </div>
+                    )}
+
+                    <Button
+                      onClick={() => {
+                        if (!selectedPlan) return;
+                        const cycle = billingCycle === 'monthly' ? 'mensual' : 'anual';
+                        const msg = [
+                          `Hola ${PLATFORM_BRAND} 👋`,
+                          ``,
+                          `Quiero activar el plan *${selectedPlan.name}* (${cycle}).`,
+                          `💵 Monto: $${selectedPrice} MXN`,
+                          `🏪 ID de tienda: ${storeId}`,
+                          ``,
+                          `¿Cómo procedo con el pago?`,
+                        ].join('\n');
+                        const url = `https://wa.me/${PLATFORM_WHATSAPP}?text=${encodeURIComponent(msg)}`;
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                      }}
+                      className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Hablar con un asesor por WhatsApp
+                    </Button>
+
+                    <p className="text-[11px] text-center text-muted-foreground flex items-center justify-center gap-1">
+                      <Headphones className="h-3 w-3" />Atención humana · {PLATFORM_SUPPORT_HOURS}
+                    </p>
                   </TabsContent>
 
                   {/* Activation Code Tab */}
