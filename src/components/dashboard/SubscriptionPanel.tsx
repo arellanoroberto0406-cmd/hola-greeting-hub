@@ -568,12 +568,15 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
 
                 {/* Payment Method Tabs */}
                 <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
-                  <TabsList className="grid w-full grid-cols-3">
+                  <TabsList className="grid w-full grid-cols-4">
                     <TabsTrigger value="paypal" className="flex items-center gap-1 text-xs">
                       <CreditCard className="h-3.5 w-3.5" />PayPal
                     </TabsTrigger>
                     <TabsTrigger value="transfer" className="flex items-center gap-1 text-xs">
-                      <Landmark className="h-3.5 w-3.5" />Transfer
+                      <Landmark className="h-3.5 w-3.5" />SPEI
+                    </TabsTrigger>
+                    <TabsTrigger value="whatsapp" className="flex items-center gap-1 text-xs">
+                      <MessageCircle className="h-3.5 w-3.5" />WhatsApp
                     </TabsTrigger>
                     <TabsTrigger value="code" className="flex items-center gap-1 text-xs">
                       <Ticket className="h-3.5 w-3.5" />Código
