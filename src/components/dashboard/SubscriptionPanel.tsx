@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode, ShieldCheck, Lock, BadgeCheck, RefreshCw, Headphones, FileCheck2, Eye } from "lucide-react";
+import { Check, Crown, Zap, Building2, Clock, AlertTriangle, CreditCard, Loader2, ExternalLink, Copy, ShieldAlert, Upload, Landmark, CheckCircle2, Ticket, QrCode, ShieldCheck, Lock, BadgeCheck, RefreshCw, Headphones, FileCheck2, Eye, MessageCircle, UserCheck, KeyRound } from "lucide-react";
+import { PLATFORM_WHATSAPP, PLATFORM_BRAND, PLATFORM_SUPPORT_HOURS } from "@/config/platform";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { 
