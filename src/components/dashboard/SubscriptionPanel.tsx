@@ -100,6 +100,7 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const [selectedBankId, setSelectedBankId] = useState<string>("");
   const [activationCode, setActivationCode] = useState("");
   const [redeemingCode, setRedeemingCode] = useState(false);
+  const [codeError, setCodeError] = useState<{ type: 'expired' | 'exhausted' | 'used' | 'invalid'; message: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: bankAccounts } = useQuery({
@@ -126,6 +127,8 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const handleRedeemCode = async () => {
     if (!activationCode.trim()) return toast.error("Ingresa un código");
     setRedeemingCode(true);
+    setCodeError(null);
+    let localErrorSet = false;
     try {
       const { data, error } = await supabase.rpc("redeem_subscription_code", {
         _code: activationCode.trim(),
@@ -133,13 +136,31 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
       });
       if (error) throw error;
       const result = data as any;
-      if (!result?.success) throw new Error(result?.error || "Código inválido");
+      if (!result?.success) {
+        const errText = (result?.error || "").toLowerCase();
+        let errObj: { type: 'expired' | 'exhausted' | 'used' | 'invalid'; message: string };
+        if (errText.includes("expir")) {
+          errObj = { type: 'expired', message: "Este código ha expirado. Los códigos de activación tienen una fecha límite de uso. Contacta al administrador para obtener uno nuevo." };
+        } else if (errText.includes("límite") || errText.includes("limite") || errText.includes("agotado")) {
+          errObj = { type: 'exhausted', message: "Este código ya alcanzó su límite de usos. Cada código es de un solo uso. Solicita un nuevo código al administrador." };
+        } else if (errText.includes("ya usó") || errText.includes("ya uso") || errText.includes("usó este código") || errText.includes("usado")) {
+          errObj = { type: 'used', message: "Esta tienda ya utilizó este código anteriormente. No se puede reutilizar en la misma tienda." };
+        } else {
+          errObj = { type: 'invalid', message: "Código inválido o inactivo. Verifica que lo hayas copiado correctamente o solicita uno nuevo al administrador." };
+        }
+        setCodeError(errObj);
+        localErrorSet = true;
+        return;
+      }
       toast.success(result.message || "¡Plan activado!");
       setActivationCode("");
+      setCodeError(null);
       setShowUpgradeDialog(false);
       queryClient.invalidateQueries({ queryKey: ["store-subscription", storeId] });
     } catch (err: any) {
-      toast.error(err.message || "Error al redimir código");
+      if (!localErrorSet) {
+        setCodeError({ type: 'invalid', message: err.message || "No se pudo validar el código. Intenta de nuevo más tarde." });
+      }
     } finally {
       setRedeemingCode(false);
     }
@@ -517,6 +538,8 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
           setProofFile(null);
           setProofPreview(null);
           setTransferSuccess(false);
+          setActivationCode("");
+          setCodeError(null);
         }
       }}>
         <DialogContent className="sm:max-w-[520px] max-h-[90vh] overflow-y-auto">
@@ -808,11 +831,27 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                       <Label className="text-sm font-medium">Código</Label>
                       <Input
                         value={activationCode}
-                        onChange={(e) => setActivationCode(e.target.value.toUpperCase())}
+                        onChange={(e) => { setActivationCode(e.target.value.toUpperCase()); setCodeError(null); }}
                         placeholder="PLAN-XXXXXXXX"
-                        className="font-mono uppercase"
+                        className={`font-mono uppercase ${codeError ? 'border-red-400 focus-visible:ring-red-300' : ''}`}
                       />
+                      <p className="text-[11px] text-muted-foreground">
+                        Los códigos tienen fecha de expiración y límite de usos. Una vez canjeados en esta tienda no se pueden reutilizar.
+                      </p>
                     </div>
+
+                    {codeError && (
+                      <div className={`rounded-lg border p-3 flex items-start gap-2 ${codeError.type === 'expired' ? 'border-red-300 bg-red-50 text-red-800' : codeError.type === 'exhausted' ? 'border-amber-300 bg-amber-50 text-amber-800' : 'border-red-200 bg-red-50 text-red-700'}`}>
+                        <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">
+                            {codeError.type === 'expired' ? 'Código expirado' : codeError.type === 'exhausted' ? 'Código agotado' : codeError.type === 'used' ? 'Código ya utilizado' : 'Código inválido'}
+                          </p>
+                          <p className="text-xs mt-0.5 opacity-90">{codeError.message}</p>
+                        </div>
+                      </div>
+                    )}
+
                     <Button
                       onClick={handleRedeemCode}
                       disabled={!activationCode.trim() || redeemingCode}

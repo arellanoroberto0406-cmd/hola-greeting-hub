@@ -128,24 +128,30 @@ const ActivationCodesAdminPanel = () => {
             {codes.map((c) => {
               const exhausted = c.used_count >= c.max_uses;
               const expired = c.expires_at && new Date(c.expires_at) < new Date();
+              const now = new Date();
+              const expiresAt = c.expires_at ? new Date(c.expires_at) : null;
+              const daysLeft = expiresAt ? Math.ceil((expiresAt.getTime() - now.getTime()) / 86400000) : null;
+              const expiringSoon = daysLeft !== null && daysLeft > 0 && daysLeft <= 7 && !expired;
               return (
-                <div key={c.id} className="border rounded-lg p-3 flex items-center justify-between gap-3">
+                <div key={c.id} className={`border rounded-lg p-3 flex items-center justify-between gap-3 ${expired ? 'opacity-60 bg-muted/30 border-destructive/30' : ''} ${expiringSoon ? 'border-amber-300 bg-amber-50/40' : ''}`}>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <code className="font-mono font-bold text-sm bg-muted px-2 py-0.5 rounded">{c.code}</code>
+                      <code className={`font-mono font-bold text-sm bg-muted px-2 py-0.5 rounded ${expired ? 'line-through text-muted-foreground' : ''}`}>{c.code}</code>
                       <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copy(c.code)}><Copy className="h-3 w-3" /></Button>
                       {!c.is_active && <Badge variant="outline">Inactivo</Badge>}
                       {exhausted && <Badge variant="destructive">Agotado</Badge>}
                       {expired && <Badge variant="destructive">Expirado</Badge>}
+                      {expiringSoon && <Badge variant="outline" className="border-amber-400 text-amber-700 bg-amber-100">Vence en {daysLeft}d</Badge>}
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
                       Plan: {c.subscription_plans?.name || "—"} · {c.duration_days} días ·
                       Usos: {c.used_count}/{c.max_uses}
-                      {c.expires_at && ` · Expira ${new Date(c.expires_at).toLocaleDateString("es-MX")}`}
+                      {expired && daysLeft !== null && ` · Venció hace ${Math.abs(daysLeft)} días`}
+                      {!expired && expiresAt && ` · Expira ${expiresAt.toLocaleDateString("es-MX")}`}
                     </p>
                   </div>
                   <div className="flex gap-1 flex-shrink-0">
-                    <Switch checked={c.is_active} onCheckedChange={() => toggleActive(c.id, c.is_active)} />
+                    <Switch checked={c.is_active} disabled={expired} onCheckedChange={() => toggleActive(c.id, c.is_active)} />
                     <Button variant="ghost" size="icon" onClick={() => handleDelete(c.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                   </div>
                 </div>
