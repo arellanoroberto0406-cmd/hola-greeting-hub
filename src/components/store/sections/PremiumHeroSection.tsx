@@ -68,12 +68,20 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1
             className={cn(
-              "text-3xl md:text-5xl font-bold mb-4",
+              "text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight leading-[0.95] drop-shadow-sm animate-gradient",
               backgroundType === "image" && store.banner_url ? "text-white" : ""
             )}
             style={{
-              color: backgroundType !== "image" ? store.primary_color : undefined,
               fontFamily: "var(--store-heading-font, inherit)",
+              ...(backgroundType !== "image"
+                ? {
+                    backgroundImage: `linear-gradient(120deg, ${store.primary_color}, ${store.accent_color || store.secondary_color || store.primary_color}, ${store.secondary_color || store.primary_color})`,
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundSize: "200% auto",
+                  }
+                : {}),
             }}
           >
             {headline || "¡Bienvenido a nuestra tienda!"}
@@ -81,7 +89,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
 
           <p
             className={cn(
-              "text-lg md:text-xl mb-8",
+              "text-lg md:text-xl mb-8 font-medium",
               backgroundType === "image" && store.banner_url ? "text-white/90" : "text-muted-foreground"
             )}
           >
@@ -127,13 +135,13 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         {/* Floating decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-30"
+            className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-60"
             style={{ backgroundColor: store.primary_color }}
             animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute bottom-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-20"
+            className="absolute bottom-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-50"
             style={{ backgroundColor: store.secondary_color || store.primary_color }}
             animate={{ y: [0, -20, 0], scale: [1.1, 1, 1.1] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -167,12 +175,21 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className={cn(
-              "text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight",
-              backgroundType === "image" && store.banner_url ? "text-white" : ""
+              "text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-[0.9] tracking-tight animate-gradient",
+              backgroundType === "image" && store.banner_url ? "text-white drop-shadow-2xl" : ""
             )}
             style={{
-              color: backgroundType !== "image" ? store.primary_color : undefined,
               fontFamily: "var(--store-heading-font, inherit)",
+              ...(backgroundType !== "image"
+                ? {
+                    backgroundImage: `linear-gradient(120deg, ${store.primary_color} 0%, ${store.accent_color || store.secondary_color || store.primary_color} 50%, ${store.secondary_color || store.primary_color} 100%)`,
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundSize: "200% auto",
+                    filter: `drop-shadow(0 4px 24px ${store.primary_color}40)`,
+                  }
+                : {}),
             }}
           >
             {headline || "¡Bienvenido a nuestra tienda!"}
@@ -311,7 +328,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
 
       {/* Floating orbs */}
       <motion.div
-        className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-[100px] opacity-40"
+        className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-[100px] opacity-70"
         style={{ backgroundColor: store.primary_color }}
         animate={{
           x: [0, 50, 0],
@@ -321,7 +338,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-30"
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-60"
         style={{ backgroundColor: store.secondary_color || store.primary_color }}
         animate={{
           x: [0, -40, 0],
@@ -358,8 +375,16 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-8 text-white leading-none tracking-tight"
-          style={{ fontFamily: "var(--store-heading-font, inherit)" }}
+          className="text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black mb-8 leading-[0.85] tracking-tighter animate-gradient"
+          style={{
+            fontFamily: "var(--store-heading-font, inherit)",
+            backgroundImage: `linear-gradient(120deg, #ffffff 0%, ${store.accent_color || store.primary_color} 40%, ${store.primary_color} 70%, ${store.secondary_color || store.primary_color} 100%)`,
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundSize: "200% auto",
+            filter: `drop-shadow(0 8px 32px ${store.primary_color}60)`,
+          }}
         >
           {headline || "¡Bienvenido!"}
         </motion.h1>
