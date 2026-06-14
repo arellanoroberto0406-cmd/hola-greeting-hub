@@ -375,8 +375,16 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-bold mb-8 text-white leading-none tracking-tight"
-          style={{ fontFamily: "var(--store-heading-font, inherit)" }}
+          className="text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black mb-8 leading-[0.85] tracking-tighter"
+          style={{
+            fontFamily: "var(--store-heading-font, inherit)",
+            backgroundImage: `linear-gradient(120deg, #ffffff 0%, ${store.accent_color || store.primary_color} 40%, ${store.primary_color} 70%, ${store.secondary_color || store.primary_color} 100%)`,
+            WebkitBackgroundClip: "text",
+            backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundSize: "200% auto",
+            filter: `drop-shadow(0 8px 32px ${store.primary_color}60)`,
+          }}
         >
           {headline || "¡Bienvenido!"}
         </motion.h1>
