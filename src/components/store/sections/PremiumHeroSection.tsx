@@ -68,7 +68,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1
             className={cn(
-              "text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight leading-[0.95] drop-shadow-sm",
+              "text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight leading-[0.95] drop-shadow-sm animate-gradient",
               backgroundType === "image" && store.banner_url ? "text-white" : ""
             )}
             style={{
@@ -175,7 +175,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className={cn(
-              "text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-[0.9] tracking-tight",
+              "text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-[0.9] tracking-tight animate-gradient",
               backgroundType === "image" && store.banner_url ? "text-white drop-shadow-2xl" : ""
             )}
             style={{
@@ -375,7 +375,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black mb-8 leading-[0.85] tracking-tighter"
+          className="text-6xl md:text-8xl lg:text-9xl xl:text-[10rem] font-black mb-8 leading-[0.85] tracking-tighter animate-gradient"
           style={{
             fontFamily: "var(--store-heading-font, inherit)",
             backgroundImage: `linear-gradient(120deg, #ffffff 0%, ${store.accent_color || store.primary_color} 40%, ${store.primary_color} 70%, ${store.secondary_color || store.primary_color} 100%)`,
