@@ -175,12 +175,21 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
             className={cn(
-              "text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight",
-              backgroundType === "image" && store.banner_url ? "text-white" : ""
+              "text-5xl md:text-7xl lg:text-8xl font-black mb-6 leading-[0.9] tracking-tight",
+              backgroundType === "image" && store.banner_url ? "text-white drop-shadow-2xl" : ""
             )}
             style={{
-              color: backgroundType !== "image" ? store.primary_color : undefined,
               fontFamily: "var(--store-heading-font, inherit)",
+              ...(backgroundType !== "image"
+                ? {
+                    backgroundImage: `linear-gradient(120deg, ${store.primary_color} 0%, ${store.accent_color || store.secondary_color || store.primary_color} 50%, ${store.secondary_color || store.primary_color} 100%)`,
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundSize: "200% auto",
+                    filter: `drop-shadow(0 4px 24px ${store.primary_color}40)`,
+                  }
+                : {}),
             }}
           >
             {headline || "¡Bienvenido a nuestra tienda!"}
