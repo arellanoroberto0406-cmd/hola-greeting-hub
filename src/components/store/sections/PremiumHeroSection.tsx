@@ -135,13 +135,13 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         {/* Floating decorative elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-30"
+            className="absolute top-20 left-10 w-32 h-32 rounded-full blur-3xl opacity-60"
             style={{ backgroundColor: store.primary_color }}
             animate={{ y: [0, 20, 0], scale: [1, 1.1, 1] }}
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
-            className="absolute bottom-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-20"
+            className="absolute bottom-20 right-10 w-40 h-40 rounded-full blur-3xl opacity-50"
             style={{ backgroundColor: store.secondary_color || store.primary_color }}
             animate={{ y: [0, -20, 0], scale: [1.1, 1, 1.1] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -328,7 +328,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
 
       {/* Floating orbs */}
       <motion.div
-        className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-[100px] opacity-40"
+        className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full blur-[100px] opacity-70"
         style={{ backgroundColor: store.primary_color }}
         animate={{
           x: [0, 50, 0],
@@ -338,7 +338,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-30"
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full blur-[120px] opacity-60"
         style={{ backgroundColor: store.secondary_color || store.primary_color }}
         animate={{
           x: [0, -40, 0],
