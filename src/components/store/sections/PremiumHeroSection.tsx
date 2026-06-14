@@ -68,12 +68,20 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1
             className={cn(
-              "text-3xl md:text-5xl font-bold mb-4",
+              "text-4xl md:text-6xl lg:text-7xl font-black mb-5 tracking-tight leading-[0.95] drop-shadow-sm",
               backgroundType === "image" && store.banner_url ? "text-white" : ""
             )}
             style={{
-              color: backgroundType !== "image" ? store.primary_color : undefined,
               fontFamily: "var(--store-heading-font, inherit)",
+              ...(backgroundType !== "image"
+                ? {
+                    backgroundImage: `linear-gradient(120deg, ${store.primary_color}, ${store.accent_color || store.secondary_color || store.primary_color}, ${store.secondary_color || store.primary_color})`,
+                    WebkitBackgroundClip: "text",
+                    backgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundSize: "200% auto",
+                  }
+                : {}),
             }}
           >
             {headline || "¡Bienvenido a nuestra tienda!"}
@@ -81,7 +89,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
 
           <p
             className={cn(
-              "text-lg md:text-xl mb-8",
+              "text-lg md:text-xl mb-8 font-medium",
               backgroundType === "image" && store.banner_url ? "text-white/90" : "text-muted-foreground"
             )}
           >
