@@ -21,6 +21,7 @@ import {
 import { Store as StoreType } from "@/types/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import HeaderSecurityStrip from "./HeaderSecurityStrip";
 
 type PlanTier = "basic" | "professional" | "enterprise";
 
