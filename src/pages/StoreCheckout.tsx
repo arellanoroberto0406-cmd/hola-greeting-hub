@@ -1135,9 +1135,13 @@ const StoreCheckout = () => {
 
           {/* Order Summary - visible on mobile step 2 and always on desktop */}
           {(!isMobile || wizardStep === 2) && (
-            <div className="lg:col-span-1">
-              <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50 sticky top-24">
+            <div className="lg:col-span-1 space-y-4">
+              <div className="hidden lg:block">
+                <CheckoutSecurityPanel store={store} primaryColor={primaryColor} />
+              </div>
+              <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50 lg:sticky lg:top-24">
                 <h2 className="text-lg lg:text-xl font-heading mb-4 lg:mb-6">Resumen del Pedido</h2>
+                
                 
                 <div className="space-y-3 mb-4 lg:mb-6">
                   {items.map((item) => (
