@@ -821,6 +821,10 @@ const StoreCheckout = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2 space-y-6 lg:space-y-8">
+            {/* Security & trust panel (visible on mobile top of checkout) */}
+            <div className="lg:hidden">
+              <CheckoutSecurityPanel store={store} primaryColor={primaryColor} />
+            </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:space-y-8">
                 {/* Step 1: Datos personales */}
