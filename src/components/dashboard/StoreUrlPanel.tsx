@@ -51,16 +51,24 @@ const StoreUrlPanel = ({
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [showQrDialog, setShowQrDialog] = useState(false);
   
-  // Usar dominio personalizado - obtener la base del dominio actual
+  // URL pública real de la tienda (la que se comparte con clientes).
+  // Si estamos en preview / sandbox de desarrollo, devolvemos el dominio
+  // publicado real para que el link siempre funcione al enviarlo.
+  const PUBLISHED_URL = "https://apptienda.lovable.app";
   const getStoreBaseUrl = () => {
+    if (typeof window === "undefined") return PUBLISHED_URL;
     const hostname = window.location.hostname;
-    // Si estamos en un dominio personalizado o en producción
-    if (!hostname.includes('localhost')) {
-      return `${window.location.protocol}//${hostname}`;
-    }
-    return window.location.origin;
+    const isPreviewHost =
+      hostname.includes("localhost") ||
+      hostname.includes("127.0.0.1") ||
+      hostname.startsWith("id-preview--") ||
+      hostname.endsWith(".lovableproject.com") ||
+      hostname.endsWith(".lovable.dev") ||
+      hostname.includes("--");
+    if (isPreviewHost) return PUBLISHED_URL;
+    return `${window.location.protocol}//${hostname}`;
   };
-  
+
   const baseUrl = getStoreBaseUrl();
   const storeUrl = `${baseUrl}/tienda/${slug}`;
 
