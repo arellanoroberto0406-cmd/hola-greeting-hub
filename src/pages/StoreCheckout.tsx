@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link, useSearchParams } from "react-router-dom"
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle2, Loader2, Store, Building2, Banknote, Wallet, AlertCircle, Clock, User, MapPin, ChevronRight, ChevronLeft } from "lucide-react";
 import CopyButton from "@/components/store/CopyButton";
 import PaymentProofUpload from "@/components/store/PaymentProofUpload";
+import CheckoutSecurityPanel from "@/components/store/CheckoutSecurityPanel";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -820,6 +821,10 @@ const StoreCheckout = () => {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form */}
           <div className="lg:col-span-2 space-y-6 lg:space-y-8">
+            {/* Security & trust panel (visible on mobile top of checkout) */}
+            <div className="lg:hidden">
+              <CheckoutSecurityPanel store={store} primaryColor={primaryColor} />
+            </div>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:space-y-8">
                 {/* Step 1: Datos personales */}
@@ -1130,9 +1135,13 @@ const StoreCheckout = () => {
 
           {/* Order Summary - visible on mobile step 2 and always on desktop */}
           {(!isMobile || wizardStep === 2) && (
-            <div className="lg:col-span-1">
-              <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50 sticky top-24">
+            <div className="lg:col-span-1 space-y-4">
+              <div className="hidden lg:block">
+                <CheckoutSecurityPanel store={store} primaryColor={primaryColor} />
+              </div>
+              <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50 lg:sticky lg:top-24">
                 <h2 className="text-lg lg:text-xl font-heading mb-4 lg:mb-6">Resumen del Pedido</h2>
+                
                 
                 <div className="space-y-3 mb-4 lg:mb-6">
                   {items.map((item) => (
