@@ -406,6 +406,9 @@ const PremiumStoreHeader = ({
           )}
         </AnimatePresence>
       </motion.header>
+
+      {/* Prominent security & trust strip - visible on every page */}
+      <HeaderSecurityStrip primaryColor={store.primary_color} />
     </>
   );
 };
