@@ -179,20 +179,20 @@ const StoreUrlPanel = ({
     }
   };
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (text = publicStoreUrl) => {
     try {
-      await navigator.clipboard.writeText(storeUrl);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       toast({
-        title: "¡Copiado!",
-        description: "El enlace se ha copiado al portapapeles",
+        title: "¡Enlace copiado!",
+        description: `Se copió el dominio publicado real: ${publicDisplayDomain}/tienda/${slug}`,
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo copiar el enlace",
+        title: "Error al copiar",
+        description: "No se pudo copiar el enlace. Copia manualmente desde el texto mostrado.",
       });
     }
   };
@@ -203,7 +203,7 @@ const StoreUrlPanel = ({
         await navigator.share({
           title: storeName,
           text: `¡Visita mi tienda ${storeName}!`,
-          url: storeUrl,
+          url: publicStoreUrl,
         });
       } catch (error) {
         // User cancelled share
