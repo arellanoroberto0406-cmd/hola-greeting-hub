@@ -3,18 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Link2, 
-  Copy, 
-  Check, 
-  ExternalLink, 
+import {
+  Link2,
+  Copy,
+  Check,
+  ExternalLink,
   QrCode,
   Share2,
   Loader2,
   Save,
   AlertCircle,
   Globe,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  Smartphone,
+  Monitor,
+  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
