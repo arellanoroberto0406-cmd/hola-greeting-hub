@@ -288,14 +288,14 @@ const StoreUrlPanel = ({
             <div className="flex-1 flex items-center gap-1 bg-background rounded-lg px-3 py-2 border">
               <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
               <code className="text-sm font-mono break-all" style={{ color: primaryColor }}>
-                {displayDomain}/tienda/{slug}
+                {publicDisplayDomain}/tienda/{slug}
               </code>
             </div>
             <Button
               variant="outline"
               size="icon"
-              onClick={copyToClipboard}
-              title="Copiar enlace"
+              onClick={() => copyToClipboard()}
+              title="Copiar enlace publicado"
               className="shrink-0"
             >
               {copied ? (
@@ -305,6 +305,10 @@ const StoreUrlPanel = ({
               )}
             </Button>
           </div>
+          <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1">
+            <ShieldCheck className="h-3 w-3 text-green-600" />
+            Este enlace apunta al dominio publicado real. Siempre funciona para tus clientes.
+          </p>
         </div>
 
         {/* Edit Slug */}
