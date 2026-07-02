@@ -400,39 +400,99 @@ const StoreUrlPanel = ({
                 </DialogTitle>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
-                <div className="p-6 bg-white rounded-2xl shadow-lg">
+                <div className="p-6 bg-white rounded-2xl shadow-lg relative">
                   <img
-                    src={generateQrCode()}
-                    alt="QR Code"
+                    src={generateQrCode(600)}
+                    alt={`Código QR para abrir ${storeName}`}
                     className="w-64 h-64"
+                    loading="lazy"
                   />
+                  {validationStatus === "ok" && (
+                    <span className="absolute -top-2 -right-2 flex items-center gap-1 bg-green-500 text-white text-[10px] font-semibold px-2 py-1 rounded-full shadow">
+                      <ShieldCheck className="h-3 w-3" /> Verificado
+                    </span>
+                  )}
                 </div>
                 <div className="text-center space-y-1">
                   <p className="font-medium">{storeName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {displayDomain}/tienda/{slug}
+                  <p className="text-sm text-muted-foreground break-all">
+                    {publicDisplayDomain}/tienda/{slug}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-2 pt-1">
+                    <Smartphone className="h-3 w-3" /> Móvil
+                    <span className="opacity-40">·</span>
+                    <Monitor className="h-3 w-3" /> Escritorio
                   </p>
                 </div>
-                <div className="flex gap-2 w-full">
+
+                {validationStatus !== "idle" && (
+                  <Alert
+                    variant={validationStatus === "error" ? "destructive" : "default"}
+                    className="py-2"
+                  >
+                    {validationStatus === "checking" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : validationStatus === "ok" ? (
+                      <ShieldCheck className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
+                    <AlertDescription className="text-xs">
+                      {validationStatus === "checking" ? "Validando enlace..." : validationMessage}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="grid grid-cols-2 gap-2 w-full">
                   <Button
                     variant="outline"
-                    className="flex-1"
-                    onClick={copyToClipboard}
+                    onClick={validatePublicUrl}
+                    disabled={validationStatus === "checking"}
                   >
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copiar enlace
+                    {validationStatus === "checking" ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="h-4 w-4 mr-2" />
+                    )}
+                    Validar
                   </Button>
                   <Button
-                    className="flex-1"
-                    style={{ backgroundColor: primaryColor }}
-                    onClick={() => {
-                      const link = document.createElement("a");
-                      link.href = generateQrCode();
-                      link.download = `qr-${slug}.png`;
-                      link.click();
+                    variant="outline"
+                    onClick={() => window.open(publicStoreUrl, "_blank", "noopener,noreferrer")}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Probar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(publicStoreUrl);
+                      toast({ title: "Enlace copiado", description: publicStoreUrl });
                     }}
                   >
-                    Descargar QR
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copiar
+                  </Button>
+                  <Button
+                    style={{ backgroundColor: primaryColor }}
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(generateQrCode(800));
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = `qr-${slug}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        URL.revokeObjectURL(url);
+                      } catch {
+                        window.open(generateQrCode(800), "_blank");
+                      }
+                    }}
+                  >
+                    Descargar
                   </Button>
                 </div>
               </div>
