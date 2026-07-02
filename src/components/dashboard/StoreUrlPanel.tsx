@@ -323,7 +323,7 @@ const StoreUrlPanel = ({
           </div>
           <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border">
             <span className="text-sm text-muted-foreground whitespace-nowrap font-mono">
-              {displayDomain}/tienda/
+              {publicDisplayDomain}/tienda/
             </span>
             <div className="relative flex-1">
               <Input
