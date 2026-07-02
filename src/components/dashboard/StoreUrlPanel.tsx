@@ -213,13 +213,51 @@ const StoreUrlPanel = ({
     }
   };
 
-  const generateQrCode = () => {
-    // Using a free QR code API
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(storeUrl)}&color=${primaryColor.replace("#", "")}`;
+  const generateQrCode = (size = 300) => {
+    // El QR siempre codifica la URL publicada real, para que funcione desde
+    // cualquier cámara de móvil o escritorio, sin importar dónde se comparta.
+    const color = primaryColor.replace("#", "");
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(publicStoreUrl)}&color=${color}&margin=10&ecc=H&format=png`;
+  };
+
+  const validatePublicUrl = async () => {
+    setValidationStatus("checking");
+    setValidationMessage("");
+    try {
+      // Comprobamos que la tienda existe en la BD para el slug actual.
+      const { data, error } = await supabase
+        .from("stores")
+        .select("id, is_active, slug")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        setValidationStatus("error");
+        setValidationMessage("No encontramos una tienda publicada con este enlace. Guarda los cambios primero.");
+        return;
+      }
+      if (data.is_active === false) {
+        setValidationStatus("error");
+        setValidationMessage("La tienda está desactivada. Actívala para que el QR abra correctamente.");
+        return;
+      }
+      // Ping en segundo plano al dominio publicado (no bloquea, sólo confirma alcance).
+      try {
+        await fetch(publicStoreUrl, { method: "HEAD", mode: "no-cors" });
+      } catch {
+        // ignoramos: no-cors no da status, pero el intento evita falsos negativos
+      }
+      setValidationStatus("ok");
+      setValidationMessage("Enlace y QR verificados. Abren tu tienda en móvil y escritorio.");
+    } catch (e: any) {
+      setValidationStatus("error");
+      setValidationMessage(e?.message || "No se pudo validar el enlace.");
+    }
   };
 
   // Obtener solo el dominio base sin protocolo para mostrar
   const displayDomain = baseUrl.replace(/^https?:\/\//, '');
+  const publicDisplayDomain = PUBLISHED_URL.replace(/^https?:\/\//, '');
 
   return (
     <Card className="overflow-hidden">
