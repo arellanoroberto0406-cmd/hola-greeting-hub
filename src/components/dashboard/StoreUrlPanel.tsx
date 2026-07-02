@@ -3,18 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { 
-  Link2, 
-  Copy, 
-  Check, 
-  ExternalLink, 
+import {
+  Link2,
+  Copy,
+  Check,
+  ExternalLink,
   QrCode,
   Share2,
   Loader2,
   Save,
   AlertCircle,
   Globe,
-  Sparkles
+  Sparkles,
+  ShieldCheck,
+  Smartphone,
+  Monitor,
+  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -50,7 +54,9 @@ const StoreUrlPanel = ({
   const [isChecking, setIsChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [showQrDialog, setShowQrDialog] = useState(false);
-  
+  const [validationStatus, setValidationStatus] = useState<"idle" | "checking" | "ok" | "error">("idle");
+  const [validationMessage, setValidationMessage] = useState<string>("");
+
   // URL pública real de la tienda (la que se comparte con clientes).
   // Si estamos en preview / sandbox de desarrollo, devolvemos el dominio
   // publicado real para que el link siempre funcione al enviarlo.
@@ -71,6 +77,8 @@ const StoreUrlPanel = ({
 
   const baseUrl = getStoreBaseUrl();
   const storeUrl = `${baseUrl}/tienda/${slug}`;
+  // El QR SIEMPRE apunta al dominio publicado real, funcione desde donde funcione (móvil o escritorio).
+  const publicStoreUrl = `${PUBLISHED_URL}/tienda/${slug}`;
 
   useEffect(() => {
     setSlug(currentSlug);
@@ -205,13 +213,51 @@ const StoreUrlPanel = ({
     }
   };
 
-  const generateQrCode = () => {
-    // Using a free QR code API
-    return `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(storeUrl)}&color=${primaryColor.replace("#", "")}`;
+  const generateQrCode = (size = 300) => {
+    // El QR siempre codifica la URL publicada real, para que funcione desde
+    // cualquier cámara de móvil o escritorio, sin importar dónde se comparta.
+    const color = primaryColor.replace("#", "");
+    return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(publicStoreUrl)}&color=${color}&margin=10&ecc=H&format=png`;
+  };
+
+  const validatePublicUrl = async () => {
+    setValidationStatus("checking");
+    setValidationMessage("");
+    try {
+      // Comprobamos que la tienda existe en la BD para el slug actual.
+      const { data, error } = await supabase
+        .from("stores")
+        .select("id, is_active, slug")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) {
+        setValidationStatus("error");
+        setValidationMessage("No encontramos una tienda publicada con este enlace. Guarda los cambios primero.");
+        return;
+      }
+      if (data.is_active === false) {
+        setValidationStatus("error");
+        setValidationMessage("La tienda está desactivada. Actívala para que el QR abra correctamente.");
+        return;
+      }
+      // Ping en segundo plano al dominio publicado (no bloquea, sólo confirma alcance).
+      try {
+        await fetch(publicStoreUrl, { method: "HEAD", mode: "no-cors" });
+      } catch {
+        // ignoramos: no-cors no da status, pero el intento evita falsos negativos
+      }
+      setValidationStatus("ok");
+      setValidationMessage("Enlace y QR verificados. Abren tu tienda en móvil y escritorio.");
+    } catch (e: any) {
+      setValidationStatus("error");
+      setValidationMessage(e?.message || "No se pudo validar el enlace.");
+    }
   };
 
   // Obtener solo el dominio base sin protocolo para mostrar
   const displayDomain = baseUrl.replace(/^https?:\/\//, '');
+  const publicDisplayDomain = PUBLISHED_URL.replace(/^https?:\/\//, '');
 
   return (
     <Card className="overflow-hidden">
@@ -354,39 +400,99 @@ const StoreUrlPanel = ({
                 </DialogTitle>
               </DialogHeader>
               <div className="flex flex-col items-center gap-4 py-4">
-                <div className="p-6 bg-white rounded-2xl shadow-lg">
+                <div className="p-6 bg-white rounded-2xl shadow-lg relative">
                   <img
-                    src={generateQrCode()}
-                    alt="QR Code"
+                    src={generateQrCode(600)}
+                    alt={`Código QR para abrir ${storeName}`}
                     className="w-64 h-64"
+                    loading="lazy"
                   />
+                  {validationStatus === "ok" && (
+                    <span className="absolute -top-2 -right-2 flex items-center gap-1 bg-green-500 text-white text-[10px] font-semibold px-2 py-1 rounded-full shadow">
+                      <ShieldCheck className="h-3 w-3" /> Verificado
+                    </span>
+                  )}
                 </div>
                 <div className="text-center space-y-1">
                   <p className="font-medium">{storeName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {displayDomain}/tienda/{slug}
+                  <p className="text-sm text-muted-foreground break-all">
+                    {publicDisplayDomain}/tienda/{slug}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground flex items-center justify-center gap-2 pt-1">
+                    <Smartphone className="h-3 w-3" /> Móvil
+                    <span className="opacity-40">·</span>
+                    <Monitor className="h-3 w-3" /> Escritorio
                   </p>
                 </div>
-                <div className="flex gap-2 w-full">
+
+                {validationStatus !== "idle" && (
+                  <Alert
+                    variant={validationStatus === "error" ? "destructive" : "default"}
+                    className="py-2"
+                  >
+                    {validationStatus === "checking" ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : validationStatus === "ok" ? (
+                      <ShieldCheck className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
+                    <AlertDescription className="text-xs">
+                      {validationStatus === "checking" ? "Validando enlace..." : validationMessage}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <div className="grid grid-cols-2 gap-2 w-full">
                   <Button
                     variant="outline"
-                    className="flex-1"
-                    onClick={copyToClipboard}
+                    onClick={validatePublicUrl}
+                    disabled={validationStatus === "checking"}
                   >
-                    <Copy className="h-4 w-4 mr-2" />
-                    Copiar enlace
+                    {validationStatus === "checking" ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <ShieldCheck className="h-4 w-4 mr-2" />
+                    )}
+                    Validar
                   </Button>
                   <Button
-                    className="flex-1"
-                    style={{ backgroundColor: primaryColor }}
-                    onClick={() => {
-                      const link = document.createElement("a");
-                      link.href = generateQrCode();
-                      link.download = `qr-${slug}.png`;
-                      link.click();
+                    variant="outline"
+                    onClick={() => window.open(publicStoreUrl, "_blank", "noopener,noreferrer")}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Probar
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(publicStoreUrl);
+                      toast({ title: "Enlace copiado", description: publicStoreUrl });
                     }}
                   >
-                    Descargar QR
+                    <Copy className="h-4 w-4 mr-2" />
+                    Copiar
+                  </Button>
+                  <Button
+                    style={{ backgroundColor: primaryColor }}
+                    onClick={async () => {
+                      try {
+                        const res = await fetch(generateQrCode(800));
+                        const blob = await res.blob();
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement("a");
+                        link.href = url;
+                        link.download = `qr-${slug}.png`;
+                        document.body.appendChild(link);
+                        link.click();
+                        link.remove();
+                        URL.revokeObjectURL(url);
+                      } catch {
+                        window.open(generateQrCode(800), "_blank");
+                      }
+                    }}
+                  >
+                    Descargar
                   </Button>
                 </div>
               </div>
