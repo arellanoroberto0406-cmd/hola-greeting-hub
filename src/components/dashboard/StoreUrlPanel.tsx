@@ -54,7 +54,9 @@ const StoreUrlPanel = ({
   const [isChecking, setIsChecking] = useState(false);
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [showQrDialog, setShowQrDialog] = useState(false);
-  
+  const [validationStatus, setValidationStatus] = useState<"idle" | "checking" | "ok" | "error">("idle");
+  const [validationMessage, setValidationMessage] = useState<string>("");
+
   // URL pública real de la tienda (la que se comparte con clientes).
   // Si estamos en preview / sandbox de desarrollo, devolvemos el dominio
   // publicado real para que el link siempre funcione al enviarlo.
@@ -75,6 +77,8 @@ const StoreUrlPanel = ({
 
   const baseUrl = getStoreBaseUrl();
   const storeUrl = `${baseUrl}/tienda/${slug}`;
+  // El QR SIEMPRE apunta al dominio publicado real, funcione desde donde funcione (móvil o escritorio).
+  const publicStoreUrl = `${PUBLISHED_URL}/tienda/${slug}`;
 
   useEffect(() => {
     setSlug(currentSlug);
