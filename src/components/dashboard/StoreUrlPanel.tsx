@@ -179,20 +179,20 @@ const StoreUrlPanel = ({
     }
   };
 
-  const copyToClipboard = async () => {
+  const copyToClipboard = async (text = publicStoreUrl) => {
     try {
-      await navigator.clipboard.writeText(storeUrl);
+      await navigator.clipboard.writeText(text);
       setCopied(true);
       toast({
-        title: "¡Copiado!",
-        description: "El enlace se ha copiado al portapapeles",
+        title: "¡Enlace copiado!",
+        description: `Se copió el dominio publicado real: ${publicDisplayDomain}/tienda/${slug}`,
       });
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "No se pudo copiar el enlace",
+        title: "Error al copiar",
+        description: "No se pudo copiar el enlace. Copia manualmente desde el texto mostrado.",
       });
     }
   };
@@ -203,7 +203,7 @@ const StoreUrlPanel = ({
         await navigator.share({
           title: storeName,
           text: `¡Visita mi tienda ${storeName}!`,
-          url: storeUrl,
+          url: publicStoreUrl,
         });
       } catch (error) {
         // User cancelled share
@@ -288,14 +288,14 @@ const StoreUrlPanel = ({
             <div className="flex-1 flex items-center gap-1 bg-background rounded-lg px-3 py-2 border">
               <Globe className="h-4 w-4 text-muted-foreground shrink-0" />
               <code className="text-sm font-mono break-all" style={{ color: primaryColor }}>
-                {displayDomain}/tienda/{slug}
+                {publicDisplayDomain}/tienda/{slug}
               </code>
             </div>
             <Button
               variant="outline"
               size="icon"
-              onClick={copyToClipboard}
-              title="Copiar enlace"
+              onClick={() => copyToClipboard()}
+              title="Copiar enlace publicado"
               className="shrink-0"
             >
               {copied ? (
@@ -305,6 +305,10 @@ const StoreUrlPanel = ({
               )}
             </Button>
           </div>
+          <p className="text-[11px] text-muted-foreground mt-1.5 flex items-center gap-1">
+            <ShieldCheck className="h-3 w-3 text-green-600" />
+            Este enlace apunta al dominio publicado real. Siempre funciona para tus clientes.
+          </p>
         </div>
 
         {/* Edit Slug */}
@@ -319,7 +323,7 @@ const StoreUrlPanel = ({
           </div>
           <div className="flex items-center gap-2 p-3 bg-muted/30 rounded-lg border">
             <span className="text-sm text-muted-foreground whitespace-nowrap font-mono">
-              {displayDomain}/tienda/
+              {publicDisplayDomain}/tienda/
             </span>
             <div className="relative flex-1">
               <Input
@@ -369,7 +373,7 @@ const StoreUrlPanel = ({
         <div className="grid grid-cols-3 gap-2">
           <Button
             variant="outline"
-            onClick={() => window.open(storeUrl, "_blank")}
+            onClick={() => window.open(publicStoreUrl, "_blank", "noopener,noreferrer")}
             className="flex-col h-auto py-3 gap-1"
           >
             <ExternalLink className="h-5 w-5" />
