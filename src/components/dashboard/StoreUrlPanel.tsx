@@ -373,7 +373,7 @@ const StoreUrlPanel = ({
         <div className="grid grid-cols-3 gap-2">
           <Button
             variant="outline"
-            onClick={() => window.open(storeUrl, "_blank")}
+            onClick={() => window.open(publicStoreUrl, "_blank", "noopener,noreferrer")}
             className="flex-col h-auto py-3 gap-1"
           >
             <ExternalLink className="h-5 w-5" />
