@@ -319,6 +319,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
             <Palette className="h-4 w-4" />
             Estilos
           </TabsTrigger>
+          <TabsTrigger value="pro" className="gap-2">
+            <Sparkles className="h-4 w-4" />
+            Diseño Pro
+          </TabsTrigger>
           <TabsTrigger value="preview" className="gap-2">
             <Eye className="h-4 w-4" />
             Vista previa
