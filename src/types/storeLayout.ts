@@ -103,6 +103,15 @@ export const BACKGROUND_COLORS: { value: string; label: string; color: string }[
   { value: 'custom', label: 'Personalizado', color: 'custom' },
 ];
 
+export type ButtonAnimation =
+  | 'none'
+  | 'pulse'
+  | 'lift'
+  | 'glow'
+  | 'shimmer'
+  | 'bounce'
+  | 'press';
+
 export interface GlobalStyles {
   headingFont: FontFamily;
   bodyFont: FontFamily;
@@ -112,6 +121,7 @@ export interface GlobalStyles {
   cardShadow: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'glow';
   colorMode?: 'light' | 'dark' | 'auto';
   accentStyle?: 'minimal' | 'bold' | 'neon' | 'pastel';
+  buttonAnimation?: ButtonAnimation;
 }
 
 export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
@@ -123,7 +133,9 @@ export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
   cardShadow: 'md',
   colorMode: 'light',
   accentStyle: 'minimal',
+  buttonAnimation: 'lift',
 };
+
 
 export const FONT_OPTIONS: { value: FontFamily; label: string; googleFont: string }[] = [
   { value: 'inter', label: 'Inter', googleFont: 'Inter:wght@400;500;600;700' },

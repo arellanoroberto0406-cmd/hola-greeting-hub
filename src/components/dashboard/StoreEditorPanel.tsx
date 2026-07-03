@@ -23,6 +23,7 @@ import { StorePreview } from "./store-editor/StorePreview";
 import { LivePreviewPanel } from "./store-editor/LivePreviewPanel";
 import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
+import ProDesignPanel from "./store-editor/ProDesignPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -317,6 +318,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           <TabsTrigger value="styles" className="gap-2">
             <Palette className="h-4 w-4" />
             Estilos
+          </TabsTrigger>
+          <TabsTrigger value="pro" className="gap-2">
+            <Sparkles className="h-4 w-4" />
+            Diseño Pro
           </TabsTrigger>
           <TabsTrigger value="preview" className="gap-2">
             <Eye className="h-4 w-4" />
@@ -690,6 +695,14 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
               </div>
             )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="pro" className="space-y-6">
+          <ProDesignPanel
+            store={store}
+            styles={globalStyles}
+            onChange={handleGlobalStylesChange}
+          />
         </TabsContent>
 
         <TabsContent value="preview">
