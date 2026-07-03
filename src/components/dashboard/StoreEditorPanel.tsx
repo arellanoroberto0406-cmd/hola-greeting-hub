@@ -23,6 +23,7 @@ import { StorePreview } from "./store-editor/StorePreview";
 import { LivePreviewPanel } from "./store-editor/LivePreviewPanel";
 import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
+import ProDesignPanel from "./store-editor/ProDesignPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
