@@ -349,6 +349,7 @@ const StoreFront = () => {
   return (
     <div 
       className="min-h-screen bg-background"
+      data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 
         fontFamily: 'var(--store-body-font, inherit)',
       }}
