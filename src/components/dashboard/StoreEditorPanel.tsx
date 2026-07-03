@@ -697,6 +697,14 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
         </TabsContent>
 
+        <TabsContent value="pro" className="space-y-6">
+          <ProDesignPanel
+            store={store}
+            styles={globalStyles}
+            onChange={handleGlobalStylesChange}
+          />
+        </TabsContent>
+
         <TabsContent value="preview">
           <Card>
             <CardHeader>
