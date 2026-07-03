@@ -496,3 +496,73 @@ All colors MUST be HSL.
       inset 0 0 15px hsl(var(--primary) / 0.1);
   }
 }
+
+/* ============ Storefront button animations ============ */
+/* Applied via [data-btn-anim="..."] wrapper on storefront root & preview */
+[data-btn-anim] button,
+[data-btn-anim] .store-btn,
+[data-btn-anim] a[role="button"] {
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.25s ease, filter 0.25s ease;
+  will-change: transform;
+}
+
+[data-btn-anim="lift"] button:hover,
+[data-btn-anim="lift"] .store-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.25);
+}
+[data-btn-anim="lift"] button:active,
+[data-btn-anim="lift"] .store-btn:active { transform: translateY(0); }
+
+[data-btn-anim="pulse"] button,
+[data-btn-anim="pulse"] .store-btn {
+  animation: store-btn-pulse 2.2s ease-in-out infinite;
+}
+@keyframes store-btn-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.35); }
+  50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+}
+
+[data-btn-anim="glow"] button:hover,
+[data-btn-anim="glow"] .store-btn:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4),
+              0 0 28px 4px currentColor;
+}
+
+[data-btn-anim="shimmer"] button,
+[data-btn-anim="shimmer"] .store-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+[data-btn-anim="shimmer"] button::after,
+[data-btn-anim="shimmer"] .store-btn::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 20%, rgba(255,255,255,0.5) 50%, transparent 80%);
+  transform: translateX(-120%);
+  transition: transform 0.7s ease;
+  pointer-events: none;
+}
+[data-btn-anim="shimmer"] button:hover::after,
+[data-btn-anim="shimmer"] .store-btn:hover::after { transform: translateX(120%); }
+
+[data-btn-anim="bounce"] button:hover,
+[data-btn-anim="bounce"] .store-btn:hover {
+  animation: store-btn-bounce 0.5s ease;
+}
+@keyframes store-btn-bounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+  60% { transform: translateY(-2px); }
+}
+
+[data-btn-anim="press"] button:active,
+[data-btn-anim="press"] .store-btn:active {
+  transform: scale(0.94);
+  filter: brightness(0.92);
+}
+
