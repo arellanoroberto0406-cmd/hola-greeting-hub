@@ -247,20 +247,44 @@ const ButtonLab = ({ styles, onChange, primaryColor }: { styles: GlobalStyles; o
 
 /* ---------------- Image Lab ---------------- */
 type ImgSlot = "logo" | "banner";
+const SLOT_CFG = {
+  logo: { previewW: 280, previewH: 280, outW: 512, outH: 512, aspectClass: "aspect-square max-w-xs mx-auto" },
+  banner: { previewW: 360, previewH: 120, outW: 1200, outH: 400, aspectClass: "aspect-[3/1]" },
+} as const;
+
 const ImageLab = ({ store }: { store: Store }) => {
   const update = useUpdateStore();
   const { uploadImage, uploading } = useImageUpload();
   const { toast } = useToast();
   const [slot, setSlot] = useState<ImgSlot>("logo");
   const [src, setSrc] = useState<string | null>(null);
+  const [natural, setNatural] = useState<{ w: number; h: number } | null>(null);
   const [filters, setFilters] = useState({ brightness: 100, contrast: 100, saturate: 100, blur: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const dragRef = useRef<{ startX: number; startY: number; ox: number; oy: number } | null>(null);
+  const boxRef = useRef<HTMLDivElement>(null);
+
+  const cfg = SLOT_CFG[slot];
+
+  const resetTransform = () => { setZoom(1); setOffset({ x: 0, y: 0 }); };
 
   useEffect(() => {
     setSrc(slot === "logo" ? store.logo_url || null : store.banner_url || null);
     setFilters({ brightness: 100, contrast: 100, saturate: 100, blur: 0 });
+    resetTransform();
   }, [slot, store.logo_url, store.banner_url]);
+
+  // Load natural size whenever src changes
+  useEffect(() => {
+    if (!src) { setNatural(null); return; }
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => setNatural({ w: img.naturalWidth, h: img.naturalHeight });
+    img.src = src;
+  }, [src]);
 
   const filterCss = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturate}%) blur(${filters.blur}px)`;
 
@@ -269,10 +293,43 @@ const ImageLab = ({ store }: { store: Store }) => {
     reader.onload = () => setSrc(reader.result as string);
     reader.readAsDataURL(f);
     setFilters({ brightness: 100, contrast: 100, saturate: 100, blur: 0 });
+    resetTransform();
+  };
+
+  // Clamp offset so image edges don't leave the crop box
+  const clampOffset = (o: { x: number; y: number }, z: number) => {
+    if (!natural) return o;
+    const scale0 = Math.max(cfg.previewW / natural.w, cfg.previewH / natural.h);
+    const dispW = natural.w * scale0 * z;
+    const dispH = natural.h * scale0 * z;
+    const maxX = Math.max(0, (dispW - cfg.previewW) / 2);
+    const maxY = Math.max(0, (dispH - cfg.previewH) / 2);
+    return { x: Math.max(-maxX, Math.min(maxX, o.x)), y: Math.max(-maxY, Math.min(maxY, o.y)) };
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (!src) return;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    dragRef.current = { startX: e.clientX, startY: e.clientY, ox: offset.x, oy: offset.y };
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!dragRef.current) return;
+    const dx = e.clientX - dragRef.current.startX;
+    const dy = e.clientY - dragRef.current.startY;
+    setOffset(clampOffset({ x: dragRef.current.ox + dx, y: dragRef.current.oy + dy }, zoom));
+  };
+  const onPointerUp = (e: React.PointerEvent) => {
+    dragRef.current = null;
+    try { (e.target as HTMLElement).releasePointerCapture(e.pointerId); } catch {}
+  };
+
+  const onZoomChange = (v: number) => {
+    setZoom(v);
+    setOffset((o) => clampOffset(o, v));
   };
 
   const bakeAndSave = async () => {
-    if (!src) return;
+    if (!src || !natural) return;
     setBusy(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -282,14 +339,26 @@ const ImageLab = ({ store }: { store: Store }) => {
       img.crossOrigin = "anonymous";
       await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = src; });
 
+      // Compute source crop from preview transform
+      const scale0 = Math.max(cfg.previewW / img.naturalWidth, cfg.previewH / img.naturalHeight);
+      const z = zoom;
+      const srcW = cfg.previewW / (scale0 * z);
+      const srcH = cfg.previewH / (scale0 * z);
+      const cx = img.naturalWidth / 2 - offset.x / (scale0 * z);
+      const cy = img.naturalHeight / 2 - offset.y / (scale0 * z);
+      const sx = Math.max(0, Math.min(img.naturalWidth - srcW, cx - srcW / 2));
+      const sy = Math.max(0, Math.min(img.naturalHeight - srcH, cy - srcH / 2));
+
       const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth; canvas.height = img.naturalHeight;
+      canvas.width = cfg.outW; canvas.height = cfg.outH;
       const ctx = canvas.getContext("2d");
       if (!ctx) throw new Error("Canvas no disponible");
+      // Apply filters to baked PNG
       ctx.filter = filterCss;
-      ctx.drawImage(img, 0, 0);
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, sx, sy, srcW, srcH, 0, 0, cfg.outW, cfg.outH);
 
-      const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b as Blob), "image/png", 0.92)!);
+      const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b as Blob), "image/png", 0.95)!);
       const file = new File([blob], `${slot}-${Date.now()}.png`, { type: "image/png" });
       const url = await uploadImage(file, user.id);
       if (!url) throw new Error("No se pudo subir");
@@ -297,12 +366,18 @@ const ImageLab = ({ store }: { store: Store }) => {
       await update.mutateAsync({ id: store.id, ...(slot === "logo" ? { logo_url: url } : { banner_url: url }) });
       toast({ title: "Imagen actualizada", description: slot === "logo" ? "Logo aplicado" : "Banner aplicado" });
       setSrc(url);
+      resetTransform();
     } catch (e: any) {
       toast({ variant: "destructive", title: "Error", description: e.message });
     } finally {
       setBusy(false);
     }
   };
+
+  // Preview base scale for CSS rendering
+  const baseScale = natural ? Math.max(cfg.previewW / natural.w, cfg.previewH / natural.h) : 1;
+  const dispW = natural ? natural.w * baseScale : 0;
+  const dispH = natural ? natural.h * baseScale : 0;
 
   return (
     <Card>
@@ -311,7 +386,7 @@ const ImageLab = ({ store }: { store: Store }) => {
           <ImageIcon className="h-5 w-5" style={{ color: store.primary_color }} />
           Editor de imágenes
         </CardTitle>
-        <CardDescription>Sube o ajusta el logo y banner con filtros en vivo</CardDescription>
+        <CardDescription>Sube, recorta y reposiciona con arrastre y zoom. Los filtros se aplican al PNG final.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex gap-2">
@@ -322,9 +397,33 @@ const ImageLab = ({ store }: { store: Store }) => {
           ))}
         </div>
 
-        <div className={`relative rounded-xl overflow-hidden border-2 bg-muted/30 ${slot === "logo" ? "aspect-square max-w-xs mx-auto" : "aspect-[3/1]"}`}>
-          {src ? (
-            <img src={src} alt={slot} className="w-full h-full object-cover" style={{ filter: filterCss }} />
+        <div
+          ref={boxRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          className={`relative rounded-xl overflow-hidden border-2 bg-muted/30 mx-auto select-none ${src ? "cursor-grab active:cursor-grabbing" : ""}`}
+          style={{ width: cfg.previewW, height: cfg.previewH, touchAction: "none" }}
+        >
+          {src && natural ? (
+            <>
+              <img
+                src={src}
+                alt={slot}
+                draggable={false}
+                className="absolute top-1/2 left-1/2 pointer-events-none max-w-none"
+                style={{
+                  width: dispW,
+                  height: dispH,
+                  transform: `translate(-50%, -50%) translate(${offset.x}px, ${offset.y}px) scale(${zoom})`,
+                  transformOrigin: "center center",
+                  filter: filterCss,
+                }}
+              />
+              {/* Crop guide */}
+              <div className="absolute inset-0 pointer-events-none ring-1 ring-white/40 shadow-[0_0_0_9999px_rgba(0,0,0,0.05)_inset]" />
+            </>
           ) : (
             <div className="flex items-center justify-center h-full text-muted-foreground text-sm">
               Sin imagen
@@ -332,10 +431,23 @@ const ImageLab = ({ store }: { store: Store }) => {
           )}
         </div>
 
+        {src && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs">Zoom</Label>
+              <span className="text-xs text-muted-foreground tabular-nums">{zoom.toFixed(2)}x</span>
+            </div>
+            <Slider value={[zoom]} min={1} max={4} step={0.01} onValueChange={(v) => onZoomChange(v[0])} />
+          </div>
+        )}
+
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => e.target.files?.[0] && onFile(e.target.files[0])} />
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={() => fileRef.current?.click()} className="gap-2">
             <Upload className="h-4 w-4" /> Subir imagen
+          </Button>
+          <Button size="sm" variant="outline" onClick={resetTransform} disabled={!src}>
+            Centrar
           </Button>
           <Button size="sm" variant="outline" onClick={() => setFilters({ brightness: 100, contrast: 100, saturate: 100, blur: 0 })}>
             Restablecer filtros
@@ -362,7 +474,7 @@ const ImageLab = ({ store }: { store: Store }) => {
 
         <Button onClick={bakeAndSave} disabled={!src || busy || uploading} className="w-full gap-2">
           {(busy || uploading) ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
-          Guardar {slot === "logo" ? "logo" : "banner"}
+          Guardar {slot === "logo" ? "logo" : "banner"} recortado
         </Button>
       </CardContent>
     </Card>
