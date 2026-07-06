@@ -24,6 +24,9 @@ import { LivePreviewPanel } from "./store-editor/LivePreviewPanel";
 import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
+import HeaderFooterPanel from "./store-editor/HeaderFooterPanel";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -305,8 +308,12 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         </div>
       </div>
 
-      <Tabs defaultValue="templates" className="space-y-6">
-        <TabsList>
+      <Tabs defaultValue="all-in-one" className="space-y-6">
+        <TabsList className="flex flex-wrap h-auto">
+          <TabsTrigger value="all-in-one" className="gap-2">
+            <Wand2 className="h-4 w-4" />
+            Editor Completo
+          </TabsTrigger>
           <TabsTrigger value="templates" className="gap-2">
             <LayoutTemplate className="h-4 w-4" />
             Plantillas
@@ -329,9 +336,133 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </TabsTrigger>
         </TabsList>
 
+        <TabsContent value="all-in-one" className="space-y-4">
+          <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+            <div className="space-y-4 min-w-0">
+              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
+                <CardContent className="pt-4 pb-4">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: store.primary_color }}>
+                      <Wand2 className="h-5 w-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold">Editor Completo</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Todo lo necesario para personalizar tu tienda en un solo lugar, con vista previa en vivo a la derecha.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Accordion type="multiple" defaultValue={["header-footer", "styles", "pro"]} className="space-y-3">
+                <AccordionItem value="header-footer" className="border rounded-xl px-4 bg-card">
+                  <AccordionTrigger className="hover:no-underline">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <Layers className="h-4 w-4" style={{ color: store.primary_color }} />
+                      Encabezado y pie de página
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2">
+                    <HeaderFooterPanel store={store} />
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="styles" className="border rounded-xl px-4 bg-card">
+                  <AccordionTrigger className="hover:no-underline">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <Palette className="h-4 w-4" style={{ color: store.primary_color }} />
+                      Estilos globales
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2">
+                    <GlobalStylesPanel
+                      styles={globalStyles}
+                      onChange={handleGlobalStylesChange}
+                      primaryColor={store.primary_color}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="pro" className="border rounded-xl px-4 bg-card">
+                  <AccordionTrigger className="hover:no-underline">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <Sparkles className="h-4 w-4" style={{ color: store.primary_color }} />
+                      Diseño Pro: colores, botones e imágenes
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2">
+                    <ProDesignPanel
+                      store={store}
+                      styles={globalStyles}
+                      onChange={handleGlobalStylesChange}
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+
+                <AccordionItem value="sections" className="border rounded-xl px-4 bg-card">
+                  <AccordionTrigger className="hover:no-underline">
+                    <span className="flex items-center gap-2 font-semibold">
+                      <Layers className="h-4 w-4" style={{ color: store.primary_color }} />
+                      Secciones activas ({sections.filter(s => s.enabled).length}/{sections.length})
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-2">
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                      <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                        <div className="space-y-2">
+                          <AnimatePresence>
+                            {sections.map((section) => (
+                              <SortableSection
+                                key={section.id}
+                                section={section}
+                                onToggle={handleToggleSection}
+                                onEdit={handleEditSection}
+                                onDuplicate={handleDuplicateSection}
+                                onDelete={handleDeleteSection}
+                                primaryColor={store.primary_color}
+                              />
+                            ))}
+                          </AnimatePresence>
+                        </div>
+                      </SortableContext>
+                    </DndContext>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
+
+            <div className="lg:sticky lg:top-4 h-fit">
+              <Card className="shadow-lg border-primary/20">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Eye className="h-4 w-4" style={{ color: store.primary_color }} />
+                    Vista previa en vivo
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Los cambios se ven al instante
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <LivePreviewPanel
+                    sections={sections}
+                    store={store}
+                    globalStyles={globalStyles}
+                    device={previewDevice}
+                    onDeviceChange={setPreviewDevice}
+                    showDeviceControls={true}
+                  />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </TabsContent>
+
         <TabsContent value="templates" className="space-y-6">
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
+
               <TemplatesPanel
                 currentStyles={globalStyles}
                 currentSections={sections}

@@ -67,7 +67,13 @@ const BTN_ANIMS: { value: ButtonAnimation; label: string; description: string }[
   { value: "shimmer", label: "Destello", description: "Barrido de luz" },
   { value: "bounce", label: "Rebote", description: "Salto lúdico" },
   { value: "press", label: "Presión", description: "Se hunde al click" },
+  { value: "float", label: "Flotar", description: "Sube y baja constante" },
+  { value: "wobble", label: "Bailar", description: "Se sacude al hover" },
+  { value: "magnetic", label: "Magnético", description: "Atrae y crece" },
+  { value: "ripple", label: "Onda", description: "Onda expansiva al hover" },
+  { value: "neon-border", label: "Neón", description: "Borde de neón pulsante" },
 ];
+
 
 /* ---------------- Color Section ---------------- */
 const ColorLab = ({ store }: { store: Store }) => {

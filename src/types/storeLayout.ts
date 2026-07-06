@@ -110,7 +110,13 @@ export type ButtonAnimation =
   | 'glow'
   | 'shimmer'
   | 'bounce'
-  | 'press';
+  | 'press'
+  | 'float'
+  | 'wobble'
+  | 'magnetic'
+  | 'ripple'
+  | 'neon-border';
+
 
 export interface GlobalStyles {
   headingFont: FontFamily;
