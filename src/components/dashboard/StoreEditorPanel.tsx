@@ -459,7 +459,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
         </TabsContent>
 
+        <TabsContent value="templates" className="space-y-6">
+          <div className="grid lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
+
               <TemplatesPanel
                 currentStyles={globalStyles}
                 currentSections={sections}
