@@ -566,3 +566,72 @@ All colors MUST be HSL.
   filter: brightness(0.92);
 }
 
+/* Float: continuous gentle rise-fall */
+[data-btn-anim="float"] button,
+[data-btn-anim="float"] .store-btn {
+  animation: store-btn-float 3s ease-in-out infinite;
+}
+@keyframes store-btn-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Wobble on hover */
+[data-btn-anim="wobble"] button:hover,
+[data-btn-anim="wobble"] .store-btn:hover {
+  animation: store-btn-wobble 0.6s ease;
+}
+@keyframes store-btn-wobble {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-3deg); }
+  40% { transform: rotate(3deg); }
+  60% { transform: rotate(-2deg); }
+  80% { transform: rotate(2deg); }
+}
+
+/* Magnetic: scale up + strong shadow on hover */
+[data-btn-anim="magnetic"] button:hover,
+[data-btn-anim="magnetic"] .store-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 15px 35px -10px currentColor;
+  filter: brightness(1.05);
+}
+
+/* Ripple: expanding ring on hover */
+[data-btn-anim="ripple"] button,
+[data-btn-anim="ripple"] .store-btn {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+[data-btn-anim="ripple"] button::before,
+[data-btn-anim="ripple"] .store-btn::before {
+  content: "";
+  position: absolute;
+  inset: 50%;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.35);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.6s ease, opacity 0.6s ease;
+  opacity: 1;
+  pointer-events: none;
+}
+[data-btn-anim="ripple"] button:hover::before,
+[data-btn-anim="ripple"] .store-btn:hover::before {
+  transform: translate(-50%, -50%) scale(6);
+  opacity: 0;
+}
+
+/* Neon border: animated dashed glow */
+[data-btn-anim="neon-border"] button,
+[data-btn-anim="neon-border"] .store-btn {
+  position: relative;
+  box-shadow: 0 0 0 2px currentColor, 0 0 12px currentColor;
+  animation: store-btn-neon 2.5s ease-in-out infinite;
+}
+@keyframes store-btn-neon {
+  0%, 100% { box-shadow: 0 0 0 2px currentColor, 0 0 12px currentColor; filter: brightness(1); }
+  50% { box-shadow: 0 0 0 2px currentColor, 0 0 24px currentColor, 0 0 40px currentColor; filter: brightness(1.15); }
+}
+
+
