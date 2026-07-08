@@ -384,7 +384,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                     </span>
                   </AccordionTrigger>
                   <AccordionContent className="pt-2">
-                    <HeaderFooterPanel store={store} />
+                    <HeaderFooterPanel store={store} values={headerFooter} onChange={handleHeaderFooterChange} />
                   </AccordionContent>
                 </AccordionItem>
 
