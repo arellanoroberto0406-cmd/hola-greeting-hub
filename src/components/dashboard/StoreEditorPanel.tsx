@@ -24,7 +24,8 @@ import { LivePreviewPanel } from "./store-editor/LivePreviewPanel";
 import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
-import HeaderFooterPanel from "./store-editor/HeaderFooterPanel";
+import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
+import { useUpdateStore } from "@/hooks/useStores";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -70,11 +71,13 @@ interface StoreEditorPanelProps {
 const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const { data: layout, isLoading } = useStoreLayout(store.id);
   const saveLayout = useSaveStoreLayout();
+  const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
+  const [headerFooter, setHeaderFooter] = useState<HeaderFooterValues>(() => buildHeaderFooterValues(store));
   const [editingSection, setEditingSection] = useState<StoreSection | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
@@ -109,6 +112,15 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
       setGlobalStyles(layout.globalStyles);
     }
   }, [layout]);
+
+  useEffect(() => {
+    setHeaderFooter(buildHeaderFooterValues(store));
+  }, [store.id]);
+
+  const handleHeaderFooterChange = (v: HeaderFooterValues) => {
+    setHeaderFooter(v);
+    setHasChanges(true);
+  };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -152,12 +164,19 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   };
 
   const handleSaveLayout = async () => {
-    await saveLayout.mutateAsync({
-      storeId: store.id,
-      sections,
-      globalStyles,
-    });
+    await Promise.all([
+      saveLayout.mutateAsync({
+        storeId: store.id,
+        sections,
+        globalStyles,
+      }),
+      updateStore.mutateAsync({ id: store.id, ...headerFooter }),
+    ]);
     setHasChanges(false);
+    toast({
+      title: "Cambios publicados",
+      description: "Encabezado, pie, estilos y botones se aplicaron a tu tienda.",
+    });
   };
 
   const handleResetLayout = () => {
