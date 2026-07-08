@@ -27,7 +27,7 @@ import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
 import { useUpdateStore } from "@/hooks/useStores";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Wand2 } from "lucide-react";
+import { Wand2, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -288,180 +288,260 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
     );
   }
 
+  const enabledCount = sections.filter(s => s.enabled).length;
+  const publishedStoreUrl = `https://apptienda.lovable.app/tienda/${store.slug}`;
+  const planLabel = planTier === 'enterprise' ? 'Enterprise' : planTier === 'professional' ? 'Professional' : 'Basic';
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-heading flex items-center gap-2">
-            <Layers className="h-6 w-6" style={{ color: store.primary_color }} />
-            Editor de Tienda
-          </h2>
-          <p className="text-muted-foreground">
-            Arrastra y suelta las secciones para reorganizar tu tienda
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetLayout}
-            disabled={saveLayout.isPending}
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Restablecer
-          </Button>
-          <Button
-            size="sm"
-            onClick={handleSaveLayout}
-            disabled={saveLayout.isPending || !hasChanges}
-            style={{ backgroundColor: store.primary_color }}
-          >
-            {saveLayout.isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : (
-              <Save className="h-4 w-4 mr-2" />
-            )}
-            {hasChanges ? 'Guardar cambios' : 'Guardado'}
-          </Button>
+      {/* Hero header */}
+      <div
+        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8"
+        style={{
+          background: `linear-gradient(135deg, ${store.primary_color}18, transparent 55%), radial-gradient(1200px 300px at 100% 0%, ${store.primary_color}22, transparent 60%)`,
+        }}
+      >
+        <div
+          className="absolute -top-24 -right-24 h-64 w-64 rounded-full blur-3xl opacity-30"
+          style={{ background: store.primary_color }}
+        />
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Badge variant="secondary" className="gap-1.5 rounded-full px-3 py-1">
+                <Crown className="h-3 w-3" style={{ color: store.primary_color }} />
+                Plan {planLabel}
+              </Badge>
+              <Badge
+                variant="outline"
+                className="gap-1.5 rounded-full px-3 py-1 border-2 transition-colors"
+                style={{
+                  borderColor: hasChanges ? '#f59e0b' : `${store.primary_color}66`,
+                  color: hasChanges ? '#b45309' : store.primary_color,
+                }}
+              >
+                <span className={`h-2 w-2 rounded-full ${hasChanges ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+                {hasChanges ? 'Cambios sin guardar' : 'Todo guardado'}
+              </Badge>
+              <Badge variant="secondary" className="gap-1.5 rounded-full px-3 py-1">
+                <Layers className="h-3 w-3" />
+                {enabledCount} secciones activas
+              </Badge>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-heading tracking-tight">
+              Estudio de diseño
+            </h2>
+            <p className="text-muted-foreground max-w-xl">
+              Personaliza cada detalle de tu tienda: colores, tipografía, secciones y animaciones. Todo se refleja al instante en la vista previa.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <a href={publishedStoreUrl} target="_blank" rel="noreferrer" className="gap-2">
+                <Eye className="h-4 w-4" />
+                Ver tienda
+              </a>
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleResetLayout}
+              disabled={saveLayout.isPending}
+            >
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Restablecer
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleSaveLayout}
+              disabled={saveLayout.isPending || !hasChanges}
+              className="shadow-lg transition-transform hover:scale-105"
+              style={{ backgroundColor: store.primary_color, color: 'white' }}
+            >
+              {saveLayout.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : hasChanges ? (
+                <Save className="h-4 w-4 mr-2" />
+              ) : (
+                <Check className="h-4 w-4 mr-2" />
+              )}
+              {saveLayout.isPending ? 'Guardando…' : hasChanges ? 'Publicar cambios' : 'Publicado'}
+            </Button>
+          </div>
         </div>
       </div>
 
       <Tabs defaultValue="all-in-one" className="space-y-6">
-        <TabsList className="flex flex-wrap h-auto">
-          <TabsTrigger value="all-in-one" className="gap-2">
+        <TabsList className="flex flex-wrap h-auto p-1 bg-muted/60 backdrop-blur rounded-xl">
+          <TabsTrigger value="all-in-one" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
             <Wand2 className="h-4 w-4" />
-            Editor Completo
+            Estudio
           </TabsTrigger>
-          <TabsTrigger value="templates" className="gap-2">
+          <TabsTrigger value="templates" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
             <LayoutTemplate className="h-4 w-4" />
             Plantillas
           </TabsTrigger>
-          <TabsTrigger value="editor" className="gap-2">
+          <TabsTrigger value="editor" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
             <Layers className="h-4 w-4" />
             Secciones
           </TabsTrigger>
-          <TabsTrigger value="styles" className="gap-2">
+          <TabsTrigger value="styles" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
             <Palette className="h-4 w-4" />
             Estilos
           </TabsTrigger>
-          <TabsTrigger value="pro" className="gap-2">
+          <TabsTrigger value="pro" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
             <Sparkles className="h-4 w-4" />
             Diseño Pro
           </TabsTrigger>
-          <TabsTrigger value="preview" className="gap-2">
+          <TabsTrigger value="preview" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
             <Eye className="h-4 w-4" />
             Vista previa
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all-in-one" className="space-y-4">
-          <div className="grid gap-6 lg:grid-cols-[1fr_400px]">
+          <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
             <div className="space-y-4 min-w-0">
-              <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-                <CardContent className="pt-4 pb-4">
-                  <div className="flex items-start gap-3">
-                    <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: store.primary_color }}>
-                      <Wand2 className="h-5 w-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Editor Completo</h3>
-                      <p className="text-sm text-muted-foreground">
-                        Todo lo necesario para personalizar tu tienda en un solo lugar, con vista previa en vivo a la derecha.
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {(() => {
+                const studioSections = [
+                  {
+                    id: 'header-footer',
+                    icon: Layout,
+                    title: 'Encabezado y pie de página',
+                    description: 'Nombre, contacto y redes sociales visibles en tu tienda',
+                    tint: '#0ea5e9',
+                    content: <HeaderFooterPanel store={store} values={headerFooter} onChange={handleHeaderFooterChange} />,
+                  },
+                  {
+                    id: 'styles',
+                    icon: Palette,
+                    title: 'Estilos globales',
+                    description: 'Tipografías, espaciados, bordes y sombras',
+                    tint: '#f43f5e',
+                    content: (
+                      <GlobalStylesPanel
+                        styles={globalStyles}
+                        onChange={handleGlobalStylesChange}
+                        primaryColor={store.primary_color}
+                      />
+                    ),
+                  },
+                  {
+                    id: 'pro',
+                    icon: Sparkles,
+                    title: 'Diseño Pro',
+                    description: 'Colores, botones con animación e imágenes de marca',
+                    tint: '#a855f7',
+                    content: (
+                      <ProDesignPanel
+                        store={store}
+                        styles={globalStyles}
+                        onChange={handleGlobalStylesChange}
+                      />
+                    ),
+                  },
+                  {
+                    id: 'sections',
+                    icon: Layers,
+                    title: `Secciones (${enabledCount}/${sections.length})`,
+                    description: 'Arrastra para reordenar, activa o edita cada bloque',
+                    tint: '#10b981',
+                    content: (
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+                          <div className="space-y-2">
+                            <AnimatePresence>
+                              {sections.map((section) => (
+                                <SortableSection
+                                  key={section.id}
+                                  section={section}
+                                  onToggle={handleToggleSection}
+                                  onEdit={handleEditSection}
+                                  onDuplicate={handleDuplicateSection}
+                                  onDelete={handleDeleteSection}
+                                  primaryColor={store.primary_color}
+                                />
+                              ))}
+                            </AnimatePresence>
+                          </div>
+                        </SortableContext>
+                      </DndContext>
+                    ),
+                  },
+                ];
 
-              <Accordion type="multiple" defaultValue={["header-footer", "styles", "pro"]} className="space-y-3">
-                <AccordionItem value="header-footer" className="border rounded-xl px-4 bg-card">
-                  <AccordionTrigger className="hover:no-underline">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <Layers className="h-4 w-4" style={{ color: store.primary_color }} />
-                      Encabezado y pie de página
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2">
-                    <HeaderFooterPanel store={store} values={headerFooter} onChange={handleHeaderFooterChange} />
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="styles" className="border rounded-xl px-4 bg-card">
-                  <AccordionTrigger className="hover:no-underline">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <Palette className="h-4 w-4" style={{ color: store.primary_color }} />
-                      Estilos globales
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2">
-                    <GlobalStylesPanel
-                      styles={globalStyles}
-                      onChange={handleGlobalStylesChange}
-                      primaryColor={store.primary_color}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="pro" className="border rounded-xl px-4 bg-card">
-                  <AccordionTrigger className="hover:no-underline">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <Sparkles className="h-4 w-4" style={{ color: store.primary_color }} />
-                      Diseño Pro: colores, botones e imágenes
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2">
-                    <ProDesignPanel
-                      store={store}
-                      styles={globalStyles}
-                      onChange={handleGlobalStylesChange}
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-
-                <AccordionItem value="sections" className="border rounded-xl px-4 bg-card">
-                  <AccordionTrigger className="hover:no-underline">
-                    <span className="flex items-center gap-2 font-semibold">
-                      <Layers className="h-4 w-4" style={{ color: store.primary_color }} />
-                      Secciones activas ({sections.filter(s => s.enabled).length}/{sections.length})
-                    </span>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-2">
-                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                      <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-                        <div className="space-y-2">
-                          <AnimatePresence>
-                            {sections.map((section) => (
-                              <SortableSection
-                                key={section.id}
-                                section={section}
-                                onToggle={handleToggleSection}
-                                onEdit={handleEditSection}
-                                onDuplicate={handleDuplicateSection}
-                                onDelete={handleDeleteSection}
-                                primaryColor={store.primary_color}
-                              />
-                            ))}
-                          </AnimatePresence>
-                        </div>
-                      </SortableContext>
-                    </DndContext>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                return (
+                  <Accordion
+                    type="single"
+                    collapsible
+                    defaultValue="header-footer"
+                    className="space-y-3"
+                  >
+                    {studioSections.map((s) => {
+                      const Icon = s.icon;
+                      return (
+                        <AccordionItem
+                          key={s.id}
+                          value={s.id}
+                          className="border rounded-2xl px-5 bg-card shadow-sm hover:shadow-md transition-shadow data-[state=open]:shadow-md data-[state=open]:border-primary/30"
+                        >
+                          <AccordionTrigger className="hover:no-underline py-4">
+                            <div className="flex items-center gap-4 text-left">
+                              <div
+                                className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                                style={{
+                                  background: `linear-gradient(135deg, ${s.tint}, ${s.tint}cc)`,
+                                }}
+                              >
+                                <Icon className="h-5 w-5 text-white" />
+                              </div>
+                              <div className="min-w-0">
+                                <div className="font-semibold">{s.title}</div>
+                                <div className="text-xs text-muted-foreground font-normal line-clamp-1">
+                                  {s.description}
+                                </div>
+                              </div>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent className="pt-2 pb-5">
+                            {s.content}
+                          </AccordionContent>
+                        </AccordionItem>
+                      );
+                    })}
+                  </Accordion>
+                );
+              })()}
             </div>
 
-            <div className="lg:sticky lg:top-4 h-fit">
-              <Card className="shadow-lg border-primary/20">
+            <div className="lg:sticky lg:top-4 h-fit space-y-3">
+              <Card
+                className="overflow-hidden border-primary/20 shadow-xl"
+                style={{
+                  background: `linear-gradient(180deg, ${store.primary_color}0d, transparent)`,
+                }}
+              >
                 <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Eye className="h-4 w-4" style={{ color: store.primary_color }} />
-                    Vista previa en vivo
-                  </CardTitle>
-                  <CardDescription className="text-xs">
-                    Los cambios se ven al instante
-                  </CardDescription>
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                        </span>
+                        Vista previa en vivo
+                      </CardTitle>
+                      <CardDescription className="text-xs mt-1">
+                        Reflejo exacto de tu tienda publicada
+                      </CardDescription>
+                    </div>
+                    <Button variant="ghost" size="icon" asChild className="h-8 w-8">
+                      <a href={publishedStoreUrl} target="_blank" rel="noreferrer" title="Abrir tienda">
+                        <Eye className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <LivePreviewPanel
@@ -474,9 +554,32 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                   />
                 </CardContent>
               </Card>
+
+              {hasChanges && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="rounded-xl border border-amber-300/60 bg-amber-50 dark:bg-amber-950/30 p-3 flex items-center gap-3"
+                >
+                  <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse flex-shrink-0" />
+                  <p className="text-xs text-amber-900 dark:text-amber-200 flex-1">
+                    Tienes cambios pendientes. Publica para que tus clientes los vean.
+                  </p>
+                  <Button
+                    size="sm"
+                    className="h-7 text-xs"
+                    onClick={handleSaveLayout}
+                    disabled={saveLayout.isPending}
+                    style={{ backgroundColor: store.primary_color, color: 'white' }}
+                  >
+                    Publicar
+                  </Button>
+                </motion.div>
+              )}
             </div>
           </div>
         </TabsContent>
+
 
         <TabsContent value="templates" className="space-y-6">
           <div className="grid lg:grid-cols-3 gap-6">
