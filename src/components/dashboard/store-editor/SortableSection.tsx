@@ -223,6 +223,40 @@ export const SortableSection = ({
 
             {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
+              {(onMoveUp || onMoveDown) && (
+                <div className="flex flex-col gap-0.5">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-7 rounded-md"
+                        disabled={!canMoveUp}
+                        onClick={() => onMoveUp?.(section.id)}
+                        aria-label="Mover arriba"
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Mover arriba</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-7 rounded-md"
+                        disabled={!canMoveDown}
+                        onClick={() => onMoveDown?.(section.id)}
+                        aria-label="Mover abajo"
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Mover abajo</TooltipContent>
+                  </Tooltip>
+                </div>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9">
