@@ -112,6 +112,10 @@ export const SortableSection = ({
   onEdit, 
   onDuplicate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = true,
+  canMoveDown = true,
   primaryColor = '#8B4513' 
 }: SortableSectionProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
