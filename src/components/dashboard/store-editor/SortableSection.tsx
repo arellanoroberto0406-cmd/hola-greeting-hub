@@ -33,7 +33,9 @@ import {
   Star,
   Gift,
   MessageCircle,
-  Crown
+  Crown,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
