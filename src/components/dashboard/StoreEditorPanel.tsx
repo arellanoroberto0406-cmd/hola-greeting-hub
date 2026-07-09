@@ -217,6 +217,16 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
     setHasChanges(true);
   };
 
+  const handleMoveSection = (id: string, direction: -1 | 1) => {
+    setSections((items) => {
+      const index = items.findIndex((s) => s.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= items.length) return items;
+      setHasChanges(true);
+      return arrayMove(items, index, target);
+    });
+  };
+
   // Get preview sections/styles for template hover
   const getPreviewData = () => {
     if (templatePreview) {
@@ -452,7 +462,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                         <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                           <div className="space-y-2">
                             <AnimatePresence>
-                              {sections.map((section) => (
+                              {sections.map((section, idx) => (
                                 <SortableSection
                                   key={section.id}
                                   section={section}
@@ -460,6 +470,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                                   onEdit={handleEditSection}
                                   onDuplicate={handleDuplicateSection}
                                   onDelete={handleDeleteSection}
+                                  onMoveUp={(id) => handleMoveSection(id, -1)}
+                                  onMoveDown={(id) => handleMoveSection(id, 1)}
+                                  canMoveUp={idx > 0}
+                                  canMoveDown={idx < sections.length - 1}
                                   primaryColor={store.primary_color}
                                 />
                               ))}
@@ -761,7 +775,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                     >
                       <div className="space-y-3">
                         <AnimatePresence>
-                          {sections.map((section) => (
+                          {sections.map((section, idx) => (
                             <SortableSection
                               key={section.id}
                               section={section}
@@ -769,6 +783,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                               onEdit={handleEditSection}
                               onDuplicate={handleDuplicateSection}
                               onDelete={handleDeleteSection}
+                              onMoveUp={(id) => handleMoveSection(id, -1)}
+                              onMoveDown={(id) => handleMoveSection(id, 1)}
+                              canMoveUp={idx > 0}
+                              canMoveDown={idx < sections.length - 1}
                               primaryColor={store.primary_color}
                             />
                           ))}

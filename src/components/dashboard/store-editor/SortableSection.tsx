@@ -33,7 +33,9 @@ import {
   Star,
   Gift,
   MessageCircle,
-  Crown
+  Crown,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import { motion } from "framer-motion";
 import {
@@ -66,6 +68,10 @@ interface SortableSectionProps {
   onEdit: (section: StoreSection) => void;
   onDuplicate: (section: StoreSection) => void;
   onDelete: (id: string) => void;
+  onMoveUp?: (id: string) => void;
+  onMoveDown?: (id: string) => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
   primaryColor?: string;
 }
 
@@ -106,6 +112,10 @@ export const SortableSection = ({
   onEdit, 
   onDuplicate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
+  canMoveUp = true,
+  canMoveDown = true,
   primaryColor = '#8B4513' 
 }: SortableSectionProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -213,6 +223,40 @@ export const SortableSection = ({
 
             {/* Actions */}
             <div className="flex items-center gap-2 flex-shrink-0">
+              {(onMoveUp || onMoveDown) && (
+                <div className="flex flex-col gap-0.5">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-7 rounded-md"
+                        disabled={!canMoveUp}
+                        onClick={() => onMoveUp?.(section.id)}
+                        aria-label="Mover arriba"
+                      >
+                        <ArrowUp className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Mover arriba</TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-7 rounded-md"
+                        disabled={!canMoveDown}
+                        onClick={() => onMoveDown?.(section.id)}
+                        aria-label="Mover abajo"
+                      >
+                        <ArrowDown className="h-3.5 w-3.5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Mover abajo</TooltipContent>
+                  </Tooltip>
+                </div>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-9 w-9">
