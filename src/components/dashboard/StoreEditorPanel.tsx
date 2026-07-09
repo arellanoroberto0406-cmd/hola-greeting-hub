@@ -462,7 +462,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                         <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
                           <div className="space-y-2">
                             <AnimatePresence>
-                              {sections.map((section) => (
+                              {sections.map((section, idx) => (
                                 <SortableSection
                                   key={section.id}
                                   section={section}
@@ -470,6 +470,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                                   onEdit={handleEditSection}
                                   onDuplicate={handleDuplicateSection}
                                   onDelete={handleDeleteSection}
+                                  onMoveUp={(id) => handleMoveSection(id, -1)}
+                                  onMoveDown={(id) => handleMoveSection(id, 1)}
+                                  canMoveUp={idx > 0}
+                                  canMoveDown={idx < sections.length - 1}
                                   primaryColor={store.primary_color}
                                 />
                               ))}
