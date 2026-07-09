@@ -217,6 +217,16 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
     setHasChanges(true);
   };
 
+  const handleMoveSection = (id: string, direction: -1 | 1) => {
+    setSections((items) => {
+      const index = items.findIndex((s) => s.id === id);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= items.length) return items;
+      setHasChanges(true);
+      return arrayMove(items, index, target);
+    });
+  };
+
   // Get preview sections/styles for template hover
   const getPreviewData = () => {
     if (templatePreview) {
