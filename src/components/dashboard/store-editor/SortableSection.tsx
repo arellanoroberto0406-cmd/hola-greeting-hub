@@ -68,6 +68,10 @@ interface SortableSectionProps {
   onEdit: (section: StoreSection) => void;
   onDuplicate: (section: StoreSection) => void;
   onDelete: (id: string) => void;
+  onMoveUp?: (id: string) => void;
+  onMoveDown?: (id: string) => void;
+  canMoveUp?: boolean;
+  canMoveDown?: boolean;
   primaryColor?: string;
 }
 
