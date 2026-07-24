@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
 import { useStoreLayout } from "@/hooks/useStoreLayout";
+import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
+
 import { useStorePlanTier } from "@/hooks/useStorePlanTier";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, ShoppingCart, Heart, Menu, Eye, Search, User, Package, LogOut, Store, ChevronRight } from "lucide-react";
@@ -91,6 +94,8 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
   const { planTier } = useStorePlanTier(store?.id);
+  const { isDark: isStoreDark, toggle: toggleStoreDark } = useStoreDarkMode();
+
   const {
     items,
     addItem,
