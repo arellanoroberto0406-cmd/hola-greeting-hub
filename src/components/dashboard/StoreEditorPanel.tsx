@@ -25,6 +25,9 @@ import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
+import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
+
 import { useUpdateStore } from "@/hooks/useStores";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Wand2, Layout } from "lucide-react";
@@ -74,6 +77,8 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
+  const { isDark: isEditorDark, toggle: toggleEditorDark } = useStoreDarkMode();
+
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
@@ -303,7 +308,8 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const planLabel = planTier === 'enterprise' ? 'Enterprise' : planTier === 'professional' ? 'Professional' : 'Basic';
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 rounded-2xl transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}>
+
       {/* Hero header */}
       <div
         className="relative overflow-hidden rounded-2xl border p-6 sm:p-8"
@@ -347,7 +353,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
+            <StoreDarkModeToggle isDark={isEditorDark} onToggle={toggleEditorDark} label />
             <Button variant="outline" size="sm" asChild>
+
               <a href={publishedStoreUrl} target="_blank" rel="noreferrer" className="gap-2">
                 <Eye className="h-4 w-4" />
                 Ver tienda

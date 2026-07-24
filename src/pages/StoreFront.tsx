@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
 import { useStoreLayout } from "@/hooks/useStoreLayout";
+import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
+
 import { useStorePlanTier } from "@/hooks/useStorePlanTier";
 import { useAuth } from "@/context/AuthContext";
 import { Loader2, ShoppingCart, Heart, Menu, Eye, Search, User, Package, LogOut, Store, ChevronRight } from "lucide-react";
@@ -91,6 +94,8 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
   const { planTier } = useStorePlanTier(store?.id);
+  const { isDark: isStoreDark, toggle: toggleStoreDark } = useStoreDarkMode();
+
   const {
     items,
     addItem,
@@ -348,12 +353,18 @@ const StoreFront = () => {
 
   return (
     <div 
-      className="min-h-screen bg-background"
+      className={`min-h-screen bg-background transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
       data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 
         fontFamily: 'var(--store-body-font, inherit)',
       }}
     >
+      <StoreDarkModeToggle
+        isDark={isStoreDark}
+        onToggle={toggleStoreDark}
+        className="fixed bottom-6 right-6 z-50"
+      />
+
       {/* Dynamic SEO for store */}
       <SEOHead
         title={`${store.name} - Tienda Online`}
