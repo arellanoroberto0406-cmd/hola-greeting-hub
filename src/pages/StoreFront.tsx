@@ -348,12 +348,18 @@ const StoreFront = () => {
 
   return (
     <div 
-      className="min-h-screen bg-background"
+      className={`min-h-screen bg-background transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
       data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 
         fontFamily: 'var(--store-body-font, inherit)',
       }}
     >
+      <StoreDarkModeToggle
+        isDark={isStoreDark}
+        onToggle={toggleStoreDark}
+        className="fixed bottom-6 right-6 z-50"
+      />
+
       {/* Dynamic SEO for store */}
       <SEOHead
         title={`${store.name} - Tienda Online`}
