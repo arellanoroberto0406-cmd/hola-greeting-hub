@@ -25,6 +25,9 @@ import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
+import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
+
 import { useUpdateStore } from "@/hooks/useStores";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Wand2, Layout } from "lucide-react";
@@ -74,6 +77,8 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
+  const { isDark: isEditorDark, toggle: toggleEditorDark } = useStoreDarkMode();
+
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
