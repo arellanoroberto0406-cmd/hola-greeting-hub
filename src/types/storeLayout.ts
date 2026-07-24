@@ -43,7 +43,9 @@ export type FontFamily =
   | 'dm-sans'
   | 'space-grotesk'
   | 'crimson-pro'
-  | 'outfit';
+  | 'outfit'
+  | 'archivo-black'
+  | 'hind';
 
 export type AnimationType = 
   | 'none'
@@ -131,14 +133,14 @@ export interface GlobalStyles {
 }
 
 export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
-  headingFont: 'oswald',
-  bodyFont: 'montserrat',
-  borderRadius: 'lg',
-  sectionSpacing: 'normal',
+  headingFont: 'archivo-black',
+  bodyFont: 'hind',
+  borderRadius: 'sm',
+  sectionSpacing: 'spacious',
   buttonStyle: 'solid',
-  cardShadow: 'md',
+  cardShadow: 'lg',
   colorMode: 'light',
-  accentStyle: 'minimal',
+  accentStyle: 'bold',
   buttonAnimation: 'lift',
 };
 
@@ -158,6 +160,8 @@ export const FONT_OPTIONS: { value: FontFamily; label: string; googleFont: strin
   { value: 'space-grotesk', label: 'Space Grotesk', googleFont: 'Space+Grotesk:wght@400;500;600;700' },
   { value: 'crimson-pro', label: 'Crimson Pro', googleFont: 'Crimson+Pro:wght@400;500;600;700' },
   { value: 'outfit', label: 'Outfit', googleFont: 'Outfit:wght@400;500;600;700' },
+  { value: 'archivo-black', label: 'Archivo Black', googleFont: 'Archivo+Black' },
+  { value: 'hind', label: 'Hind', googleFont: 'Hind:wght@300;400;500;600;700' },
 ];
 
 // Section availability by plan
