@@ -160,6 +160,8 @@ export const FONT_OPTIONS: { value: FontFamily; label: string; googleFont: strin
   { value: 'space-grotesk', label: 'Space Grotesk', googleFont: 'Space+Grotesk:wght@400;500;600;700' },
   { value: 'crimson-pro', label: 'Crimson Pro', googleFont: 'Crimson+Pro:wght@400;500;600;700' },
   { value: 'outfit', label: 'Outfit', googleFont: 'Outfit:wght@400;500;600;700' },
+  { value: 'archivo-black', label: 'Archivo Black', googleFont: 'Archivo+Black' },
+  { value: 'hind', label: 'Hind', googleFont: 'Hind:wght@300;400;500;600;700' },
 ];
 
 // Section availability by plan
