@@ -133,14 +133,14 @@ export interface GlobalStyles {
 }
 
 export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
-  headingFont: 'oswald',
-  bodyFont: 'montserrat',
-  borderRadius: 'lg',
-  sectionSpacing: 'normal',
+  headingFont: 'archivo-black',
+  bodyFont: 'hind',
+  borderRadius: 'sm',
+  sectionSpacing: 'spacious',
   buttonStyle: 'solid',
-  cardShadow: 'md',
+  cardShadow: 'lg',
   colorMode: 'light',
-  accentStyle: 'minimal',
+  accentStyle: 'bold',
   buttonAnimation: 'lift',
 };
 
