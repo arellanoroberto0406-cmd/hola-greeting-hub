@@ -43,7 +43,9 @@ export type FontFamily =
   | 'dm-sans'
   | 'space-grotesk'
   | 'crimson-pro'
-  | 'outfit';
+  | 'outfit'
+  | 'archivo-black'
+  | 'hind';
 
 export type AnimationType = 
   | 'none'
