@@ -308,7 +308,10 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const planLabel = planTier === 'enterprise' ? 'Enterprise' : planTier === 'professional' ? 'Professional' : 'Basic';
 
   return (
-    <div className={`space-y-6 rounded-2xl transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}>
+    <div
+      data-store-accent={globalStyles.accentPalette || 'champagne'}
+      className={`space-y-6 rounded-2xl transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}
+    >
 
       {/* Hero header */}
       <div
