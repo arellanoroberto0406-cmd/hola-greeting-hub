@@ -353,6 +353,7 @@ const StoreFront = () => {
 
   return (
     <div 
+      data-store-accent={globalStyles.accentPalette || 'champagne'}
       className={`min-h-screen bg-background transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
       data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 

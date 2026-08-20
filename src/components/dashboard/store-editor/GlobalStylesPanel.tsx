@@ -12,9 +12,10 @@ import {
   GlobalStyles, 
   FontFamily, 
   FONT_OPTIONS,
-  DEFAULT_GLOBAL_STYLES 
+  DEFAULT_GLOBAL_STYLES,
+  ACCENT_PALETTES
 } from "@/types/storeLayout";
-import { Type, Radius, Layers, MousePointer, Square } from "lucide-react";
+import { Type, Radius, Layers, MousePointer, Square, Palette } from "lucide-react";
 
 interface GlobalStylesPanelProps {
   styles: GlobalStyles;
@@ -61,8 +62,56 @@ export const GlobalStylesPanel = ({
     onChange({ ...styles, [key]: value });
   };
 
+  const activePalette = styles.accentPalette || 'champagne';
+
   return (
     <div className="space-y-6">
+      {/* Accent palette */}
+      <Card>
+        <CardHeader className="pb-4">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Palette className="h-5 w-5" style={{ color: primaryColor }} />
+            Paleta de acentos
+          </CardTitle>
+          <CardDescription>
+            Define el color de acento del estilo Bento Prestige (se adapta a modo claro y oscuro)
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {ACCENT_PALETTES.map((palette) => (
+              <button
+                key={palette.value}
+                type="button"
+                aria-pressed={activePalette === palette.value}
+                onClick={() => updateStyle('accentPalette', palette.value)}
+                className={`text-left p-4 rounded-lg border-2 transition-all ${
+                  activePalette === palette.value
+                    ? 'border-primary bg-primary/5 shadow-md'
+                    : 'border-transparent bg-muted/50 hover:bg-muted'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span
+                    className="h-6 w-6 rounded-full border"
+                    style={{ backgroundColor: palette.light }}
+                  />
+                  <span
+                    className="h-6 w-6 rounded-full border"
+                    style={{ backgroundColor: palette.dark }}
+                  />
+                  <span className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                    Claro / Oscuro
+                  </span>
+                </div>
+                <p className="font-medium text-sm">{palette.label}</p>
+                <p className="text-xs text-muted-foreground">{palette.description}</p>
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Typography */}
       <Card>
         <CardHeader className="pb-4">
