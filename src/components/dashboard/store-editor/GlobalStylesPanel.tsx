@@ -14,7 +14,7 @@ import {
   FONT_OPTIONS,
   DEFAULT_GLOBAL_STYLES 
 } from "@/types/storeLayout";
-import { Type, Radius, Layers, MousePointer, Square } from "lucide-react";
+import { Type, Radius, Layers, MousePointer, Square, Palette } from "lucide-react";
 
 interface GlobalStylesPanelProps {
   styles: GlobalStyles;
