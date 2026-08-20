@@ -12,7 +12,8 @@ import {
   GlobalStyles, 
   FontFamily, 
   FONT_OPTIONS,
-  DEFAULT_GLOBAL_STYLES 
+  DEFAULT_GLOBAL_STYLES,
+  ACCENT_PALETTES
 } from "@/types/storeLayout";
 import { Type, Radius, Layers, MousePointer, Square, Palette } from "lucide-react";
 
