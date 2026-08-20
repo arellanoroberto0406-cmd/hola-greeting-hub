@@ -172,6 +172,111 @@ All colors MUST be HSL.
   .store-dark .text-black {
     color: hsl(var(--foreground)) !important;
   }
+
+  /* ==========================================================
+     Bento Prestige — Paletas de acento (claro y oscuro)
+     Aplicadas con data-store-accent en el wrapper de tienda/editor
+     ========================================================== */
+  [data-store-accent="champagne"] {
+    --primary: 40 55% 44%;
+    --primary-foreground: 40 40% 98%;
+    --accent: 40 55% 44%;
+    --accent-foreground: 40 40% 98%;
+    --ring: 40 55% 44%;
+    --gold: 42 70% 50%;
+  }
+  .store-dark[data-store-accent="champagne"] {
+    --primary: 42 78% 62%;
+    --primary-foreground: 30 15% 8%;
+    --accent: 42 78% 62%;
+    --accent-foreground: 30 15% 8%;
+    --ring: 42 78% 62%;
+    --gold: 42 88% 62%;
+  }
+
+  [data-store-accent="coral"] {
+    --primary: 9 74% 56%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 9 74% 56%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 9 74% 56%;
+    --gold: 14 80% 58%;
+  }
+  .store-dark[data-store-accent="coral"] {
+    --primary: 13 100% 71%;
+    --primary-foreground: 12 30% 10%;
+    --accent: 13 100% 71%;
+    --accent-foreground: 12 30% 10%;
+    --ring: 13 100% 71%;
+    --gold: 16 90% 68%;
+    background-image:
+      radial-gradient(1200px 500px at 15% -10%, hsl(13 70% 55% / 0.10), transparent 60%),
+      radial-gradient(900px 400px at 100% 10%, hsl(20 30% 30% / 0.15), transparent 55%),
+      linear-gradient(180deg, hsl(15 10% 5%), hsl(15 8% 7%));
+  }
+
+  [data-store-accent="esmeralda"] {
+    --primary: 163 78% 27%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 163 78% 27%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 163 78% 27%;
+    --gold: 160 60% 35%;
+  }
+  .store-dark[data-store-accent="esmeralda"] {
+    --primary: 157 65% 58%;
+    --primary-foreground: 160 40% 8%;
+    --accent: 157 65% 58%;
+    --accent-foreground: 160 40% 8%;
+    --ring: 157 65% 58%;
+    --gold: 157 70% 60%;
+    background-image:
+      radial-gradient(1200px 500px at 15% -10%, hsl(157 55% 45% / 0.10), transparent 60%),
+      radial-gradient(900px 400px at 100% 10%, hsl(170 25% 25% / 0.15), transparent 55%),
+      linear-gradient(180deg, hsl(170 12% 5%), hsl(168 9% 7%));
+  }
+
+  [data-store-accent="zafiro"] {
+    --primary: 211 63% 40%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 211 63% 40%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 211 63% 40%;
+    --gold: 205 60% 45%;
+  }
+  .store-dark[data-store-accent="zafiro"] {
+    --primary: 210 83% 69%;
+    --primary-foreground: 215 45% 10%;
+    --accent: 210 83% 69%;
+    --accent-foreground: 215 45% 10%;
+    --ring: 210 83% 69%;
+    --gold: 205 85% 70%;
+    background-image:
+      radial-gradient(1200px 500px at 15% -10%, hsl(210 65% 50% / 0.10), transparent 60%),
+      radial-gradient(900px 400px at 100% 10%, hsl(215 30% 28% / 0.15), transparent 55%),
+      linear-gradient(180deg, hsl(215 14% 5%), hsl(214 10% 7%));
+  }
+
+  [data-store-accent="lavanda"] {
+    --primary: 260 51% 57%;
+    --primary-foreground: 0 0% 100%;
+    --accent: 260 51% 57%;
+    --accent-foreground: 0 0% 100%;
+    --ring: 260 51% 57%;
+    --gold: 268 50% 58%;
+  }
+  .store-dark[data-store-accent="lavanda"] {
+    --primary: 260 82% 78%;
+    --primary-foreground: 265 40% 10%;
+    --accent: 260 82% 78%;
+    --accent-foreground: 265 40% 10%;
+    --ring: 260 82% 78%;
+    --gold: 265 80% 78%;
+    background-image:
+      radial-gradient(1200px 500px at 15% -10%, hsl(260 60% 55% / 0.10), transparent 60%),
+      radial-gradient(900px 400px at 100% 10%, hsl(265 28% 28% / 0.15), transparent 55%),
+      linear-gradient(180deg, hsl(265 12% 5%), hsl(263 9% 7%));
+  }
 }
 
 
