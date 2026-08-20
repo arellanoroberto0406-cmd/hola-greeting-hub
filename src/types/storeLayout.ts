@@ -120,6 +120,22 @@ export type ButtonAnimation =
   | 'neon-border';
 
 
+export type AccentPalette = 'champagne' | 'coral' | 'esmeralda' | 'zafiro' | 'lavanda';
+
+export const ACCENT_PALETTES: {
+  value: AccentPalette;
+  label: string;
+  description: string;
+  light: string;
+  dark: string;
+}[] = [
+  { value: 'champagne', label: 'Champagne', description: 'Dorado cálido y sofisticado', light: '#B08B34', dark: '#E8C471' },
+  { value: 'coral', label: 'Coral', description: 'Cálido, vibrante y cercano', light: '#E2553D', dark: '#FF8A6B' },
+  { value: 'esmeralda', label: 'Esmeralda', description: 'Natural, fresco y premium', light: '#0F7A5A', dark: '#4FD8A5' },
+  { value: 'zafiro', label: 'Zafiro', description: 'Confiable y corporativo', light: '#2563A8', dark: '#6FB3F2' },
+  { value: 'lavanda', label: 'Lavanda', description: 'Creativo y elegante', light: '#7A5AC8', dark: '#B79BF5' },
+];
+
 export interface GlobalStyles {
   headingFont: FontFamily;
   bodyFont: FontFamily;
@@ -129,6 +145,7 @@ export interface GlobalStyles {
   cardShadow: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'glow';
   colorMode?: 'light' | 'dark' | 'auto';
   accentStyle?: 'minimal' | 'bold' | 'neon' | 'pastel';
+  accentPalette?: AccentPalette;
   buttonAnimation?: ButtonAnimation;
 }
 
@@ -141,6 +158,7 @@ export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
   cardShadow: 'lg',
   colorMode: 'light',
   accentStyle: 'bold',
+  accentPalette: 'champagne',
   buttonAnimation: 'lift',
 };
 
