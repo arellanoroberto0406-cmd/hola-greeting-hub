@@ -94,7 +94,7 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
   const { planTier } = useStorePlanTier(store?.id);
-  const { isDark: isStoreDark, toggle: toggleStoreDark } = useStoreDarkMode();
+  const { mode: storeDarkMode, isDark: isStoreDark, cycle: cycleStoreDark } = useStoreDarkMode();
 
   const {
     items,
@@ -361,8 +361,9 @@ const StoreFront = () => {
       }}
     >
       <StoreDarkModeToggle
+        mode={storeDarkMode}
         isDark={isStoreDark}
-        onToggle={toggleStoreDark}
+        onCycle={cycleStoreDark}
         className="fixed bottom-6 right-6 z-50"
       />
 

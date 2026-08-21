@@ -77,7 +77,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
-  const { isDark: isEditorDark, toggle: toggleEditorDark } = useStoreDarkMode();
+  const { mode: editorDarkMode, isDark: isEditorDark, cycle: cycleEditorDark } = useStoreDarkMode();
 
   
   const [sections, setSections] = useState<StoreSection[]>([]);
@@ -356,7 +356,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <StoreDarkModeToggle isDark={isEditorDark} onToggle={toggleEditorDark} label />
+            <StoreDarkModeToggle mode={editorDarkMode} isDark={isEditorDark} onCycle={cycleEditorDark} label />
             <Button variant="outline" size="sm" asChild>
 
               <a href={publishedStoreUrl} target="_blank" rel="noreferrer" className="gap-2">
