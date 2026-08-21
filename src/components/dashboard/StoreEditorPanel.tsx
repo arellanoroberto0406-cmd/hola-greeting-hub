@@ -356,7 +356,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <StoreDarkModeToggle isDark={isEditorDark} onToggle={toggleEditorDark} label />
+            <StoreDarkModeToggle mode={editorDarkMode} isDark={isEditorDark} onCycle={cycleEditorDark} label />
             <Button variant="outline" size="sm" asChild>
 
               <a href={publishedStoreUrl} target="_blank" rel="noreferrer" className="gap-2">
