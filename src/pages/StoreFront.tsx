@@ -94,7 +94,7 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
   const { planTier } = useStorePlanTier(store?.id);
-  const { isDark: isStoreDark, toggle: toggleStoreDark } = useStoreDarkMode();
+  const { mode: storeDarkMode, isDark: isStoreDark, cycle: cycleStoreDark } = useStoreDarkMode();
 
   const {
     items,

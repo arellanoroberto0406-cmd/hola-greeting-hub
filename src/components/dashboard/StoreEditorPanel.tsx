@@ -77,7 +77,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
-  const { isDark: isEditorDark, toggle: toggleEditorDark } = useStoreDarkMode();
+  const { mode: editorDarkMode, isDark: isEditorDark, cycle: cycleEditorDark } = useStoreDarkMode();
 
   
   const [sections, setSections] = useState<StoreSection[]>([]);
