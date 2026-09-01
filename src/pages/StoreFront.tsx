@@ -2,6 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
 import { useStoreLayout } from "@/hooks/useStoreLayout";
 import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
+
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
 
 import { useStorePlanTier } from "@/hooks/useStorePlanTier";

@@ -26,6 +26,8 @@ import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
 import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
+
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
 
 import { useUpdateStore } from "@/hooks/useStores";
