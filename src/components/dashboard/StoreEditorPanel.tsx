@@ -314,7 +314,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
 
   return (
     <div
-      data-store-accent={globalStyles.accentPalette || 'champagne'}
+      data-store-accent={accentPalette}
       className={`space-y-6 rounded-2xl transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}
     >
 
