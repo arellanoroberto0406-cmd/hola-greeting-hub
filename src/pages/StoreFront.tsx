@@ -2,6 +2,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useStore, useStoreProducts } from "@/hooks/useStores";
 import { useStoreLayout } from "@/hooks/useStoreLayout";
 import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
+
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
 
 import { useStorePlanTier } from "@/hooks/useStorePlanTier";
@@ -134,6 +136,10 @@ const StoreFront = () => {
   const globalStyles = useMemo(() => {
     return layout?.globalStyles || DEFAULT_GLOBAL_STYLES;
   }, [layout]);
+
+  // Paleta de acentos sincronizada entre pestañas (evento `storage`)
+  const accentPalette = useStoreAccentSync(globalStyles.accentPalette);
+
 
   // All products mapped
   const allProducts = useMemo(() => {
@@ -353,7 +359,7 @@ const StoreFront = () => {
 
   return (
     <div 
-      data-store-accent={globalStyles.accentPalette || 'champagne'}
+      data-store-accent={accentPalette}
       className={`min-h-screen bg-background transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
       data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 

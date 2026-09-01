@@ -66,6 +66,20 @@ export function useStoreDarkMode() {
     return () => mediaQuery.removeEventListener("change", listener);
   }, [mode]);
 
+  // Sync across tabs: react to changes of the storage key in other tabs.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== STORAGE_KEY && e.key !== null) return;
+      const next = readSavedMode() ?? "auto";
+      setMode((prev) => (prev === next ? prev : next));
+      setIsDark(resolveIsDark(next));
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+
   const setModeAndResolve = useCallback((next: ThemeMode) => {
     setMode(next);
   }, []);

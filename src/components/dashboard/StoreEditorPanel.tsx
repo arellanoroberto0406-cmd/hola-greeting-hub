@@ -26,6 +26,8 @@ import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
 import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
+
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
 
 import { useUpdateStore } from "@/hooks/useStores";
@@ -82,6 +84,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
+  // Paleta de acentos sincronizada entre pestañas (evento `storage`)
+  const accentPalette = useStoreAccentSync(globalStyles.accentPalette);
+
   const [headerFooter, setHeaderFooter] = useState<HeaderFooterValues>(() => buildHeaderFooterValues(store));
   const [editingSection, setEditingSection] = useState<StoreSection | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -309,7 +314,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
 
   return (
     <div
-      data-store-accent={globalStyles.accentPalette || 'champagne'}
+      data-store-accent={accentPalette}
       className={`space-y-6 rounded-2xl transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}
     >
 
