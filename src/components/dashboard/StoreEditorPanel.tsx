@@ -84,6 +84,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
+  // Paleta de acentos sincronizada entre pestañas (evento `storage`)
+  const accentPalette = useStoreAccentSync(globalStyles.accentPalette);
+
   const [headerFooter, setHeaderFooter] = useState<HeaderFooterValues>(() => buildHeaderFooterValues(store));
   const [editingSection, setEditingSection] = useState<StoreSection | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

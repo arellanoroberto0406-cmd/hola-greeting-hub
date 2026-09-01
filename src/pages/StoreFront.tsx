@@ -137,6 +137,10 @@ const StoreFront = () => {
     return layout?.globalStyles || DEFAULT_GLOBAL_STYLES;
   }, [layout]);
 
+  // Paleta de acentos sincronizada entre pestañas (evento `storage`)
+  const accentPalette = useStoreAccentSync(globalStyles.accentPalette);
+
+
   // All products mapped
   const allProducts = useMemo(() => {
     return (productsData || []).map(mapDbProduct);
