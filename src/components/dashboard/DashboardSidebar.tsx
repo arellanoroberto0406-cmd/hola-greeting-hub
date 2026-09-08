@@ -46,6 +46,7 @@ const tabs = [
   { id: "analytics", label: "Analytics", icon: BarChart3, group: "marketing", minPlan: "professional" as PlanTier },
   { id: "coupons", label: "Cupones", icon: Tag, group: "marketing", minPlan: "professional" as PlanTier },
   { id: "chat", label: "Chat en Vivo", icon: MessagesSquare, group: "marketing", minPlan: "professional" as PlanTier },
+  { id: "my-stores", label: "Mis Tiendas", icon: LayoutGrid, group: "configuración", minPlan: "basic" as PlanTier },
   { id: "editor", label: "Editor Visual", icon: Layers, group: "configuración", minPlan: "basic" as PlanTier },
   { id: "settings", label: "Configuración", icon: Settings, group: "configuración", minPlan: "basic" as PlanTier },
   { id: "subscription", label: "Mi Plan", icon: CreditCard, group: "configuración", minPlan: "basic" as PlanTier },
