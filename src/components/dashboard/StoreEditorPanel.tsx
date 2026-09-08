@@ -25,7 +25,7 @@ import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
-import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import { useStoreDarkMode, type ThemeMode } from "@/hooks/useStoreDarkMode";
 import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
 
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
@@ -79,9 +79,31 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
-  const { mode: editorDarkMode, isDark: isEditorDark, cycle: cycleEditorDark } = useStoreDarkMode(
-    store.slug || store.id
-  );
+  const storeDefaultTheme: ThemeMode =
+    store.default_theme === "dark" ? "dark" : store.default_theme === "light" ? "light" : "auto";
+  const {
+    mode: editorDarkMode,
+    isDark: isEditorDark,
+    cycle: cycleEditorDark,
+  } = useStoreDarkMode(store.slug || store.id, storeDefaultTheme);
+
+  // Guarda el tema elegido en la base de datos para que persista al recargar.
+  const handleCycleTheme = () => {
+    const next: ThemeMode =
+      editorDarkMode === "light" ? "dark" : editorDarkMode === "dark" ? "auto" : "light";
+    cycleEditorDark();
+    updateStore.mutate(
+      { id: store.id, default_theme: next },
+      {
+        onError: () =>
+          toast({
+            title: "No se pudo guardar el tema",
+            description: "Intenta de nuevo en un momento.",
+            variant: "destructive",
+          }),
+      }
+    );
+  };
 
   
   const [sections, setSections] = useState<StoreSection[]>([]);
@@ -363,7 +385,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <StoreDarkModeToggle mode={editorDarkMode} isDark={isEditorDark} onCycle={cycleEditorDark} label />
+            <StoreDarkModeToggle mode={editorDarkMode} isDark={isEditorDark} onCycle={handleCycleTheme} label />
             <Button variant="outline" size="sm" asChild>
 
               <a href={publishedStoreUrl} target="_blank" rel="noreferrer" className="gap-2">
