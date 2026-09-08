@@ -454,7 +454,7 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-13 text-base gap-2.5 rounded-xl shadow-xl shadow-primary/30 font-bold mt-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-primary/40 transition-all duration-300"
+                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
