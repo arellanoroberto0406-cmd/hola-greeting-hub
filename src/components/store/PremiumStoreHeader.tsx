@@ -22,6 +22,8 @@ import { Store as StoreType } from "@/types/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import HeaderSecurityStrip from "./HeaderSecurityStrip";
+import CartSheet from "./CartSheet";
+
 
 type PlanTier = "basic" | "professional" | "enterprise";
 
@@ -295,30 +297,34 @@ const PremiumStoreHeader = ({
               </Button>
 
               {/* Cart Button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  "relative rounded-xl gap-1.5 transition-all",
-                  totalItems > 0 && "text-white hover:text-white"
-                )}
-                style={totalItems > 0 ? {
-                  background: `linear-gradient(135deg, ${store.primary_color}, ${store.primary_color}cc)`,
-                  boxShadow: `0 2px 12px ${store.primary_color}30`,
-                } : undefined}
-              >
-                <ShoppingCart className="h-[18px] w-[18px]" />
-                {totalItems > 0 && (
-                  <motion.span
-                    key={totalItems}
-                    initial={{ scale: 0.5, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-xs font-bold"
-                  >
-                    {totalItems}
-                  </motion.span>
-                )}
-              </Button>
+              <CartSheet slug={slug} primaryColor={store.primary_color || undefined}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  aria-label="Abrir carrito"
+                  className={cn(
+                    "relative rounded-xl gap-1.5 transition-all",
+                    totalItems > 0 && "text-white hover:text-white"
+                  )}
+                  style={totalItems > 0 ? {
+                    background: `linear-gradient(135deg, ${store.primary_color}, ${store.primary_color}cc)`,
+                    boxShadow: `0 2px 12px ${store.primary_color}30`,
+                  } : undefined}
+                >
+                  <ShoppingCart className="h-[18px] w-[18px]" />
+                  {totalItems > 0 && (
+                    <motion.span
+                      key={totalItems}
+                      initial={{ scale: 0.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      className="text-xs font-bold"
+                    >
+                      {totalItems}
+                    </motion.span>
+                  )}
+                </Button>
+              </CartSheet>
+
 
               {/* Mobile Menu */}
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>

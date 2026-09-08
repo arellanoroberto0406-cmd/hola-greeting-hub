@@ -746,13 +746,22 @@ const StoreCheckout = () => {
                   Contactar por WhatsApp
                 </a>
               )}
-              <div className="mt-4">
+              <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
+                <Link to={`/tienda/${slug}/cuenta`}>
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    Ver mi pedido en Mi cuenta
+                  </Button>
+                </Link>
                 <Link to={`/tienda/${slug}`}>
-                  <Button size="lg" style={{ backgroundColor: primaryColor }}>
+                  <Button size="lg" style={{ backgroundColor: primaryColor }} className="w-full sm:w-auto">
                     Seguir comprando
                   </Button>
                 </Link>
               </div>
+              <p className="text-xs text-muted-foreground mt-3">
+                Si compraste como invitado, crea tu cuenta con el mismo correo y tu pedido aparecerá automáticamente.
+              </p>
+
             </div>
           </div>
         </div>
