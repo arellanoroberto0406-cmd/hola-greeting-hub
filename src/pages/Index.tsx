@@ -180,7 +180,7 @@ const Index = () => {
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
                 <Store className="h-4.5 w-4.5 text-primary-foreground" />
               </div>
-              <span className="font-heading text-lg font-bold tracking-tight">MiTienda</span>
+              <span className="font-heading text-lg font-bold tracking-tight">APP TIENDA</span>
             </motion.div>
             
             <nav className="hidden md:flex items-center gap-8">
