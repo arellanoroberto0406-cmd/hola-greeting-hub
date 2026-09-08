@@ -25,7 +25,7 @@ import GlobalStylesPanel from "./store-editor/GlobalStylesPanel";
 import TemplatesPanel from "./store-editor/TemplatesPanel";
 import ProDesignPanel from "./store-editor/ProDesignPanel";
 import HeaderFooterPanel, { HeaderFooterValues, buildHeaderFooterValues } from "./store-editor/HeaderFooterPanel";
-import { useStoreDarkMode } from "@/hooks/useStoreDarkMode";
+import { useStoreDarkMode, type ThemeMode } from "@/hooks/useStoreDarkMode";
 import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
 
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
@@ -385,7 +385,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <StoreDarkModeToggle mode={editorDarkMode} isDark={isEditorDark} onCycle={cycleEditorDark} label />
+            <StoreDarkModeToggle mode={editorDarkMode} isDark={isEditorDark} onCycle={handleCycleTheme} label />
             <Button variant="outline" size="sm" asChild>
 
               <a href={publishedStoreUrl} target="_blank" rel="noreferrer" className="gap-2">
