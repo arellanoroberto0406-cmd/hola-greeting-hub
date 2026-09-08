@@ -116,6 +116,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [hasChanges, setHasChanges] = useState(false);
+  const [editorTab, setEditorTab] = useState("all-in-one");
+  const [advancedMode, setAdvancedMode] = useState(() => localStorage.getItem("editor_advanced_mode") === "1");
+
   
   const sectionsWithAvailability = getSectionsWithAvailability(planTier);
   const [showLivePreview, setShowLivePreview] = useState(true);
