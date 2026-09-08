@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ACCENT_PALETTES, AccentPalette, DEFAULT_GLOBAL_STYLES, DEFAULT_SECTIONS, GlobalStyles, StoreSection } from "@/types/storeLayout";
-import { Loader2, Store as StoreIcon, Sun, Moon, Monitor, Layers, ExternalLink } from "lucide-react";
+import { Loader2, Store as StoreIcon, Sun, Moon, Monitor, Layers, ExternalLink, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ThemeMode = "light" | "dark" | "auto";
@@ -122,12 +123,15 @@ const MyStoresPanel = ({ userId }: { userId: string | undefined }) => {
     );
   }
 
+  const publicOrigin = typeof window !== "undefined" ? window.location.origin : "https://apptienda.lovable.app";
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {stores.map((store) => {
         const theme = (store.default_theme === "dark" || store.default_theme === "light" ? store.default_theme : "auto") as ThemeMode;
         const accent = (store.globalStyles.accentPalette || "champagne") as AccentPalette;
         const visibleSections = store.sections.filter((s) => s.enabled !== false).length;
+        const publicUrl = `${publicOrigin}/tienda/${store.slug}`;
 
         return (
           <Card key={store.id} className="overflow-hidden border-border/60">
@@ -150,6 +154,19 @@ const MyStoresPanel = ({ userId }: { userId: string | undefined }) => {
 
               <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-flex items-center gap-1"><Layers className="h-3.5 w-3.5" />{visibleSections} de {store.sections.length} secciones visibles</span>
+              </div>
+
+              <div className="rounded-xl border border-border/60 bg-muted/30 p-3 space-y-2">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Enlace público</p>
+                <p className="text-sm font-medium truncate" title={publicUrl}>{publicUrl}</p>
+                <div className="flex gap-2">
+                  <CopyButton url={publicUrl} />
+                  <Button variant="default" size="sm" className="flex-1 gap-2" asChild>
+                    <a href={publicUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink className="h-4 w-4" />Abrir tienda
+                    </a>
+                  </Button>
+                </div>
               </div>
 
               <div>
@@ -192,17 +209,34 @@ const MyStoresPanel = ({ userId }: { userId: string | undefined }) => {
                   Actual: {ACCENT_PALETTES.find((p) => p.value === accent)?.label}
                 </p>
               </div>
-
-              <Button variant="outline" size="sm" className="w-full gap-2" asChild>
-                <a href={`/${store.slug}`} target="_blank" rel="noreferrer">
-                  <ExternalLink className="h-4 w-4" />Ver tienda
-                </a>
-              </Button>
             </CardContent>
           </Card>
         );
       })}
     </div>
+  );
+};
+
+const CopyButton = ({ url }: { url: string }) => {
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast({ title: "Enlace copiado", description: "Ya puedes compartir tu tienda." });
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast({ title: "No se pudo copiar", variant: "destructive" });
+    }
+  };
+
+  return (
+    <Button variant="outline" size="sm" className="gap-2" onClick={handleCopy} aria-label="Copiar enlace">
+      {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+      {copied ? "Copiado" : "Copiar"}
+    </Button>
   );
 };
 
