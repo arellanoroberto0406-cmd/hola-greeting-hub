@@ -612,7 +612,7 @@ const Index = () => {
               <span className="block mt-2 bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">clientes felices</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Miles de emprendedores confían en MiTienda para hacer crecer su negocio
+              Miles de emprendedores confían en APP TIENDA para hacer crecer su negocio
             </p>
           </motion.div>
 
@@ -665,7 +665,7 @@ const Index = () => {
             {[
               { value: "4.9/5", label: "Calificación promedio" },
               { value: "2,500+", label: "Reseñas verificadas" },
-              { value: "98%", label: "Recomiendan MiTienda" },
+              { value: "98%", label: "Recomiendan APP TIENDA" },
             ].map((s, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl md:text-4xl font-bold font-heading bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">{s.value}</p>
