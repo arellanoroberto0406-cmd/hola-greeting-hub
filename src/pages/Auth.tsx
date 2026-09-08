@@ -286,14 +286,24 @@ const Auth = () => {
                 <div className="h-px flex-1 bg-border/70" />
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoogle}
-                className="w-full h-14 rounded-2xl border border-border/70 bg-background/70 hover:bg-background hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 font-semibold text-sm shadow-sm"
-              >
-                <GoogleIcon />
-                Google
-              </button>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { key: "google", label: "Google", icon: <GoogleIcon />, onClick: handleGoogle },
+                  { key: "apple", label: "Apple", icon: <AppleIcon />, onClick: () => toast({ title: "Apple", description: "Este acceso estará disponible pronto." }) },
+                  { key: "facebook", label: "Facebook", icon: <FacebookIcon />, onClick: () => toast({ title: "Facebook", description: "Este acceso estará disponible pronto." }) },
+                ].map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={s.onClick}
+                    className="h-[86px] rounded-2xl border border-border/70 bg-background/80 hover:bg-background hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center justify-center gap-2 text-xs font-medium text-foreground/80 shadow-sm"
+                  >
+                    {s.icon}
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+
 
               <p className="text-center text-sm text-muted-foreground mt-6">
                 {isSignup ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
