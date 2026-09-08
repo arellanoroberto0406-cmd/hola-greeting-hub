@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ACCENT_PALETTES, AccentPalette, DEFAULT_GLOBAL_STYLES, DEFAULT_SECTIONS, GlobalStyles, StoreSection } from "@/types/storeLayout";
-import { Loader2, Store as StoreIcon, Sun, Moon, Monitor, Layers, ExternalLink } from "lucide-react";
+import { Loader2, Store as StoreIcon, Sun, Moon, Monitor, Layers, ExternalLink, Copy, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ThemeMode = "light" | "dark" | "auto";
