@@ -77,6 +77,7 @@ const DashboardSidebar = ({
   onMobileClose
 }: DashboardSidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const isTabLocked = (minPlan: PlanTier) => planOrder[planTier] < planOrder[minPlan];
 
@@ -97,14 +98,29 @@ const DashboardSidebar = ({
           const groupTabs = tabs.filter(t => t.group === group.id);
           if (groupTabs.length === 0) return null;
 
+          const isMore = group.id === "mas";
+          const activeInMore = isMore && groupTabs.some(t => t.id === activeTab);
+          const collapsedGroup = isMore && !showMore && !activeInMore && !isCollapsed;
+
           return (
             <div key={group.id}>
-              {!isCollapsed && (
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-3 mb-2">
-                  {group.label}
-                </p>
+              {!isCollapsed && group.label && (
+                isMore ? (
+                  <button
+                    onClick={() => setShowMore(v => !v)}
+                    className="w-full flex items-center justify-between px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors"
+                  >
+                    {group.label}
+                    <ChevronDown className={cn("h-3 w-3 transition-transform", (showMore || activeInMore) && "rotate-180")} />
+                  </button>
+                ) : (
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-3 mb-2">
+                    {group.label}
+                  </p>
+                )
               )}
-              <div className="space-y-0.5">
+              <div className={cn("space-y-0.5", collapsedGroup && "hidden")}>
+
                 {groupTabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   const hasNotification = tab.id === "chat" && unreadCount > 0;
