@@ -290,6 +290,43 @@ const StoreCheckout = () => {
 
        const order = createOrderRes.order as { id: string };
 
+      const orderSnapshot = {
+        id: order.id,
+        paymentMethod: data.paymentMethod,
+        total: finalTotal,
+        subtotal: totalPrice,
+        shipping: shippingCost,
+        items: items.map((item) => ({
+          name: item.name,
+          image: item.image,
+          quantity: item.quantity,
+          price: item.price,
+          variant: item.selectedColor || null,
+        })),
+        customer: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zipCode: data.zipCode,
+        },
+      };
+
+      // Pago real con tarjeta
+      if (data.paymentMethod === 'card' && isPaymentsConfigured()) {
+        try {
+          sessionStorage.setItem(`order-confirm-${order.id}`, JSON.stringify(orderSnapshot));
+        } catch { /* almacenamiento opcional */ }
+        setCompletedOrder(orderSnapshot);
+        setCardOrderId(order.id);
+        setIsSubmitting(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
       // Handle MercadoPago payment
       if (data.paymentMethod === 'mercadopago') {
         // Check if store has MercadoPago configured
