@@ -219,7 +219,7 @@ const MyStoresPanel = ({ userId }: { userId: string | undefined }) => {
 
 const CopyButton = ({ url }: { url: string }) => {
   const { toast } = useToast();
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
     try {
