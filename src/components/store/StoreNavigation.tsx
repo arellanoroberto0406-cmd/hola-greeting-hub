@@ -35,6 +35,8 @@ import {
   Store,
 } from "lucide-react";
 import { Store as StoreType } from "@/types/store";
+import CartSheet from "./CartSheet";
+
 
 interface StoreNavigationProps {
   store: StoreType;
