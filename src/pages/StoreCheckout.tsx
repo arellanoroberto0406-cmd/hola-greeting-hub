@@ -89,6 +89,10 @@ const StoreCheckout = () => {
     id: string;
     paymentMethod: string;
     total: number;
+    subtotal: number;
+    shipping: number;
+    items: { name: string; image?: string; quantity: number; price: number; variant?: string | null }[];
+    customer: { firstName: string; lastName: string; email: string; phone: string; address: string; city: string; state: string; zipCode: string };
   } | null>(null);
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
