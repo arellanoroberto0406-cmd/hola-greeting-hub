@@ -529,6 +529,43 @@ const StoreCheckout = () => {
 
   const primaryColor = store.primary_color || "#8B4513";
 
+  // Pantalla de pago con tarjeta (cobro real)
+  if (cardOrderId && !orderComplete) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b py-4" style={{ backgroundColor: `${primaryColor}10` }}>
+          <div className="container mx-auto px-4 flex items-center gap-3">
+            {store.logo_url ? (
+              <img src={store.logo_url} alt={store.name} className="h-8 w-auto" />
+            ) : (
+              <Store className="h-6 w-6" style={{ color: primaryColor }} />
+            )}
+            <span className="font-heading text-lg" style={{ color: primaryColor }}>{store.name}</span>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-10">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-heading">Pago seguro con tarjeta</h1>
+              <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4" /> Total a pagar: ${finalTotal.toLocaleString('es-MX')} {(store as any).currency || 'MXN'}
+              </p>
+            </div>
+            <StoreCardCheckout
+              orderId={cardOrderId}
+              returnUrl={`${window.location.origin}/tienda/${slug}/checkout?status=success&order=${cardOrderId}`}
+            />
+            <div className="text-center">
+              <Button variant="ghost" onClick={() => setCardOrderId(null)}>
+                Cancelar y elegir otro método
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Handle payment failure from MercadoPago
   if (paymentStatus === 'failure') {
     return (
