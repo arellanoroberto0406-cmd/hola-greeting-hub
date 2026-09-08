@@ -20,6 +20,9 @@ import {
   SubscriptionPlan 
 } from "@/hooks/useSubscription";
 import { usePayPalPayment } from "@/hooks/usePayPalPayment";
+import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { isPaymentsConfigured } from "@/lib/stripe";
 
 interface SubscriptionPanelProps {
   storeId: string;
@@ -92,7 +95,8 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer' | 'code' | 'whatsapp'>('paypal');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal' | 'transfer' | 'code' | 'whatsapp'>('card');
+  const [showCardForm, setShowCardForm] = useState(false);
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isUploadingProof, setIsUploadingProof] = useState(false);
@@ -590,8 +594,11 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 </div>
 
                 {/* Payment Method Tabs */}
-                <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
-                  <TabsList className="grid w-full grid-cols-4">
+                <Tabs value={paymentMethod} onValueChange={(v) => { setPaymentMethod(v as any); setShowCardForm(false); }}>
+                  <TabsList className="grid w-full grid-cols-5">
+                    <TabsTrigger value="card" className="flex items-center gap-1 text-xs">
+                      <CreditCard className="h-3.5 w-3.5" />Tarjeta
+                    </TabsTrigger>
                     <TabsTrigger value="paypal" className="flex items-center gap-1 text-xs">
                       <CreditCard className="h-3.5 w-3.5" />PayPal
                     </TabsTrigger>
@@ -605,6 +612,43 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                       <Ticket className="h-3.5 w-3.5" />Código
                     </TabsTrigger>
                   </TabsList>
+
+                  {/* Card Tab */}
+                  <TabsContent value="card" className="space-y-3 mt-3">
+                    {!isPaymentsConfigured() ? (
+                      <div className="rounded-lg border border-red-200 bg-red-50 p-3">
+                        <p className="text-sm text-red-700">El pago con tarjeta aún no está disponible en esta versión.</p>
+                      </div>
+                    ) : showCardForm && selectedPlan ? (
+                      <div className="space-y-3">
+                        <PaymentTestModeBanner />
+                        <StripeEmbeddedCheckout
+                          priceId={`${selectedPlan.slug}_${billingCycle === 'yearly' ? 'yearly' : 'monthly'}`}
+                          storeId={storeId}
+                          planId={selectedPlan.id}
+                          billingCycle={billingCycle}
+                          returnUrl={`${window.location.origin}/dashboard?checkout=success&session_id={CHECKOUT_SESSION_ID}`}
+                        />
+                        <Button variant="outline" className="w-full" onClick={() => setShowCardForm(false)}>
+                          Cancelar
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
+                          <p className="text-sm font-medium flex items-center gap-2">
+                            <ShieldCheck className="h-4 w-4 text-green-600" />Pago seguro con tarjeta
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Acepta Visa, Mastercard y American Express. Tu plan se activa automáticamente al confirmarse el pago.
+                          </p>
+                        </div>
+                        <Button className="w-full" onClick={() => setShowCardForm(true)}>
+                          <CreditCard className="mr-2 h-4 w-4" />Pagar ${selectedPrice} MXN con tarjeta
+                        </Button>
+                      </div>
+                    )}
+                  </TabsContent>
 
                   {/* PayPal Tab */}
                   <TabsContent value="paypal" className="space-y-3 mt-3">
