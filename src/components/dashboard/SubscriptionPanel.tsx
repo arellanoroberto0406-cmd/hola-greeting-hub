@@ -594,8 +594,11 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
                 </div>
 
                 {/* Payment Method Tabs */}
-                <Tabs value={paymentMethod} onValueChange={(v) => setPaymentMethod(v as any)}>
-                  <TabsList className="grid w-full grid-cols-4">
+                <Tabs value={paymentMethod} onValueChange={(v) => { setPaymentMethod(v as any); setShowCardForm(false); }}>
+                  <TabsList className="grid w-full grid-cols-5">
+                    <TabsTrigger value="card" className="flex items-center gap-1 text-xs">
+                      <CreditCard className="h-3.5 w-3.5" />Tarjeta
+                    </TabsTrigger>
                     <TabsTrigger value="paypal" className="flex items-center gap-1 text-xs">
                       <CreditCard className="h-3.5 w-3.5" />PayPal
                     </TabsTrigger>
