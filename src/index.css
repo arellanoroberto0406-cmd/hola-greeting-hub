@@ -798,3 +798,81 @@ All colors MUST be HSL.
 }
 
 
+
+/* ============ MODERN UI KIT (2026 refresh) ============ */
+
+/* Aurora mesh backdrop */
+.aurora-mesh {
+  background:
+    radial-gradient(45% 40% at 15% 15%, hsl(var(--primary) / 0.22), transparent 70%),
+    radial-gradient(40% 35% at 85% 10%, hsl(var(--accent) / 0.18), transparent 70%),
+    radial-gradient(50% 45% at 75% 85%, hsl(var(--primary) / 0.14), transparent 70%);
+  filter: blur(40px);
+  animation: aurora-drift 22s ease-in-out infinite alternate;
+}
+@keyframes aurora-drift {
+  0% { transform: scale(1) translate3d(0,0,0); }
+  50% { transform: scale(1.08) translate3d(2%, -2%, 0); }
+  100% { transform: scale(1.02) translate3d(-2%, 2%, 0); }
+}
+
+/* Glass surface with gradient hairline border */
+.glass-surface {
+  position: relative;
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  box-shadow:
+    0 1px 0 0 hsl(0 0% 100% / 0.06) inset,
+    0 30px 70px -30px hsl(var(--primary) / 0.28),
+    0 10px 40px -20px hsl(0 0% 0% / 0.35);
+}
+.glass-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(140deg, hsl(var(--primary) / 0.55), hsl(var(--border) / 0.25) 40%, transparent 70%, hsl(var(--primary) / 0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Shine sweep CTA */
+.shine-cta {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.shine-cta::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -140%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, hsl(0 0% 100% / 0.28), transparent);
+  transform: skewX(-18deg);
+  transition: left 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.shine-cta:hover::after { left: 140%; }
+
+/* Soft elevated tile */
+.soft-tile {
+  background: linear-gradient(160deg, hsl(var(--muted) / 0.35), hsl(var(--muted) / 0.12));
+  border: 1px solid hsl(var(--border) / 0.35);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.soft-tile:hover {
+  transform: translateY(-3px);
+  border-color: hsl(var(--primary) / 0.35);
+  box-shadow: 0 16px 34px -18px hsl(var(--primary) / 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-mesh { animation: none; }
+  .shine-cta::after { display: none; }
+}
