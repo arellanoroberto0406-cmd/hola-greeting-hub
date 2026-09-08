@@ -876,3 +876,12 @@ All colors MUST be HSL.
   .aurora-mesh { animation: none; }
   .shine-cta::after { display: none; }
 }
+
+/* Auth canvas — soft pastel gradient (MiTienda style) */
+.auth-canvas {
+  background:
+    radial-gradient(900px 600px at 12% 8%, hsl(var(--primary) / 0.10), transparent 60%),
+    radial-gradient(800px 620px at 92% 12%, hsl(265 80% 70% / 0.12), transparent 60%),
+    radial-gradient(900px 700px at 50% 105%, hsl(200 90% 72% / 0.10), transparent 60%),
+    hsl(var(--background));
+}
