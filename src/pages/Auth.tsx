@@ -303,23 +303,23 @@ const Auth = () => {
 
             {/* Tab Switcher */}
             <div className="px-6 md:px-8 pt-6 lg:pt-4">
-              <div className="flex bg-muted/40 rounded-2xl p-1.5 gap-1">
+              <div className="flex bg-background/50 border border-border/40 rounded-2xl p-1 gap-1">
                 {(["signup", "signin"] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => { setActiveTab(tab); setErrors({}); setShowForgotPassword(false); }}
                     className={`
-                      flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 relative
-                      ${activeTab === tab 
-                        ? "text-primary-foreground" 
+                      flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold transition-colors duration-200 relative
+                      ${activeTab === tab
+                        ? "text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground"}
                     `}
                   >
                     {activeTab === tab && (
                       <motion.div
                         layoutId="auth-tab-indicator"
-                        className="absolute inset-0 bg-gradient-to-r from-primary to-primary/90 rounded-xl shadow-lg shadow-primary/25"
-                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/25"
+                        transition={{ type: "spring", stiffness: 400, damping: 34 }}
                       />
                     )}
                     <span className="relative z-10 flex items-center justify-center gap-1.5">
@@ -333,6 +333,7 @@ const Auth = () => {
                 ))}
               </div>
             </div>
+
 
             {/* Form Area */}
             <div className="px-6 md:px-8 pb-8 pt-6 relative">
