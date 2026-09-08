@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Store } from "@/types/store";
+import { STORE_PUBLIC_COLUMNS } from "./storeColumns";
 
 export const useStore = (slug: string) => {
   return useQuery({
@@ -8,13 +9,13 @@ export const useStore = (slug: string) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("stores")
-        .select("*")
+        .select(STORE_PUBLIC_COLUMNS)
         .eq("slug", slug)
         .eq("is_active", true)
         .maybeSingle();
 
       if (error) throw error;
-      return data as Store | null;
+      return data as unknown as Store | null;
     },
     enabled: !!slug,
   });
@@ -28,12 +29,12 @@ export const useMyStore = (userId: string | undefined) => {
       
       const { data, error } = await supabase
         .from("stores")
-        .select("*")
+        .select(STORE_PUBLIC_COLUMNS)
         .eq("owner_id", userId)
         .maybeSingle();
 
       if (error) throw error;
-      return data as Store | null;
+      return data as unknown as Store | null;
     },
     enabled: !!userId,
   });
@@ -47,11 +48,11 @@ export const useCreateStore = () => {
       const { data, error } = await supabase
         .from("stores")
         .insert([store])
-        .select()
+        .select(STORE_PUBLIC_COLUMNS)
         .single();
 
       if (error) throw error;
-      return data as Store;
+      return data as unknown as Store;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-store"] });
@@ -68,11 +69,11 @@ export const useUpdateStore = () => {
         .from("stores")
         .update(updates)
         .eq("id", id)
-        .select()
+        .select(STORE_PUBLIC_COLUMNS)
         .single();
 
       if (error) throw error;
-      return data as Store;
+      return data as unknown as Store;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["my-store"] });

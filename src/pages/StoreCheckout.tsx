@@ -92,6 +92,25 @@ const StoreCheckout = () => {
   } | null>(null);
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
+
+  // Datos de cobro sensibles: se obtienen mediante una funcion segura del backend
+  const [paymentConfig, setPaymentConfig] = useState<{
+    bank_info?: BankInfo | null;
+    paypal_email?: string | null;
+    has_mercadopago?: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!store?.id) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.rpc("get_store_payment_config", { _store_id: store.id });
+      if (!cancelled && !error && data) {
+        setPaymentConfig(data as any);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [store?.id]);
   const { createPreference, isProcessing: isMPProcessing } = useMercadoPagoPayment();
   const { createPayPalOrder, isProcessing: isPayPalProcessing } = usePayPalStorePayment();
 
@@ -263,7 +282,7 @@ const StoreCheckout = () => {
       // Handle MercadoPago payment
       if (data.paymentMethod === 'mercadopago') {
         // Check if store has MercadoPago configured
-        if (!store.mercadopago_access_token) {
+        if (!paymentConfig?.has_mercadopago) {
           toast({
             title: "MercadoPago no configurado",
             description: "Esta tienda no tiene MercadoPago configurado. Por favor selecciona otro método de pago.",
@@ -305,7 +324,7 @@ const StoreCheckout = () => {
 
       // Handle PayPal payment
       if (data.paymentMethod === 'paypal') {
-        if (!store.paypal_email) {
+        if (!paymentConfig?.paypal_email) {
           toast({
             title: "PayPal no configurado",
             description: "Esta tienda no tiene PayPal configurado. Por favor selecciona otro método de pago.",
@@ -549,7 +568,7 @@ const StoreCheckout = () => {
   }
 
   if (orderComplete) {
-    const bankInfo = store.bank_info as BankInfo | null;
+    const bankInfo = (paymentConfig?.bank_info ?? null) as BankInfo | null;
     
     return (
       <div className="min-h-screen bg-background">
