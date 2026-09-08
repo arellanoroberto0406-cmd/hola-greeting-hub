@@ -261,16 +261,25 @@ const CustomerAccount = () => {
           {/* Main Content */}
           <motion.div variants={fadeInUp} className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 mb-6 h-auto">
                 <TabsTrigger value="orders" className="gap-2">
                   <Package className="h-4 w-4" />
-                  Mis Pedidos
+                  Pedidos
+                </TabsTrigger>
+                <TabsTrigger value="cart" className="gap-2">
+                  <ShoppingCart className="h-4 w-4" />
+                  Carrito
                 </TabsTrigger>
                 <TabsTrigger value="wishlist" className="gap-2">
                   <Heart className="h-4 w-4" />
                   Favoritos
                 </TabsTrigger>
+                <TabsTrigger value="profile" className="gap-2">
+                  <User className="h-4 w-4" />
+                  Mis datos
+                </TabsTrigger>
               </TabsList>
+
 
               {/* Orders Tab */}
               <TabsContent value="orders" className="space-y-4">
@@ -462,7 +471,150 @@ const CustomerAccount = () => {
                   </Card>
                 )}
               </TabsContent>
+
+              {/* Cart Tab */}
+              <TabsContent value="cart" className="space-y-4">
+                {cartItems.length > 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Tu carrito actual</CardTitle>
+                      <CardDescription>Продукты guardados listos para comprar</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      {cartItems.map((item) => (
+                        <div key={`${item.product.id}-${item.selectedColor || ""}`} className="flex items-center gap-4">
+                          <img
+                            src={item.product.image}
+                            alt={item.product.name}
+                            className="h-16 w-16 rounded-lg object-cover shrink-0"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium truncate">{item.product.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              ${item.product.price.toLocaleString()} x {item.quantity}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Button size="icon" variant="outline" className="h-8 w-8"
+                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>-</Button>
+                            <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
+                            <Button size="icon" variant="outline" className="h-8 w-8"
+                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>+</Button>
+                            <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive"
+                              onClick={() => removeItem(item.product.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                      <Separator />
+                      <div className="flex items-center justify-between">
+                        <span className="text-muted-foreground">Total</span>
+                        <span className="text-2xl font-bold" style={{ color: store.primary_color }}>
+                          ${totalPrice.toLocaleString()}
+                        </span>
+                      </div>
+                      <Button
+                        className="w-full"
+                        style={{ backgroundColor: store.primary_color }}
+                        onClick={() => navigate(`/tienda/${slug}/checkout`)}
+                      >
+                        Finalizar compra
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card className="py-16">
+                    <CardContent className="text-center space-y-4">
+                      <ShoppingCart className="h-16 w-16 mx-auto text-muted-foreground" />
+                      <div>
+                        <h3 className="font-heading font-bold text-xl">Tu carrito está vacío</h3>
+                        <p className="text-muted-foreground mt-1">Agrega productos para verlos aquí</p>
+                      </div>
+                      <Button style={{ backgroundColor: store.primary_color }} onClick={() => navigate(`/tienda/${slug}`)}>
+                        Ver productos
+                      </Button>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {savedCarts && savedCarts.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Carritos guardados</CardTitle>
+                      <CardDescription>Compras que dejaste pendientes en esta tienda</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {savedCarts.map((c: any) => (
+                        <div key={c.id} className="flex items-center justify-between rounded-lg border p-3">
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium">
+                              {Array.isArray(c.items) ? c.items.length : 0} producto(s)
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(c.created_at), "d 'de' MMMM, yyyy", { locale: es })}
+                            </p>
+                          </div>
+                          <span className="font-bold" style={{ color: store.primary_color }}>
+                            ${Number(c.total).toLocaleString()}
+                          </span>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+
+              {/* Profile Tab */}
+              <TabsContent value="profile" className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg">Datos de mi cuenta</CardTitle>
+                    <CardDescription>Información con la que compras en esta tienda</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <div>
+                        <p className="text-xs text-muted-foreground">Nombre</p>
+                        <p className="font-medium">{profile?.full_name || "Sin nombre"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Correo</p>
+                        <p className="font-medium break-all">{user.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Teléfono</p>
+                        <p className="font-medium">{lastOrder?.phone || "No registrado"}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-muted-foreground">Cliente desde</p>
+                        <p className="font-medium">
+                          {profile?.created_at
+                            ? format(new Date(profile.created_at), "MMMM yyyy", { locale: es })
+                            : "—"}
+                        </p>
+                      </div>
+                    </div>
+                    <Separator />
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Última dirección de envío</p>
+                      <p className="font-medium flex items-start gap-2">
+                        <MapPin className="h-4 w-4 mt-0.5 shrink-0" />
+                        {lastOrder
+                          ? `${lastOrder.address}, ${lastOrder.city}, ${lastOrder.state} ${lastOrder.zip_code}`
+                          : "Aún no tienes pedidos con dirección"}
+                      </p>
+                    </div>
+                    <Separator />
+                    <Button variant="outline" className="gap-2" onClick={signOut}>
+                      <LogOut className="h-4 w-4" />
+                      Cerrar sesión
+                    </Button>
+                  </CardContent>
+                </Card>
+              </TabsContent>
             </Tabs>
+
           </motion.div>
         </motion.div>
       </div>
