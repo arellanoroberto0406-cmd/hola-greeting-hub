@@ -842,7 +842,7 @@ const StoreCheckout = () => {
                 </Link>
                 <Link to={`/tienda/${slug}`}>
                   <Button size="lg" style={{ backgroundColor: primaryColor }} className="w-full sm:w-auto">
-                    Seguir comprando
+                    Volver a la tienda
                   </Button>
                 </Link>
               </div>
