@@ -421,6 +421,25 @@ const StoreCheckout = () => {
          id: order.id,
          paymentMethod: data.paymentMethod,
          total: finalTotal,
+         subtotal: totalPrice,
+         shipping: shippingCost,
+         items: items.map((item) => ({
+           name: item.name,
+           image: item.image,
+           quantity: item.quantity,
+           price: item.price,
+           variant: item.selectedColor || null,
+         })),
+         customer: {
+           firstName: data.firstName,
+           lastName: data.lastName,
+           email: data.email,
+           phone: data.phone,
+           address: data.address,
+           city: data.city,
+           state: data.state,
+           zipCode: data.zipCode,
+         },
        });
       setOrderComplete(true);
       clearCart();
