@@ -321,7 +321,7 @@ const Auth = () => {
                     {activeTab === tab && (
                       <motion.div
                         layoutId="auth-tab-indicator"
-                        className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/25"
+                        className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-xl shadow-lg shadow-primary/30"
                         transition={{ type: "spring", stiffness: 400, damping: 34 }}
                       />
                     )}
