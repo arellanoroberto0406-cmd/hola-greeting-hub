@@ -96,6 +96,27 @@ const CustomerAccount = () => {
     enabled: !!user?.id,
   });
 
+  // Saved / abandoned carts for this store
+  const { data: savedCarts } = useQuery({
+    queryKey: ["customer-carts", user?.id, store?.id],
+    queryFn: async () => {
+      if (!user?.id || !store?.id) return [];
+      const { data, error } = await supabase
+        .from("abandoned_carts")
+        .select("id, items, total, created_at")
+        .eq("user_id", user.id)
+        .eq("store_id", store.id)
+        .eq("recovered", false)
+        .order("created_at", { ascending: false })
+        .limit(5);
+      if (error) return [];
+      return data;
+    },
+    enabled: !!user?.id && !!store?.id,
+  });
+
+  const lastOrder: any = orders?.[0] || null;
+
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "pending":
@@ -479,7 +500,7 @@ const CustomerAccount = () => {
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg">Tu carrito actual</CardTitle>
-                      <CardDescription>Продукты guardados listos para comprar</CardDescription>
+                      <CardDescription>Productos listos para comprar</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {cartItems.map((item) => (
