@@ -180,19 +180,33 @@ const Auth = () => {
       {/* === RIGHT: AUTH CARD === */}
       <div className="w-full lg:w-[48%] flex flex-col items-center justify-center px-5 py-10 md:px-12 relative z-10">
         <div className="w-full max-w-[430px]">
-          {/* Mobile brand */}
-          <div className="lg:hidden flex justify-center mb-6">
-            <Brand onClick={() => navigate("/inicio")} size="sm" />
+          {/* Mobile top bar: back + small brand */}
+          <div className="lg:hidden relative flex items-center justify-center mb-7">
+            <button
+              type="button"
+              onClick={() => navigate("/inicio")}
+              aria-label="Volver"
+              className="absolute left-0 h-10 w-10 rounded-full flex items-center justify-center text-foreground/70 hover:bg-foreground/5 transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-[0.7rem] bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
+                <Store className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="font-heading text-base font-bold tracking-tight">APP TIENDA</span>
+            </div>
           </div>
 
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-[2rem] bg-card/85 backdrop-blur-xl border border-border/50 shadow-[0_30px_80px_-40px_hsl(var(--primary)/0.45)] px-6 md:px-8 py-8"
+            className="relative rounded-[2rem] bg-card/85 backdrop-blur-xl border border-border/50 shadow-[0_30px_80px_-40px_hsl(var(--primary)/0.35)] px-6 md:px-8 py-8"
           >
             {/* Heading */}
-            <div className="text-center mb-6">
+            <div className="mb-6">
+
               <motion.h2
                 key={activeTab}
                 initial={{ opacity: 0, y: 8 }}
@@ -272,14 +286,24 @@ const Auth = () => {
                 <div className="h-px flex-1 bg-border/70" />
               </div>
 
-              <button
-                type="button"
-                onClick={handleGoogle}
-                className="w-full h-14 rounded-2xl border border-border/70 bg-background/70 hover:bg-background hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 font-semibold text-sm shadow-sm"
-              >
-                <GoogleIcon />
-                Google
-              </button>
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { key: "google", label: "Google", icon: <GoogleIcon />, onClick: handleGoogle },
+                  { key: "apple", label: "Apple", icon: <AppleIcon />, onClick: () => toast({ title: "Apple", description: "Este acceso estará disponible pronto." }) },
+                  { key: "facebook", label: "Facebook", icon: <FacebookIcon />, onClick: () => toast({ title: "Facebook", description: "Este acceso estará disponible pronto." }) },
+                ].map((s) => (
+                  <button
+                    key={s.key}
+                    type="button"
+                    onClick={s.onClick}
+                    className="h-[86px] rounded-2xl border border-border/70 bg-background/80 hover:bg-background hover:border-primary/40 hover:-translate-y-0.5 transition-all duration-300 flex flex-col items-center justify-center gap-2 text-xs font-medium text-foreground/80 shadow-sm"
+                  >
+                    {s.icon}
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+
 
               <p className="text-center text-sm text-muted-foreground mt-6">
                 {isSignup ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"}{" "}
@@ -444,6 +468,19 @@ const GoogleIcon = () => (
     <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.1-4.1 5.6l6.2 5.2C39.9 35.6 44 30.4 44 24c0-1.2-.1-2.4-.4-3.5z" />
   </svg>
 );
+
+const AppleIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+    <path d="M16.36 12.78c.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.18-1.72-1.35-.14-2.64.79-3.33.79-.69 0-1.75-.77-2.87-.75-1.48.02-2.84.86-3.6 2.18-1.53 2.66-.39 6.6 1.1 8.76.73 1.06 1.6 2.25 2.74 2.2 1.1-.04 1.52-.71 2.85-.71 1.33 0 1.7.71 2.87.69 1.18-.02 1.93-1.08 2.65-2.14.83-1.22 1.18-2.4 1.2-2.46-.03-.01-2.3-.89-2.31-3.53zM14.2 6.3c.6-.74 1.01-1.76.9-2.78-.87.04-1.93.58-2.56 1.31-.56.65-1.05 1.7-.92 2.7.97.08 1.96-.49 2.58-1.23z" />
+  </svg>
+);
+
+const FacebookIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+    <path fill="#1877F2" d="M22 12a10 10 0 10-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.89h-2.34v6.99A10 10 0 0022 12z" />
+  </svg>
+);
+
 
 /* ─── Reusable Form Field ─── */
 interface FormFieldProps {
