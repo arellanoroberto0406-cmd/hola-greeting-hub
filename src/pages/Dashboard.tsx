@@ -23,6 +23,7 @@ import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel"
 import FAQPoliciesPanel from "@/components/dashboard/FAQPoliciesPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
+import MyStoresPanel from "@/components/dashboard/MyStoresPanel";
 import { TutorialOverlay } from "@/components/dashboard/TutorialOverlay";
 import PaymentSettingsPanel from "@/components/dashboard/PaymentSettingsPanel";
 import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
@@ -316,6 +317,13 @@ const Dashboard = () => {
           <div className="space-y-4">
             <SectionHeader title="Editor de Tienda" tip="Arrastra secciones para reordenarlas, edita contenido y usa plantillas predefinidas." />
             <StoreEditorPanel store={store} />
+          </div>
+        );
+      case "my-stores":
+        return (
+          <div className="space-y-4">
+            <SectionHeader title="Mis Tiendas" tip="Revisa el tema, el acento y las secciones de cada tienda, y cámbialos desde aquí." />
+            <MyStoresPanel userId={user?.id} />
           </div>
         );
       case "subscription":
