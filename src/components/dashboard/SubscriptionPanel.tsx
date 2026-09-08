@@ -20,6 +20,9 @@ import {
   SubscriptionPlan 
 } from "@/hooks/useSubscription";
 import { usePayPalPayment } from "@/hooks/usePayPalPayment";
+import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { isPaymentsConfigured } from "@/lib/stripe";
 
 interface SubscriptionPanelProps {
   storeId: string;
@@ -92,7 +95,8 @@ const SubscriptionPanel = ({ storeId, primaryColor }: SubscriptionPanelProps) =>
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
-  const [paymentMethod, setPaymentMethod] = useState<'paypal' | 'transfer' | 'code' | 'whatsapp'>('paypal');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal' | 'transfer' | 'code' | 'whatsapp'>('card');
+  const [showCardForm, setShowCardForm] = useState(false);
   const [proofFile, setProofFile] = useState<File | null>(null);
   const [proofPreview, setProofPreview] = useState<string | null>(null);
   const [isUploadingProof, setIsUploadingProof] = useState(false);
