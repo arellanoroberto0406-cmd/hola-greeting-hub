@@ -64,6 +64,15 @@ async function activateStorePlan(subscription: any, statusOverride?: string) {
   }
 }
 
+async function markOrderPaid(orderId: string, reference: unknown) {
+  const { error } = await getSupabase()
+    .from('orders')
+    .update({ status: 'paid', updated_at: new Date().toISOString() })
+    .eq('id', orderId);
+  if (error) console.error('No se pudo marcar el pedido como pagado', orderId, error);
+  else console.log('Pedido pagado', orderId, String(reference ?? ''));
+}
+
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = await verifyWebhook(req, env);
 
