@@ -21,7 +21,9 @@ import {
   Lock,
   X,
   LayoutGrid,
-  FileCheck
+  FileCheck,
+  Home,
+  ChevronDown
 } from "lucide-react";
 import { useState } from "react";
 import { PlanTier } from "@/hooks/useStorePlanTier";
