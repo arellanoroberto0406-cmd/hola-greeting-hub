@@ -20,6 +20,7 @@ import {
   Crown,
   Lock,
   X,
+  LayoutGrid,
   FileCheck
 } from "lucide-react";
 import { useState } from "react";
