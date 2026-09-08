@@ -132,7 +132,7 @@ const Index = () => {
   const store = demoStores[activeStore];
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="landing-canvas min-h-screen bg-background overflow-hidden">
       {/* Floating CTA Banner */}
       <AnimatePresence>
         {!user && showBanner && (
