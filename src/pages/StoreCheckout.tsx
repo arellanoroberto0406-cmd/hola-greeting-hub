@@ -129,6 +129,10 @@ const StoreCheckout = () => {
     if (status && orderId) {
       setPaymentStatus(status);
       if (status === 'success') {
+        try {
+          const snapshot = sessionStorage.getItem(`order-confirm-${orderId}`);
+          if (snapshot) setCompletedOrder(JSON.parse(snapshot));
+        } catch { /* snapshot opcional */ }
         setOrderComplete(true);
         clearCart();
       }
