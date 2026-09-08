@@ -180,19 +180,33 @@ const Auth = () => {
       {/* === RIGHT: AUTH CARD === */}
       <div className="w-full lg:w-[48%] flex flex-col items-center justify-center px-5 py-10 md:px-12 relative z-10">
         <div className="w-full max-w-[430px]">
-          {/* Mobile brand */}
-          <div className="lg:hidden flex justify-center mb-6">
-            <Brand onClick={() => navigate("/inicio")} size="sm" />
+          {/* Mobile top bar: back + small brand */}
+          <div className="lg:hidden relative flex items-center justify-center mb-7">
+            <button
+              type="button"
+              onClick={() => navigate("/inicio")}
+              aria-label="Volver"
+              className="absolute left-0 h-10 w-10 rounded-full flex items-center justify-center text-foreground/70 hover:bg-foreground/5 transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-[0.7rem] bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/30">
+                <Store className="h-4 w-4 text-primary-foreground" />
+              </div>
+              <span className="font-heading text-base font-bold tracking-tight">APP TIENDA</span>
+            </div>
           </div>
 
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-[2rem] bg-card/85 backdrop-blur-xl border border-border/50 shadow-[0_30px_80px_-40px_hsl(var(--primary)/0.45)] px-6 md:px-8 py-8"
+            className="relative rounded-[2rem] bg-card/85 backdrop-blur-xl border border-border/50 shadow-[0_30px_80px_-40px_hsl(var(--primary)/0.35)] px-6 md:px-8 py-8"
           >
             {/* Heading */}
-            <div className="text-center mb-6">
+            <div className="mb-6">
+
               <motion.h2
                 key={activeTab}
                 initial={{ opacity: 0, y: 8 }}
