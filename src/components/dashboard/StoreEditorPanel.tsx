@@ -79,9 +79,31 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
-  const { mode: editorDarkMode, isDark: isEditorDark, cycle: cycleEditorDark } = useStoreDarkMode(
-    store.slug || store.id
-  );
+  const storeDefaultTheme: ThemeMode =
+    store.default_theme === "dark" ? "dark" : store.default_theme === "light" ? "light" : "auto";
+  const {
+    mode: editorDarkMode,
+    isDark: isEditorDark,
+    cycle: cycleEditorDark,
+  } = useStoreDarkMode(store.slug || store.id, storeDefaultTheme);
+
+  // Guarda el tema elegido en la base de datos para que persista al recargar.
+  const handleCycleTheme = () => {
+    const next: ThemeMode =
+      editorDarkMode === "light" ? "dark" : editorDarkMode === "dark" ? "auto" : "light";
+    cycleEditorDark();
+    updateStore.mutate(
+      { id: store.id, default_theme: next },
+      {
+        onError: () =>
+          toast({
+            title: "No se pudo guardar el tema",
+            description: "Intenta de nuevo en un momento.",
+            variant: "destructive",
+          }),
+      }
+    );
+  };
 
   
   const [sections, setSections] = useState<StoreSection[]>([]);
