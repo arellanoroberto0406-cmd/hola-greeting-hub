@@ -879,9 +879,33 @@ All colors MUST be HSL.
 
 /* Auth canvas — soft pastel gradient (MiTienda style) */
 .auth-canvas {
+  /* Light pastel scope (independent of the app dark theme) */
+  --background: 0 0% 100%;
+  --foreground: 225 20% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 225 20% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 225 20% 14%;
+  --secondary: 225 25% 96%;
+  --secondary-foreground: 225 20% 14%;
+  --muted: 225 25% 96%;
+  --muted-foreground: 225 10% 46%;
+  --border: 225 20% 90%;
+  --input: 225 20% 90%;
+
+  color: hsl(var(--foreground));
   background:
-    radial-gradient(900px 600px at 12% 8%, hsl(var(--primary) / 0.10), transparent 60%),
-    radial-gradient(800px 620px at 92% 12%, hsl(265 80% 70% / 0.12), transparent 60%),
-    radial-gradient(900px 700px at 50% 105%, hsl(200 90% 72% / 0.10), transparent 60%),
-    hsl(var(--background));
+    radial-gradient(760px 520px at 8% 4%, hsl(12 90% 60% / 0.13), transparent 62%),
+    radial-gradient(720px 560px at 96% 8%, hsl(265 85% 72% / 0.16), transparent 62%),
+    radial-gradient(820px 620px at 50% 104%, hsl(200 95% 72% / 0.13), transparent 62%),
+    linear-gradient(160deg, hsl(25 100% 98%), hsl(0 0% 100%) 45%, hsl(250 100% 98%));
 }
+
+.auth-canvas .font-heading,
+.auth-canvas h1,
+.auth-canvas h2,
+.auth-canvas h3 {
+  font-family: "Hind", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
