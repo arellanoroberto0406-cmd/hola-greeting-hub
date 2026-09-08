@@ -274,7 +274,7 @@ const Auth = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-3xl border border-border/50 bg-card/60 backdrop-blur-2xl shadow-2xl shadow-black/25 overflow-hidden relative"
+            className="rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-2xl shadow-2xl shadow-black/30 overflow-hidden relative"
           >
             {/* Subtle top accent line */}
             <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
