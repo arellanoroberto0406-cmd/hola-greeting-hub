@@ -1,5 +1,5 @@
 # Roadmap
 
 - [x] Proteger los correos de carritos abandonados del acceso público.
-- [ ] Corregir todos los errores de compilación de la vista previa.
-- [ ] Verificar que la compilación quede limpia.
+- [x] Corregir todos los errores de compilación de la vista previa.
+- [x] Verificar que la compilación quede limpia.
