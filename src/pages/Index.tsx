@@ -132,7 +132,7 @@ const Index = () => {
   const store = demoStores[activeStore];
 
   return (
-    <div className="min-h-screen bg-background overflow-hidden">
+    <div className="landing-canvas min-h-screen bg-background overflow-hidden">
       {/* Floating CTA Banner */}
       <AnimatePresence>
         {!user && showBanner && (
@@ -180,7 +180,7 @@ const Index = () => {
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
                 <Store className="h-4.5 w-4.5 text-primary-foreground" />
               </div>
-              <span className="font-heading text-lg font-bold tracking-tight">MiTienda</span>
+              <span className="font-heading text-lg font-bold tracking-tight">APP TIENDA</span>
             </motion.div>
             
             <nav className="hidden md:flex items-center gap-8">
@@ -216,9 +216,10 @@ const Index = () => {
       <motion.section ref={heroRef} className="relative min-h-screen flex items-center pt-28 pb-20" style={{ opacity: heroOpacity }}>
         {/* Background */}
         <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,hsl(var(--primary)/0.25),transparent_60%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_100%,hsl(var(--gold)/0.15),transparent_50%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,hsl(var(--primary)/0.12),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_100%,hsl(265_85%_72%/0.12),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(hsl(222_47%_11%/0.035)_1px,transparent_1px),linear-gradient(90deg,hsl(222_47%_11%/0.035)_1px,transparent_1px)] bg-[size:64px_64px]" />
+
           
           {/* Subtle animated orbs */}
           <motion.div 
@@ -611,7 +612,7 @@ const Index = () => {
               <span className="block mt-2 bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">clientes felices</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Miles de emprendedores confían en MiTienda para hacer crecer su negocio
+              Miles de emprendedores confían en APP TIENDA para hacer crecer su negocio
             </p>
           </motion.div>
 
@@ -664,7 +665,7 @@ const Index = () => {
             {[
               { value: "4.9/5", label: "Calificación promedio" },
               { value: "2,500+", label: "Reseñas verificadas" },
-              { value: "98%", label: "Recomiendan MiTienda" },
+              { value: "98%", label: "Recomiendan APP TIENDA" },
             ].map((s, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl md:text-4xl font-bold font-heading bg-gradient-to-r from-primary to-gold bg-clip-text text-transparent">{s.value}</p>

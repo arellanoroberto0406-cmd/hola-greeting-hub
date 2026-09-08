@@ -909,3 +909,37 @@ All colors MUST be HSL.
   letter-spacing: -0.02em;
 }
 
+
+/* Landing canvas — light "Claro y limpio" scope for /inicio */
+.landing-canvas {
+  --background: 24 60% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --secondary: 225 25% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 225 25% 96%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 25 100% 96%;
+  --accent-foreground: 222 47% 11%;
+  --border: 220 20% 92%;
+  --input: 220 20% 92%;
+  --ring: 12 90% 55%;
+
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(900px 620px at 10% -6%, hsl(12 90% 60% / 0.10), transparent 62%),
+    radial-gradient(820px 600px at 96% 4%, hsl(265 85% 72% / 0.12), transparent 62%),
+    linear-gradient(180deg, hsl(24 100% 98%), hsl(0 0% 100%) 40%, hsl(250 100% 99%));
+}
+
+.landing-canvas .font-heading,
+.landing-canvas h1,
+.landing-canvas h2,
+.landing-canvas h3 {
+  font-family: "Hind", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
