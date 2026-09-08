@@ -127,7 +127,7 @@ const MyStoresPanel = ({ userId }: { userId: string | undefined }) => {
       {stores.map((store) => {
         const theme = (store.default_theme === "dark" || store.default_theme === "light" ? store.default_theme : "auto") as ThemeMode;
         const accent = (store.globalStyles.accentPalette || "champagne") as AccentPalette;
-        const visibleSections = store.sections.filter((s) => s.visible !== false).length;
+        const visibleSections = store.sections.filter((s) => s.enabled !== false).length;
 
         return (
           <Card key={store.id} className="overflow-hidden border-border/60">
