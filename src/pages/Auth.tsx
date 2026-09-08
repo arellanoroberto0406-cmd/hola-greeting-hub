@@ -615,12 +615,12 @@ interface FormFieldProps {
 }
 
 const FormField = ({ id, label, icon, type, placeholder, value, onChange, error, showPasswordToggle, showPassword, onTogglePassword }: FormFieldProps) => (
-  <div className="space-y-2">
-    <Label htmlFor={id} className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+  <div className="space-y-1.5">
+    <Label htmlFor={id} className="text-xs font-semibold text-muted-foreground/70 ml-1">
       {label}
     </Label>
     <div className="relative group">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary/70 transition-colors duration-200">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors duration-200">
         {icon}
       </div>
       <Input
@@ -629,8 +629,9 @@ const FormField = ({ id, label, icon, type, placeholder, value, onChange, error,
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-13 pl-11 ${showPasswordToggle ? 'pr-12' : ''} bg-background/40 border-border/40 focus:border-primary/40 focus:bg-background/60 rounded-xl transition-all duration-300 text-sm placeholder:text-muted-foreground/40`}
+        className={`h-14 pl-11 ${showPasswordToggle ? 'pr-12' : ''} bg-background/60 border-border/50 focus-visible:ring-2 focus-visible:ring-primary/25 focus:border-primary/50 rounded-2xl transition-all duration-300 text-sm placeholder:text-muted-foreground/40 group-focus-within:-translate-y-[1px] group-focus-within:shadow-lg group-focus-within:shadow-primary/10`}
       />
+
       {showPasswordToggle && (
         <button
           type="button"
