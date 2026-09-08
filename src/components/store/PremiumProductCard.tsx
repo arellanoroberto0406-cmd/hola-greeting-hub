@@ -309,7 +309,7 @@ export const PremiumProductCard = ({
         {/* Add to cart - full width */}
         <Button
           className={cn(
-            "w-full transition-all duration-300 rounded-xl font-semibold",
+            "shine-cta w-full transition-all duration-300 rounded-2xl font-semibold hover:-translate-y-0.5 active:scale-[0.98]",
             isEnterprise && "h-11 text-sm",
             isProfessional && "h-10 text-sm",
             isBasic && "h-9 text-xs"
@@ -318,7 +318,7 @@ export const PremiumProductCard = ({
             background: addedToCart 
               ? "linear-gradient(135deg, #22c55e, #16a34a)" 
               : `linear-gradient(135deg, ${store.primary_color}, ${store.primary_color}dd)`,
-            boxShadow: addedToCart ? undefined : `0 2px 10px ${store.primary_color}25`,
+            boxShadow: addedToCart ? undefined : `0 10px 24px -10px ${store.primary_color}66`,
           } : undefined}
           variant={product.stock === 0 ? "secondary" : "default"}
           onClick={handleAddToCart}

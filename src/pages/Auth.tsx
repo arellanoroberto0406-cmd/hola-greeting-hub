@@ -131,6 +131,7 @@ const Auth = () => {
     <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-background">
       {/* === ANIMATED BACKGROUND === */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 aurora-mesh opacity-70" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)]" />
         <motion.div 
           className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-primary/8 rounded-full blur-[150px]"
@@ -142,8 +143,9 @@ const Auth = () => {
           animate={{ x: [0, -50, 0], y: [0, -40, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 5 }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.03)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.03)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
       </div>
+
 
       {/* === LEFT PANEL — STORE PREVIEW (desktop) === */}
       <motion.div
@@ -274,10 +276,11 @@ const Auth = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-2xl shadow-2xl shadow-black/30 overflow-hidden relative"
+            className="glass-surface rounded-[2.5rem] overflow-hidden relative"
           >
             {/* Subtle top accent line */}
-            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+
 
             {/* Desktop Card Header */}
             <div className="hidden lg:block px-8 pt-8 pb-2">
@@ -318,7 +321,7 @@ const Auth = () => {
                     {activeTab === tab && (
                       <motion.div
                         layoutId="auth-tab-indicator"
-                        className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/25"
+                        className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-xl shadow-lg shadow-primary/30"
                         transition={{ type: "spring", stiffness: 400, damping: 34 }}
                       />
                     )}
@@ -384,7 +387,7 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                      className="shine-cta w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/30 font-semibold mt-2 bg-gradient-to-r from-primary via-primary to-primary/80 hover:shadow-2xl hover:shadow-primary/45 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
 
                       disabled={isSubmitting}
                     >
@@ -410,7 +413,7 @@ const Auth = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.4 + i * 0.1 }}
-                          className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl bg-muted/20 border border-border/20"
+                          className="soft-tile flex flex-col items-center gap-1.5 py-3 rounded-2xl"
                         >
                           <item.icon className="h-4 w-4 text-primary/60" />
                           <span className="text-[10px] text-muted-foreground/70 font-semibold tracking-wide uppercase">{item.text}</span>
@@ -454,7 +457,7 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                      className="shine-cta w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/30 font-semibold mt-2 bg-gradient-to-r from-primary via-primary to-primary/80 hover:shadow-2xl hover:shadow-primary/45 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (

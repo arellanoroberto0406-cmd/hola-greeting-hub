@@ -100,7 +100,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
             <Button
               size="lg"
               onClick={onAction}
-              className="gap-2 shadow-lg hover:shadow-xl transition-all"
+              className="shine-cta gap-2 rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
               style={{ backgroundColor: store.primary_color }}
             >
               {buttonText || "Ver productos"}
@@ -219,7 +219,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
               <Button
                 size="lg"
                 onClick={onAction}
-                className="gap-2 shadow-xl hover:shadow-2xl transition-all text-lg px-8 py-6 rounded-xl"
+                className="shine-cta gap-2 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300 text-lg px-8 py-6 rounded-2xl"
                 style={{ backgroundColor: store.primary_color }}
               >
                 <ShoppingBag className="h-5 w-5" />
@@ -229,7 +229,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
                 size="lg"
                 variant="outline"
                 onClick={onAction}
-                className="gap-2 text-lg px-8 py-6 rounded-xl backdrop-blur-sm"
+                className="gap-2 text-lg px-8 py-6 rounded-2xl backdrop-blur-md hover:-translate-y-0.5 transition-all duration-300"
                 style={{
                   borderColor: backgroundType === "image" ? "white" : store.primary_color,
                   color: backgroundType === "image" ? "white" : store.primary_color,
@@ -413,7 +413,7 @@ export const PremiumHeroSection = ({ section, store, planTier, onAction }: Premi
               <Button
                 size="lg"
                 onClick={onAction}
-                className="gap-3 text-lg px-10 py-7 rounded-2xl shadow-2xl font-semibold"
+                className="shine-cta gap-3 text-lg px-10 py-7 rounded-2xl shadow-2xl font-semibold hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
                 style={{
                   backgroundColor: store.primary_color,
                   boxShadow: `0 20px 40px ${store.primary_color}50`,
