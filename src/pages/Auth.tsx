@@ -387,7 +387,7 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                      className="shine-cta w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/30 font-semibold mt-2 bg-gradient-to-r from-primary via-primary to-primary/80 hover:shadow-2xl hover:shadow-primary/45 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
 
                       disabled={isSubmitting}
                     >
@@ -413,7 +413,7 @@ const Auth = () => {
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: 0.4 + i * 0.1 }}
-                          className="flex flex-col items-center gap-1.5 py-2.5 rounded-xl bg-muted/20 border border-border/20"
+                          className="soft-tile flex flex-col items-center gap-1.5 py-3 rounded-2xl"
                         >
                           <item.icon className="h-4 w-4 text-primary/60" />
                           <span className="text-[10px] text-muted-foreground/70 font-semibold tracking-wide uppercase">{item.text}</span>
@@ -457,7 +457,7 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+                      className="shine-cta w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/30 font-semibold mt-2 bg-gradient-to-r from-primary via-primary to-primary/80 hover:shadow-2xl hover:shadow-primary/45 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
