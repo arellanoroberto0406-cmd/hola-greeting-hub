@@ -52,8 +52,9 @@ const CustomerAccount = () => {
   const { user, signOut } = useAuth();
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
   const { wishlist, removeFromWishlist } = useWishlist();
-  const { addItem } = useCart();
+  const { addItem, items: cartItems, updateQuantity, removeItem, totalPrice } = useCart();
   const [activeTab, setActiveTab] = useState("orders");
+
 
   // Fetch user orders
   const { data: orders, isLoading: ordersLoading } = useQuery({
