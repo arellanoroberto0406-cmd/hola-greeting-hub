@@ -56,11 +56,19 @@ const CustomerAccount = () => {
   const [activeTab, setActiveTab] = useState("orders");
 
 
-  // Fetch user orders
+  // Fetch user orders (including guest orders made with the same email)
   const { data: orders, isLoading: ordersLoading } = useQuery({
     queryKey: ["customer-orders", user?.id, store?.id],
     queryFn: async () => {
       if (!user?.id || !store?.id) return [];
+
+      // Link previous guest purchases made with this email to the account
+      try {
+        await supabase.rpc("claim_my_orders");
+      } catch (e) {
+        console.warn("claim_my_orders failed", e);
+      }
+
 
       const { data, error } = await supabase
         .from("orders")
