@@ -79,13 +79,15 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const updateStore = useUpdateStore();
   const { planTier } = useStorePlanTier(store.id);
   const { toast } = useToast();
-  const { mode: editorDarkMode, isDark: isEditorDark, cycle: cycleEditorDark } = useStoreDarkMode();
+  const { mode: editorDarkMode, isDark: isEditorDark, cycle: cycleEditorDark } = useStoreDarkMode(
+    store.slug || store.id
+  );
 
   
   const [sections, setSections] = useState<StoreSection[]>([]);
   const [globalStyles, setGlobalStyles] = useState<GlobalStyles>(DEFAULT_GLOBAL_STYLES);
   // Paleta de acentos sincronizada entre pestañas (evento `storage`)
-  const accentPalette = useStoreAccentSync(globalStyles.accentPalette);
+  const accentPalette = useStoreAccentSync(globalStyles.accentPalette, store.slug || store.id);
 
   const [headerFooter, setHeaderFooter] = useState<HeaderFooterValues>(() => buildHeaderFooterValues(store));
   const [editingSection, setEditingSection] = useState<StoreSection | null>(null);
