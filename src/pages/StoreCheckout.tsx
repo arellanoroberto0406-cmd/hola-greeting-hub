@@ -628,6 +628,71 @@ const StoreCheckout = () => {
               )}
             </div>
 
+            {/* Order details */}
+            {completedOrder && (
+              <div className="bg-card rounded-xl p-6 border border-border/50 mb-6">
+                <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
+                  <Truck className="w-5 h-5" style={{ color: primaryColor }} />
+                  Detalles de tu pedido
+                </h2>
+
+                {/* Items */}
+                <ul className="space-y-3 mb-4">
+                  {completedOrder.items.map((item, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover border border-border/50" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center shrink-0">
+                          <Store className="w-5 h-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{item.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {item.variant ? `${item.variant} · ` : ""}Cantidad: {item.quantity}
+                        </p>
+                      </div>
+                      <p className="font-semibold shrink-0">${(item.price * item.quantity).toLocaleString()}</p>
+                    </li>
+                  ))}
+                </ul>
+
+                <Separator className="my-4" />
+
+                {/* Totals */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>${completedOrder.subtotal.toLocaleString()} MXN</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Envío</span>
+                    <span>{completedOrder.shipping === 0 ? "Gratis" : `$${completedOrder.shipping.toLocaleString()} MXN`}</span>
+                  </div>
+                  <Separator className="my-2" />
+                  <div className="flex justify-between font-bold text-base">
+                    <span>Total</span>
+                    <span style={{ color: primaryColor }}>${completedOrder.total.toLocaleString()} MXN</span>
+                  </div>
+                </div>
+
+                <Separator className="my-4" />
+
+                {/* Shipping address */}
+                <div className="text-sm space-y-1">
+                  <p className="font-medium flex items-center gap-2">
+                    <MapPin className="w-4 h-4" style={{ color: primaryColor }} />
+                    Envío para {completedOrder.customer.firstName} {completedOrder.customer.lastName}
+                  </p>
+                  <p className="text-muted-foreground pl-6">
+                    {completedOrder.customer.address}, {completedOrder.customer.city}, {completedOrder.customer.state}, C.P. {completedOrder.customer.zipCode}
+                  </p>
+                  <p className="text-muted-foreground pl-6">{completedOrder.customer.email} · {completedOrder.customer.phone}</p>
+                </div>
+              </div>
+            )}
+
             {/* Payment Instructions based on method */}
             {completedOrder && (
               <div className="bg-card rounded-xl p-6 border border-border/50 mb-8">
