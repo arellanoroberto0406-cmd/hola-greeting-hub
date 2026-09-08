@@ -318,6 +318,13 @@ const Dashboard = () => {
             <StoreEditorPanel store={store} />
           </div>
         );
+      case "my-stores":
+        return (
+          <div className="space-y-4">
+            <SectionHeader title="Mis Tiendas" tip="Revisa el tema, el acento y las secciones de cada tienda, y cámbialos desde aquí." />
+            <MyStoresPanel userId={user?.id} />
+          </div>
+        );
       case "subscription":
         return (
           <div className="space-y-6">
