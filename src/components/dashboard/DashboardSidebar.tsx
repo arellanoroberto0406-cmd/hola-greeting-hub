@@ -21,7 +21,9 @@ import {
   Lock,
   X,
   LayoutGrid,
-  FileCheck
+  FileCheck,
+  Home,
+  ChevronDown
 } from "lucide-react";
 import { useState } from "react";
 import { PlanTier } from "@/hooks/useStorePlanTier";
@@ -38,28 +40,30 @@ interface DashboardSidebarProps {
 }
 
 const tabs = [
+  { id: "home", label: "Inicio", icon: Home, group: "empezar", minPlan: "basic" as PlanTier },
+  { id: "editor", label: "Diseñar tienda", icon: Layers, group: "mi-tienda", minPlan: "basic" as PlanTier },
+  { id: "products", label: "Productos", icon: Package, group: "mi-tienda", minPlan: "basic" as PlanTier },
+  { id: "url", label: "Compartir enlace", icon: Link2, group: "mi-tienda", minPlan: "basic" as PlanTier },
   { id: "orders", label: "Pedidos", icon: ShoppingBag, group: "ventas", minPlan: "basic" as PlanTier },
-  { id: "products", label: "Productos", icon: Package, group: "ventas", minPlan: "basic" as PlanTier },
-  { id: "url", label: "URL & QR", icon: Link2, group: "ventas", minPlan: "basic" as PlanTier },
-  { id: "payments", label: "Métodos de Pago", icon: Wallet, group: "finanzas", minPlan: "basic" as PlanTier },
-  { id: "payment-stats", label: "Ventas", icon: PieChart, group: "finanzas", minPlan: "basic" as PlanTier },
-  { id: "refunds", label: "Reembolsos", icon: RotateCcw, group: "finanzas", minPlan: "basic" as PlanTier },
-  { id: "analytics", label: "Analytics", icon: BarChart3, group: "marketing", minPlan: "professional" as PlanTier },
-  { id: "coupons", label: "Cupones", icon: Tag, group: "marketing", minPlan: "professional" as PlanTier },
-  { id: "chat", label: "Chat en Vivo", icon: MessagesSquare, group: "marketing", minPlan: "professional" as PlanTier },
-  { id: "my-stores", label: "Mis Tiendas", icon: LayoutGrid, group: "configuración", minPlan: "basic" as PlanTier },
-  { id: "editor", label: "Editor Visual", icon: Layers, group: "configuración", minPlan: "basic" as PlanTier },
-  { id: "settings", label: "Configuración", icon: Settings, group: "configuración", minPlan: "basic" as PlanTier },
-  { id: "subscription", label: "Mi Plan", icon: CreditCard, group: "configuración", minPlan: "basic" as PlanTier },
-  { id: "payment-proofs", label: "Comprobantes", icon: FileCheck, group: "configuración", minPlan: "basic" as PlanTier },
+  { id: "payments", label: "Cómo te pagan", icon: Wallet, group: "ventas", minPlan: "basic" as PlanTier },
+  { id: "chat", label: "Chat en Vivo", icon: MessagesSquare, group: "ventas", minPlan: "professional" as PlanTier },
+  { id: "subscription", label: "Mi Plan", icon: CreditCard, group: "ventas", minPlan: "basic" as PlanTier },
+  { id: "payment-stats", label: "Ventas", icon: PieChart, group: "mas", minPlan: "basic" as PlanTier },
+  { id: "analytics", label: "Analytics", icon: BarChart3, group: "mas", minPlan: "professional" as PlanTier },
+  { id: "coupons", label: "Cupones", icon: Tag, group: "mas", minPlan: "professional" as PlanTier },
+  { id: "refunds", label: "Reembolsos", icon: RotateCcw, group: "mas", minPlan: "basic" as PlanTier },
+  { id: "my-stores", label: "Mis Tiendas", icon: LayoutGrid, group: "mas", minPlan: "basic" as PlanTier },
+  { id: "settings", label: "Configuración", icon: Settings, group: "mas", minPlan: "basic" as PlanTier },
+  { id: "payment-proofs", label: "Comprobantes", icon: FileCheck, group: "mas", minPlan: "basic" as PlanTier },
 ];
 
 const groups = [
-  { id: "ventas", label: "Ventas" },
-  { id: "finanzas", label: "Finanzas" },
-  { id: "marketing", label: "Marketing" },
-  { id: "configuración", label: "Configuración" },
+  { id: "empezar", label: "" },
+  { id: "mi-tienda", label: "Mi tienda" },
+  { id: "ventas", label: "Ventas y cobros" },
+  { id: "mas", label: "Más opciones" },
 ];
+
 
 const planOrder: Record<PlanTier, number> = { basic: 0, professional: 1, enterprise: 2 };
 
@@ -73,6 +77,7 @@ const DashboardSidebar = ({
   onMobileClose
 }: DashboardSidebarProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   const isTabLocked = (minPlan: PlanTier) => planOrder[planTier] < planOrder[minPlan];
 
@@ -93,14 +98,29 @@ const DashboardSidebar = ({
           const groupTabs = tabs.filter(t => t.group === group.id);
           if (groupTabs.length === 0) return null;
 
+          const isMore = group.id === "mas";
+          const activeInMore = isMore && groupTabs.some(t => t.id === activeTab);
+          const collapsedGroup = isMore && !showMore && !activeInMore && !isCollapsed;
+
           return (
             <div key={group.id}>
-              {!isCollapsed && (
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-3 mb-2">
-                  {group.label}
-                </p>
+              {!isCollapsed && group.label && (
+                isMore ? (
+                  <button
+                    onClick={() => setShowMore(v => !v)}
+                    className="w-full flex items-center justify-between px-3 mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors"
+                  >
+                    {group.label}
+                    <ChevronDown className={cn("h-3 w-3 transition-transform", (showMore || activeInMore) && "rotate-180")} />
+                  </button>
+                ) : (
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 px-3 mb-2">
+                    {group.label}
+                  </p>
+                )
               )}
-              <div className="space-y-0.5">
+              <div className={cn("space-y-0.5", collapsedGroup && "hidden")}>
+
                 {groupTabs.map((tab) => {
                   const isActive = activeTab === tab.id;
                   const hasNotification = tab.id === "chat" && unreadCount > 0;
