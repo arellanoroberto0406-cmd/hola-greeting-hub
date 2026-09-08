@@ -276,10 +276,11 @@ const Auth = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-2xl shadow-2xl shadow-black/30 overflow-hidden relative"
+            className="glass-surface rounded-[2.5rem] overflow-hidden relative"
           >
             {/* Subtle top accent line */}
-            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+            <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent" />
+
 
             {/* Desktop Card Header */}
             <div className="hidden lg:block px-8 pt-8 pb-2">
