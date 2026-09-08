@@ -85,13 +85,21 @@ export const PremiumProductCard = ({
         }),
       }}
       className={cn(
-        "group relative bg-card rounded-2xl overflow-hidden transition-all duration-500",
-        "border border-border/40 hover:border-border/80",
-        isEnterprise && "hover:shadow-[0_20px_60px_-12px_rgba(0,0,0,0.15)]",
-        isProfessional && "hover:shadow-xl hover:-translate-y-1",
-        isBasic && "hover:shadow-md"
+        "group relative rounded-3xl overflow-hidden transition-all duration-500 ease-out",
+        "bg-card/80 backdrop-blur-xl border border-white/50 dark:border-white/10",
+        "shadow-[0_8px_30px_-12px_rgba(255,127,80,0.18),0_2px_8px_-2px_rgba(0,0,0,0.06)]",
+        "hover:-translate-y-1.5 hover:border-orange-200/70 dark:hover:border-orange-400/20",
+        "hover:shadow-[0_24px_50px_-16px_rgba(255,127,80,0.35),0_8px_20px_-8px_rgba(0,0,0,0.10)]",
+        isEnterprise && "hover:shadow-[0_30px_70px_-16px_rgba(255,127,80,0.40),0_10px_24px_-8px_rgba(0,0,0,0.12)]"
       )}
     >
+      {/* Coral glass top gloss */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-16 z-[5] opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.35), transparent)" }}
+      />
+
       {/* Image container */}
       <div className="relative aspect-[4/5] overflow-hidden cursor-pointer" onClick={() => onProductClick(product)}>
         {/* Main image with smooth zoom */}
