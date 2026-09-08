@@ -131,6 +131,7 @@ const Auth = () => {
     <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden bg-background">
       {/* === ANIMATED BACKGROUND === */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 aurora-mesh opacity-70" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(var(--primary)/0.12),transparent)]" />
         <motion.div 
           className="absolute -top-[20%] -left-[10%] w-[600px] h-[600px] bg-primary/8 rounded-full blur-[150px]"
@@ -142,8 +143,9 @@ const Auth = () => {
           animate={{ x: [0, -50, 0], y: [0, -40, 0] }}
           transition={{ duration: 25, repeat: Infinity, ease: "easeInOut", delay: 5 }}
         />
-        <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.03)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.03)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_75%)]" />
       </div>
+
 
       {/* === LEFT PANEL — STORE PREVIEW (desktop) === */}
       <motion.div
