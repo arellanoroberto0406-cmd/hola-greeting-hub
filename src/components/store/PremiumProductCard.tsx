@@ -93,6 +93,13 @@ export const PremiumProductCard = ({
         isEnterprise && "hover:shadow-[0_30px_70px_-16px_rgba(255,127,80,0.40),0_10px_24px_-8px_rgba(0,0,0,0.12)]"
       )}
     >
+      {/* Coral glass top gloss */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 h-16 z-[5] opacity-60 transition-opacity duration-500 group-hover:opacity-100"
+        style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.35), transparent)" }}
+      />
+
       {/* Image container */}
       <div className="relative aspect-[4/5] overflow-hidden cursor-pointer" onClick={() => onProductClick(product)}>
         {/* Main image with smooth zoom */}
