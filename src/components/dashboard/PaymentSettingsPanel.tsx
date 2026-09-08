@@ -83,13 +83,19 @@ const PaymentSettingsPanel = ({ storeId, primaryColor = "#8B4513" }: PaymentSett
     const loadSettings = async () => {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
-          .from("stores")
-          .select("payment_methods, bank_info, paypal_email, mercadopago_access_token, cash_instructions")
-          .eq("id", storeId)
-          .single();
+        const { data: rpcData, error } = await supabase.rpc("get_my_store_payment_settings", {
+          _store_id: storeId,
+        });
 
         if (error) throw error;
+
+        const data = rpcData as {
+          payment_methods?: PaymentMethods | null;
+          bank_info?: BankInfo | null;
+          paypal_email?: string | null;
+          mercadopago_access_token?: string | null;
+          cash_instructions?: string | null;
+        } | null;
 
         if (data) {
           if (data.payment_methods) {
