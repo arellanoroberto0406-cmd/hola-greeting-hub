@@ -504,26 +504,26 @@ const CustomerAccount = () => {
                     </CardHeader>
                     <CardContent className="space-y-4">
                       {cartItems.map((item) => (
-                        <div key={`${item.product.id}-${item.selectedColor || ""}`} className="flex items-center gap-4">
+                        <div key={`${item.id}-${item.selectedColor || ""}-${item.selectedVariant?.id || ""}`} className="flex items-center gap-4">
                           <img
-                            src={item.product.image}
-                            alt={item.product.name}
+                            src={item.image}
+                            alt={item.name}
                             className="h-16 w-16 rounded-lg object-cover shrink-0"
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="font-medium truncate">{item.product.name}</p>
+                            <p className="font-medium truncate">{item.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              ${item.product.price.toLocaleString()} x {item.quantity}
+                              ${item.price.toLocaleString()} x {item.quantity}
                             </p>
                           </div>
                           <div className="flex items-center gap-1">
                             <Button size="icon" variant="outline" className="h-8 w-8"
-                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>-</Button>
+                              onClick={() => updateQuantity(item.id, item.quantity - 1, item.selectedVariant?.id)}>-</Button>
                             <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
                             <Button size="icon" variant="outline" className="h-8 w-8"
-                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>+</Button>
+                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.selectedVariant?.id)}>+</Button>
                             <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive"
-                              onClick={() => removeItem(item.product.id)}>
+                              onClick={() => removeItem(item.id, item.selectedVariant?.id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
