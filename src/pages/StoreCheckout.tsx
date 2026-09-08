@@ -20,6 +20,8 @@ import { useStore } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { useMercadoPagoPayment } from "@/hooks/useMercadoPagoPayment";
 import { usePayPalStorePayment } from "@/hooks/usePayPalStorePayment";
+import { StoreCardCheckout } from "@/components/store/StoreCardCheckout";
+import { isPaymentsConfigured } from "@/lib/stripe";
 import {
   Form,
   FormControl,
@@ -85,6 +87,7 @@ const StoreCheckout = () => {
   const [orderComplete, setOrderComplete] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failure' | 'pending' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cardOrderId, setCardOrderId] = useState<string | null>(null);
   const [completedOrder, setCompletedOrder] = useState<{
     id: string;
     paymentMethod: string;
