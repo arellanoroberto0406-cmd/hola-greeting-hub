@@ -1462,6 +1462,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_my_orders: { Args: never; Returns: number }
       get_my_store_payment_settings: {
         Args: { _store_id: string }
         Returns: Json
