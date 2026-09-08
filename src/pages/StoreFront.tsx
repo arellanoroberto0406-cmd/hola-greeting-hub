@@ -96,7 +96,16 @@ const StoreFront = () => {
   const { data: productsData, isLoading: productsLoading } = useStoreProducts(store?.id);
   const { data: layout } = useStoreLayout(store?.id);
   const { planTier } = useStorePlanTier(store?.id);
-  const { mode: storeDarkMode, isDark: isStoreDark, cycle: cycleStoreDark } = useStoreDarkMode();
+  const storeThemeScope = store?.slug || slug || undefined;
+  const storeDefaultTheme = (store as any)?.default_theme === "dark"
+    ? "dark"
+    : (store as any)?.default_theme === "light"
+      ? "light"
+      : "auto";
+  const { mode: storeDarkMode, isDark: isStoreDark, cycle: cycleStoreDark } = useStoreDarkMode(
+    storeThemeScope,
+    storeDefaultTheme
+  );
 
   const {
     items,
@@ -138,7 +147,7 @@ const StoreFront = () => {
   }, [layout]);
 
   // Paleta de acentos sincronizada entre pestañas (evento `storage`)
-  const accentPalette = useStoreAccentSync(globalStyles.accentPalette);
+  const accentPalette = useStoreAccentSync(globalStyles.accentPalette, storeThemeScope);
 
 
   // All products mapped
