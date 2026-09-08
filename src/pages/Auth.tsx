@@ -274,7 +274,7 @@ const Auth = () => {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-3xl border border-border/50 bg-card/60 backdrop-blur-2xl shadow-2xl shadow-black/25 overflow-hidden relative"
+            className="rounded-[2.5rem] border border-border/50 bg-card/50 backdrop-blur-2xl shadow-2xl shadow-black/30 overflow-hidden relative"
           >
             {/* Subtle top accent line */}
             <div className="h-[2px] bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
@@ -303,23 +303,23 @@ const Auth = () => {
 
             {/* Tab Switcher */}
             <div className="px-6 md:px-8 pt-6 lg:pt-4">
-              <div className="flex bg-muted/40 rounded-2xl p-1.5 gap-1">
+              <div className="flex bg-background/50 border border-border/40 rounded-2xl p-1 gap-1">
                 {(["signup", "signin"] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => { setActiveTab(tab); setErrors({}); setShowForgotPassword(false); }}
                     className={`
-                      flex-1 py-3 px-4 rounded-xl text-sm font-semibold transition-all duration-300 relative
-                      ${activeTab === tab 
-                        ? "text-primary-foreground" 
+                      flex-1 py-2.5 px-4 rounded-xl text-sm font-semibold transition-colors duration-200 relative
+                      ${activeTab === tab
+                        ? "text-primary-foreground"
                         : "text-muted-foreground hover:text-foreground"}
                     `}
                   >
                     {activeTab === tab && (
                       <motion.div
                         layoutId="auth-tab-indicator"
-                        className="absolute inset-0 bg-gradient-to-r from-primary to-primary/90 rounded-xl shadow-lg shadow-primary/25"
-                        transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        className="absolute inset-0 bg-primary rounded-xl shadow-lg shadow-primary/25"
+                        transition={{ type: "spring", stiffness: 400, damping: 34 }}
                       />
                     )}
                     <span className="relative z-10 flex items-center justify-center gap-1.5">
@@ -333,6 +333,7 @@ const Auth = () => {
                 ))}
               </div>
             </div>
+
 
             {/* Form Area */}
             <div className="px-6 md:px-8 pb-8 pt-6 relative">
@@ -383,7 +384,8 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-13 text-base gap-2.5 rounded-xl shadow-xl shadow-primary/30 font-bold mt-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-primary/40 transition-all duration-300"
+                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
+
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -452,7 +454,7 @@ const Auth = () => {
 
                     <Button
                       type="submit"
-                      className="w-full h-13 text-base gap-2.5 rounded-xl shadow-xl shadow-primary/30 font-bold mt-1 bg-gradient-to-r from-primary to-primary/90 hover:shadow-primary/40 transition-all duration-300"
+                      className="w-full h-14 text-base gap-2.5 rounded-2xl shadow-xl shadow-primary/25 font-semibold mt-2 bg-primary hover:bg-primary/90 hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-[0.98] transition-all duration-300"
                       disabled={isSubmitting}
                     >
                       {isSubmitting ? (
@@ -615,12 +617,12 @@ interface FormFieldProps {
 }
 
 const FormField = ({ id, label, icon, type, placeholder, value, onChange, error, showPasswordToggle, showPassword, onTogglePassword }: FormFieldProps) => (
-  <div className="space-y-2">
-    <Label htmlFor={id} className="text-xs font-bold uppercase tracking-widest text-muted-foreground/60">
+  <div className="space-y-1.5">
+    <Label htmlFor={id} className="text-xs font-semibold text-muted-foreground/70 ml-1">
       {label}
     </Label>
     <div className="relative group">
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary/70 transition-colors duration-200">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/50 group-focus-within:text-primary transition-colors duration-200">
         {icon}
       </div>
       <Input
@@ -629,8 +631,9 @@ const FormField = ({ id, label, icon, type, placeholder, value, onChange, error,
         placeholder={placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className={`h-13 pl-11 ${showPasswordToggle ? 'pr-12' : ''} bg-background/40 border-border/40 focus:border-primary/40 focus:bg-background/60 rounded-xl transition-all duration-300 text-sm placeholder:text-muted-foreground/40`}
+        className={`h-14 pl-11 ${showPasswordToggle ? 'pr-12' : ''} bg-background/60 border-border/50 focus-visible:ring-2 focus-visible:ring-primary/25 focus:border-primary/50 rounded-2xl transition-all duration-300 text-sm placeholder:text-muted-foreground/40 group-focus-within:-translate-y-[1px] group-focus-within:shadow-lg group-focus-within:shadow-primary/10`}
       />
+
       {showPasswordToggle && (
         <button
           type="button"
