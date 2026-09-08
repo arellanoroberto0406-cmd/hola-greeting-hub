@@ -64,6 +64,15 @@ async function activateStorePlan(subscription: any, statusOverride?: string) {
   }
 }
 
+async function markOrderPaid(orderId: string, reference: unknown) {
+  const { error } = await getSupabase()
+    .from('orders')
+    .update({ status: 'paid', updated_at: new Date().toISOString() })
+    .eq('id', orderId);
+  if (error) console.error('No se pudo marcar el pedido como pagado', orderId, error);
+  else console.log('Pedido pagado', orderId, String(reference ?? ''));
+}
+
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = await verifyWebhook(req, env);
 
@@ -75,10 +84,24 @@ async function handleWebhook(req: Request, env: StripeEnv) {
     case 'customer.subscription.deleted':
       await activateStorePlan(event.data.object, 'canceled');
       break;
-    case 'checkout.session.completed': {
+    case 'checkout.session.completed':
+    case 'checkout.session.async_payment_succeeded': {
       const session = event.data.object;
-      if (session.payment_status !== 'unpaid' && session.metadata?.storeId) {
+      const isPaid = session.payment_status !== 'unpaid';
+      if (isPaid && session.metadata?.kind === 'store_order' && session.metadata?.orderId) {
+        await markOrderPaid(session.metadata.orderId, session.payment_intent ?? session.id);
+      } else if (isPaid && session.metadata?.storeId) {
         console.log('Checkout completado para tienda', session.metadata.storeId);
+      }
+      break;
+    }
+    case 'checkout.session.async_payment_failed': {
+      const session = event.data.object;
+      if (session.metadata?.kind === 'store_order' && session.metadata?.orderId) {
+        await getSupabase()
+          .from('orders')
+          .update({ status: 'payment_failed', updated_at: new Date().toISOString() })
+          .eq('id', session.metadata.orderId);
       }
       break;
     }

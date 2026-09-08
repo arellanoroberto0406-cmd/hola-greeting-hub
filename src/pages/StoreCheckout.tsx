@@ -20,6 +20,8 @@ import { useStore } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { useMercadoPagoPayment } from "@/hooks/useMercadoPagoPayment";
 import { usePayPalStorePayment } from "@/hooks/usePayPalStorePayment";
+import { StoreCardCheckout } from "@/components/store/StoreCardCheckout";
+import { isPaymentsConfigured } from "@/lib/stripe";
 import {
   Form,
   FormControl,
@@ -85,6 +87,7 @@ const StoreCheckout = () => {
   const [orderComplete, setOrderComplete] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<'success' | 'failure' | 'pending' | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cardOrderId, setCardOrderId] = useState<string | null>(null);
   const [completedOrder, setCompletedOrder] = useState<{
     id: string;
     paymentMethod: string;
@@ -126,6 +129,10 @@ const StoreCheckout = () => {
     if (status && orderId) {
       setPaymentStatus(status);
       if (status === 'success') {
+        try {
+          const snapshot = sessionStorage.getItem(`order-confirm-${orderId}`);
+          if (snapshot) setCompletedOrder(JSON.parse(snapshot));
+        } catch { /* snapshot opcional */ }
         setOrderComplete(true);
         clearCart();
       }
@@ -282,6 +289,43 @@ const StoreCheckout = () => {
        }
 
        const order = createOrderRes.order as { id: string };
+
+      const orderSnapshot = {
+        id: order.id,
+        paymentMethod: data.paymentMethod,
+        total: finalTotal,
+        subtotal: totalPrice,
+        shipping: shippingCost,
+        items: items.map((item) => ({
+          name: item.name,
+          image: item.image,
+          quantity: item.quantity,
+          price: item.price,
+          variant: item.selectedColor || null,
+        })),
+        customer: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zipCode: data.zipCode,
+        },
+      };
+
+      // Pago real con tarjeta
+      if (data.paymentMethod === 'card' && isPaymentsConfigured()) {
+        try {
+          sessionStorage.setItem(`order-confirm-${order.id}`, JSON.stringify(orderSnapshot));
+        } catch { /* almacenamiento opcional */ }
+        setCompletedOrder(orderSnapshot);
+        setCardOrderId(order.id);
+        setIsSubmitting(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
 
       // Handle MercadoPago payment
       if (data.paymentMethod === 'mercadopago') {
@@ -484,6 +528,43 @@ const StoreCheckout = () => {
   }
 
   const primaryColor = store.primary_color || "#8B4513";
+
+  // Pantalla de pago con tarjeta (cobro real)
+  if (cardOrderId && !orderComplete) {
+    return (
+      <div className="min-h-screen bg-background">
+        <header className="border-b py-4" style={{ backgroundColor: `${primaryColor}10` }}>
+          <div className="container mx-auto px-4 flex items-center gap-3">
+            {store.logo_url ? (
+              <img src={store.logo_url} alt={store.name} className="h-8 w-auto" />
+            ) : (
+              <Store className="h-6 w-6" style={{ color: primaryColor }} />
+            )}
+            <span className="font-heading text-lg" style={{ color: primaryColor }}>{store.name}</span>
+          </div>
+        </header>
+        <div className="container mx-auto px-4 py-10">
+          <div className="max-w-2xl mx-auto space-y-6">
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-heading">Pago seguro con tarjeta</h1>
+              <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
+                <Shield className="h-4 w-4" /> Total a pagar: ${finalTotal.toLocaleString('es-MX')} {(store as any).currency || 'MXN'}
+              </p>
+            </div>
+            <StoreCardCheckout
+              orderId={cardOrderId}
+              returnUrl={`${window.location.origin}/tienda/${slug}/checkout?status=success&order=${cardOrderId}`}
+            />
+            <div className="text-center">
+              <Button variant="ghost" onClick={() => setCardOrderId(null)}>
+                Cancelar y elegir otro método
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Handle payment failure from MercadoPago
   if (paymentStatus === 'failure') {
