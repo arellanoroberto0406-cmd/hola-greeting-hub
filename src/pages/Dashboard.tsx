@@ -24,6 +24,7 @@ import FAQPoliciesPanel from "@/components/dashboard/FAQPoliciesPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
 import MyStoresPanel from "@/components/dashboard/MyStoresPanel";
+import HomeGuidePanel from "@/components/dashboard/HomeGuidePanel";
 import { TutorialOverlay } from "@/components/dashboard/TutorialOverlay";
 import PaymentSettingsPanel from "@/components/dashboard/PaymentSettingsPanel";
 import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
@@ -61,7 +62,7 @@ const Dashboard = () => {
   const bannerInputRef = useRef<HTMLInputElement>(null);
 
   // Active tab state (replaces Tabs component)
-  const [activeTab, setActiveTab] = useState("orders");
+  const [activeTab, setActiveTab] = useState("home");
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   // Store form state
@@ -260,6 +261,19 @@ const Dashboard = () => {
     if (!store) return null;
 
     switch (activeTab) {
+      case "home":
+        return (
+          <HomeGuidePanel
+            storeName={store.name}
+            storeSlug={store.slug}
+            primaryColor={store.primary_color}
+            productCount={products?.length || 0}
+            orderCount={orderStats?.thisMonthOrders || 0}
+            hasCustomDesign={Boolean(store.logo_url || store.banner_url)}
+            hasPaymentMethod={Boolean(store.payment_methods)}
+            onGo={setActiveTab}
+          />
+        );
       case "orders":
         return (
           <div className="space-y-4">
@@ -671,9 +685,11 @@ const Dashboard = () => {
           <main className="flex-1 min-w-0 overflow-x-hidden">
             <div className="p-4 md:p-6 lg:p-8 max-w-6xl">
               {/* Stats */}
+              {activeTab !== "home" && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="mb-6">
                 <DashboardStats storeId={store.id} primaryColor={store.primary_color} productsCount={products?.length || 0} />
               </motion.div>
+              )}
 
               {/* Active Panel */}
               <motion.div
