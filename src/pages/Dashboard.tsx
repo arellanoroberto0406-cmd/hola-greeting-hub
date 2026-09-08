@@ -23,6 +23,7 @@ import AdvancedSettingsPanel from "@/components/dashboard/AdvancedSettingsPanel"
 import FAQPoliciesPanel from "@/components/dashboard/FAQPoliciesPanel";
 import SubscriptionPanel from "@/components/dashboard/SubscriptionPanel";
 import StoreEditorPanel from "@/components/dashboard/StoreEditorPanel";
+import MyStoresPanel from "@/components/dashboard/MyStoresPanel";
 import { TutorialOverlay } from "@/components/dashboard/TutorialOverlay";
 import PaymentSettingsPanel from "@/components/dashboard/PaymentSettingsPanel";
 import PaymentStatsPanel from "@/components/dashboard/PaymentStatsPanel";
