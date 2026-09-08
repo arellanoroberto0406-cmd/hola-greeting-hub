@@ -20,6 +20,9 @@ export interface Store {
   tiktok_url?: string;
   whatsapp_number?: string;
   is_active: boolean;
+  /** Tema por defecto de la tienda guardado en la base de datos */
+  default_theme?: "light" | "dark" | "auto" | null;
+  dark_mode_enabled?: boolean | null;
   created_at: string;
   updated_at: string;
   // Payment configuration
