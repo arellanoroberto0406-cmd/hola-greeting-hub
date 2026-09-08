@@ -422,33 +422,52 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         </div>
       </div>
 
-      <Tabs defaultValue="all-in-one" className="space-y-6">
-        <TabsList className="flex flex-wrap h-auto p-1 bg-muted/60 backdrop-blur rounded-xl">
-          <TabsTrigger value="all-in-one" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
-            <Wand2 className="h-4 w-4" />
-            Estudio
-          </TabsTrigger>
-          <TabsTrigger value="templates" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
-            <LayoutTemplate className="h-4 w-4" />
-            Plantillas
-          </TabsTrigger>
-          <TabsTrigger value="editor" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
-            <Layers className="h-4 w-4" />
-            Secciones
-          </TabsTrigger>
-          <TabsTrigger value="styles" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
-            <Palette className="h-4 w-4" />
-            Estilos
-          </TabsTrigger>
-          <TabsTrigger value="pro" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
-            <Sparkles className="h-4 w-4" />
-            Diseño Pro
-          </TabsTrigger>
-          <TabsTrigger value="preview" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
-            <Eye className="h-4 w-4" />
-            Vista previa
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={editorTab} onValueChange={setEditorTab} className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <TabsList className="flex flex-wrap h-auto p-1 bg-muted/60 backdrop-blur rounded-xl">
+            <TabsTrigger value="all-in-one" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+              <Wand2 className="h-4 w-4" />
+              Estudio
+            </TabsTrigger>
+            <TabsTrigger value="editor" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+              <Layers className="h-4 w-4" />
+              Secciones
+            </TabsTrigger>
+            <TabsTrigger value="preview" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+              <Eye className="h-4 w-4" />
+              Vista previa
+            </TabsTrigger>
+            {advancedMode && (
+              <>
+                <TabsTrigger value="templates" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                  <LayoutTemplate className="h-4 w-4" />
+                  Plantillas
+                </TabsTrigger>
+                <TabsTrigger value="styles" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                  <Palette className="h-4 w-4" />
+                  Estilos
+                </TabsTrigger>
+                <TabsTrigger value="pro" className="gap-2 rounded-lg data-[state=active]:shadow-sm">
+                  <Sparkles className="h-4 w-4" />
+                  Diseño Pro
+                </TabsTrigger>
+              </>
+            )}
+          </TabsList>
+
+          <label className="flex items-center gap-2 text-xs font-medium text-muted-foreground cursor-pointer select-none">
+            <Switch
+              checked={advancedMode}
+              onCheckedChange={(v) => {
+                setAdvancedMode(v);
+                localStorage.setItem("editor_advanced_mode", v ? "1" : "0");
+                if (!v && ["templates", "styles", "pro"].includes(editorTab)) setEditorTab("all-in-one");
+              }}
+            />
+            Opciones avanzadas
+          </label>
+        </div>
+
 
         <TabsContent value="all-in-one" className="space-y-4">
           <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
