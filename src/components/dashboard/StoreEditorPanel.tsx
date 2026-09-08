@@ -36,6 +36,7 @@ import { Wand2, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { useStorePlanTier } from "@/hooks/useStorePlanTier";
 import { useToast } from "@/hooks/use-toast";
