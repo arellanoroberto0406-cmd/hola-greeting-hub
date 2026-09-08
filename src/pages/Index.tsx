@@ -29,7 +29,10 @@ import {
   MousePointerClick,
   Layers,
   Globe,
-  Play
+  Play,
+  WandSparkles,
+  Boxes,
+  CircleDollarSign
 } from "lucide-react";
 
 const fadeUp = {
@@ -132,7 +135,7 @@ const Index = () => {
   const store = demoStores[activeStore];
 
   return (
-    <div className="landing-canvas min-h-screen bg-background overflow-hidden">
+    <div className="landing-canvas min-h-screen bg-background overflow-x-hidden">
       {/* Floating CTA Banner */}
       <AnimatePresence>
         {!user && showBanner && (
@@ -144,9 +147,9 @@ const Index = () => {
             className="fixed bottom-4 left-4 right-4 z-50 mx-auto max-w-md"
           >
             <div className="relative rounded-2xl border border-primary/20 bg-background/90 backdrop-blur-xl p-4 shadow-2xl shadow-primary/10">
-              <button onClick={() => setShowBanner(false)} className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-muted border border-border flex items-center justify-center hover:bg-muted/80 transition-colors">
+              <Button variant="outline" size="icon" aria-label="Cerrar aviso" onClick={() => setShowBanner(false)} className="absolute -top-2 -right-2 h-7 w-7 rounded-full bg-background shadow-sm">
                 <X className="h-3 w-3 text-muted-foreground" />
-              </button>
+              </Button>
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                   <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shrink-0">
@@ -172,10 +175,10 @@ const Index = () => {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-4 left-4 right-4 z-50 mx-auto max-w-6xl"
+        className="fixed top-3 left-3 right-3 z-50 mx-auto max-w-6xl sm:top-4 sm:left-4 sm:right-4"
       >
-        <div className="rounded-2xl border border-border/40 bg-background/60 backdrop-blur-2xl shadow-2xl shadow-black/5">
-          <div className="flex items-center justify-between px-6 py-3.5">
+        <div className="rounded-2xl border border-border/70 bg-background/85 backdrop-blur-2xl shadow-lg shadow-primary/5">
+          <div className="flex items-center justify-between px-3.5 py-3 sm:px-6 sm:py-3.5">
             <motion.div className="flex items-center gap-3 cursor-pointer" whileHover={{ scale: 1.02 }} onClick={() => navigate("/")}>
               <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
                 <Store className="h-4.5 w-4.5 text-primary-foreground" />
@@ -213,30 +216,18 @@ const Index = () => {
       </motion.header>
 
       {/* ==================== HERO ==================== */}
-      <motion.section ref={heroRef} className="relative min-h-screen flex items-center pt-28 pb-20" style={{ opacity: heroOpacity }}>
+      <motion.section ref={heroRef} className="relative min-h-[92svh] flex items-center pt-28 pb-14 md:pt-32 md:pb-20" style={{ opacity: heroOpacity }}>
         {/* Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,hsl(var(--primary)/0.12),transparent_60%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_100%_100%,hsl(265_85%_72%/0.12),transparent_50%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(hsl(222_47%_11%/0.035)_1px,transparent_1px),linear-gradient(90deg,hsl(222_47%_11%/0.035)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
-          
-          {/* Subtle animated orbs */}
-          <motion.div 
-            className="absolute top-1/4 -left-20 w-[600px] h-[600px] bg-primary/15 rounded-full blur-[150px]"
-            animate={{ x: [0, 60, 0], y: [0, 30, 0] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div 
-            className="absolute bottom-1/4 -right-20 w-[500px] h-[500px] bg-gold/10 rounded-full blur-[150px]"
-            animate={{ x: [0, -40, 0], y: [0, -30, 0] }}
-            transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          />
         </div>
         
         <motion.div className="container mx-auto px-4 md:px-8 relative z-10" style={{ y: heroY }}>
           <div className="max-w-5xl mx-auto">
-            <motion.div className="text-center space-y-8" initial="hidden" animate="visible" variants={stagger}>
+             <motion.div className="text-center space-y-6 md:space-y-8" initial="hidden" animate="visible" variants={stagger}>
               {/* Badge */}
               <motion.div variants={fadeUp} custom={0}>
                 <span className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-primary/20 bg-primary/5 backdrop-blur-md text-sm font-medium">
@@ -253,7 +244,7 @@ const Index = () => {
 
               {/* Title */}
               <motion.div variants={fadeUp} custom={1} className="space-y-3">
-                <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-heading leading-[0.95] tracking-tight">
+                 <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold font-heading leading-[1.02]">
                   <span className="block">Crea tu tienda</span>
                   <span className="block bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">
                     en minutos
@@ -294,9 +285,9 @@ const Index = () => {
               </motion.div>
 
               {/* Trust badges */}
-              <motion.div variants={fadeUp} custom={4} className="flex flex-wrap justify-center gap-3">
+               <motion.div variants={fadeUp} custom={4} className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-center sm:gap-3">
                 {["Sin código necesario", "Configuración en 5 min", "Soporte 24/7", "14 días gratis"].map((b, i) => (
-                  <span key={i} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/50 border border-border/40 backdrop-blur-sm text-sm text-muted-foreground">
+                   <span key={i} className="inline-flex items-center justify-center gap-2 rounded-xl border border-border/60 bg-card/80 px-3 py-2 text-xs text-muted-foreground shadow-sm sm:rounded-full sm:px-4 sm:text-sm">
                     <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
                     {b}
                   </span>
@@ -307,11 +298,11 @@ const Index = () => {
             {/* Stats Row */}
             <motion.div 
               initial="hidden" animate="visible" variants={stagger}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-20"
+               className="mt-12 grid grid-cols-2 overflow-hidden rounded-2xl border border-border/70 bg-card/80 shadow-xl shadow-primary/5 md:mt-16 md:grid-cols-4"
             >
               {stats.map((stat, i) => (
-                <motion.div key={i} variants={fadeUp} custom={i + 5} whileHover={{ y: -4 }} className="group">
-                  <div className="relative p-6 rounded-2xl bg-card/40 border border-border/30 backdrop-blur-sm text-center hover:border-primary/30 transition-all duration-300 overflow-hidden">
+                 <motion.div key={i} variants={fadeUp} custom={i + 5} className="group border-b border-r border-border/50 even:border-r-0 md:border-b-0 md:[&:nth-child(2)]:border-r md:last:border-r-0">
+                   <div className="relative p-4 text-center transition-colors duration-300 hover:bg-primary/5 md:p-6">
                     <motion.div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     <stat.icon className="h-5 w-5 text-primary mx-auto mb-3 relative z-10" />
                     <p className="text-3xl md:text-4xl font-bold font-heading relative z-10">{stat.value}</p>
@@ -323,43 +314,48 @@ const Index = () => {
           </div>
         </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div 
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
-        >
-          <motion.div 
-            className="flex flex-col items-center gap-2 cursor-pointer"
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            <span className="text-xs text-muted-foreground font-medium uppercase tracking-widest">Explorar</span>
-            <div className="w-5 h-9 rounded-full border-2 border-muted-foreground/30 flex justify-center pt-2">
-              <motion.div className="w-1 h-2.5 rounded-full bg-muted-foreground/40" animate={{ y: [0, 6, 0], opacity: [1, 0.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }} />
-            </div>
-          </motion.div>
-        </motion.div>
       </motion.section>
 
+      {/* Product flow overview */}
+      <section aria-label="Todo tu negocio conectado" className="border-y border-border/60 bg-card/55">
+        <div className="container mx-auto grid max-w-6xl grid-cols-1 px-4 py-5 sm:grid-cols-3 md:px-8">
+          {[
+            { icon: WandSparkles, title: "Diseña", text: "Tu marca y estilo" },
+            { icon: Boxes, title: "Administra", text: "Productos y pedidos" },
+            { icon: CircleDollarSign, title: "Vende", text: "Pagos y seguimiento" },
+          ].map((item, index) => (
+            <div key={item.title} className="flex items-center gap-4 border-b border-border/50 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:px-6 sm:last:border-r-0">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <item.icon className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="text-xs font-semibold text-primary">0{index + 1}</p>
+                <p className="font-heading font-bold">{item.title}</p>
+                <p className="text-sm text-muted-foreground">{item.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ==================== FEATURES - BENTO GRID ==================== */}
-      <section id="features" className="py-24 md:py-32 relative" ref={featuresRef}>
+      <section id="features" className="landing-section relative" ref={featuresRef}>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-muted/5 to-transparent" />
         <div className="container mx-auto px-4 md:px-8 relative">
           <motion.div 
-            className="text-center mb-16"
+            className="mb-12 grid items-end gap-6 text-left md:grid-cols-[1.2fr_0.8fr] md:mb-16"
             initial="hidden" animate={featuresInView ? "visible" : "hidden"} variants={stagger}
           >
-            <motion.div variants={fadeUp} custom={0}>
-              <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full"><Zap className="h-3.5 w-3.5 mr-2" />Características</Badge>
-            </motion.div>
-            <motion.h2 variants={fadeUp} custom={1} className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading mb-4">
-              Todo lo que necesitas
-            </motion.h2>
-            <motion.p variants={fadeUp} custom={2} className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Herramientas profesionales para hacer crecer tu negocio online
+            <div>
+              <motion.div variants={fadeUp} custom={0}>
+                <Badge variant="outline" className="mb-5 px-4 py-1.5 rounded-full"><Zap className="h-3.5 w-3.5 mr-2" />Todo en un solo lugar</Badge>
+              </motion.div>
+              <motion.h2 variants={fadeUp} custom={1} className="text-3xl font-bold font-heading sm:text-4xl md:text-5xl lg:text-6xl">
+                Tu tienda, más fácil de manejar
+              </motion.h2>
+            </div>
+            <motion.p variants={fadeUp} custom={2} className="max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg md:justify-self-end">
+              Una vista clara para vender, personalizar y atender a tus clientes sin perderte entre herramientas.
             </motion.p>
           </motion.div>
           
@@ -377,7 +373,7 @@ const Index = () => {
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className={feature.size === "large" ? "lg:col-span-2" : ""}
               >
-                <Card className="group h-full border-border/30 bg-card/40 backdrop-blur-sm hover:border-primary/30 hover:bg-card/70 transition-all duration-500 overflow-hidden relative">
+                 <Card className="landing-panel group h-full overflow-hidden border-border/60 bg-card/90 transition-all duration-500 hover:border-primary/30">
                   <motion.div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <CardContent className={`p-8 ${feature.size === "large" ? "flex items-start gap-6" : ""}`}>
                     <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/10 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:border-primary/30 transition-all duration-300 shrink-0">
@@ -396,7 +392,7 @@ const Index = () => {
       </section>
 
       {/* ==================== HOW IT WORKS ==================== */}
-      <section id="steps" className="py-24 md:py-32 relative" ref={stepsRef}>
+      <section id="steps" className="landing-section relative border-y border-border/50 bg-muted/35" ref={stepsRef}>
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,hsl(var(--primary)/0.06),transparent_60%)]" />
         </div>
@@ -468,7 +464,7 @@ const Index = () => {
       </section>
 
       {/* ==================== STORE PREVIEW ==================== */}
-      <section id="tiendas" className="py-24 md:py-32 relative" ref={storesRef}>
+      <section id="tiendas" className="landing-section relative" ref={storesRef}>
         <div className="container mx-auto px-4 md:px-8">
           <motion.div className="text-center mb-16" initial="hidden" animate={storesInView ? "visible" : "hidden"} variants={stagger}>
             <motion.div variants={fadeUp} custom={0}>
@@ -484,11 +480,10 @@ const Index = () => {
             {/* Store Switcher */}
             <motion.div variants={fadeUp} custom={3} className="flex justify-center gap-3">
               {demoStores.map((s, i) => (
-                <motion.button
+                <Button
                   key={i}
                   onClick={() => setActiveStore(i)}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
+                  variant="outline"
                   className={`flex items-center gap-2.5 px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
                     activeStore === i 
                       ? "border-primary bg-primary/10 shadow-lg shadow-primary/10" 
@@ -497,7 +492,7 @@ const Index = () => {
                 >
                   <span className="text-xl">{s.icon}</span>
                   <span className={`font-heading font-semibold text-sm ${activeStore === i ? "text-primary" : "text-muted-foreground"}`}>{s.name}</span>
-                </motion.button>
+                </Button>
               ))}
             </motion.div>
           </motion.div>
@@ -590,7 +585,7 @@ const Index = () => {
       </section>
 
       {/* ==================== TESTIMONIALS ==================== */}
-      <section id="testimonials" className="py-24 md:py-32 relative overflow-hidden">
+      <section id="testimonials" className="landing-section relative overflow-hidden border-y border-border/50 bg-muted/35">
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_100%_60%_at_20%_50%,hsl(var(--primary)/0.06),transparent_60%)]" />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_50%,hsl(var(--gold)/0.04),transparent_60%)]" />
@@ -677,16 +672,7 @@ const Index = () => {
       </section>
 
       {/* ==================== CTA ==================== */}
-      <section className="py-24 md:py-32 relative overflow-hidden">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-gold/5" />
-          <motion.div 
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[200px]"
-            animate={{ scale: [1, 1.15, 1] }}
-            transition={{ duration: 10, repeat: Infinity }}
-          />
-        </div>
-        
+      <section className="landing-section relative overflow-hidden bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 md:px-8 relative">
           <motion.div 
             className="max-w-3xl mx-auto"
@@ -695,38 +681,36 @@ const Index = () => {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Card className="border-primary/15 bg-card/50 backdrop-blur-xl overflow-hidden">
-              <CardContent className="p-10 md:p-16 text-center space-y-7">
-                <Badge variant="outline" className="px-4 py-1.5 rounded-full border-green-500/30 bg-green-500/10">
-                  <CheckCircle2 className="h-4 w-4 mr-2 text-green-500" />14 días gratis
+            <div className="py-4 text-center space-y-7 md:py-8">
+                <Badge variant="outline" className="border-primary-foreground/30 bg-primary-foreground/10 px-4 py-1.5 text-primary-foreground rounded-full">
+                  <CheckCircle2 className="h-4 w-4 mr-2" />14 días gratis
                 </Badge>
                 
                 <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-heading">
                   ¿Listo para
-                  <span className="block mt-2 bg-gradient-to-r from-primary via-orange-400 to-gold bg-clip-text text-transparent">empezar a vender?</span>
+                  <span className="block mt-2">empezar a vender?</span>
                 </h2>
                 
-                <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+                <p className="text-lg text-primary-foreground/80 max-w-xl mx-auto">
                   Crea tu tienda en minutos y comienza a recibir pedidos hoy. Sin tarjeta, sin compromisos.
                 </p>
                 
                 <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.98 }}>
-                  <Button size="lg" className="text-base px-10 py-6 gap-3 rounded-xl shadow-lg shadow-primary/20 group" onClick={() => navigate("/auth")}>
+                  <Button size="lg" variant="secondary" className="text-base px-10 py-6 gap-3 rounded-xl shadow-lg group" onClick={() => navigate("/auth")}>
                     <Rocket className="h-5 w-5" />
                     Crear Mi Tienda Gratis
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Button>
                 </motion.div>
 
-                <div className="flex flex-wrap justify-center gap-6 pt-2 text-sm text-muted-foreground">
+                <div className="flex flex-wrap justify-center gap-6 pt-2 text-sm text-primary-foreground/75">
                   {["Sin código", "5 min setup", "Soporte 24/7"].map((item, i) => (
                     <span key={i} className="flex items-center gap-2">
-                      <CheckCircle2 className="h-4 w-4 text-green-500" />{item}
+                       <CheckCircle2 className="h-4 w-4" />{item}
                     </span>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+            </div>
           </motion.div>
         </div>
       </section>
