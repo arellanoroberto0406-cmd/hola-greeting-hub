@@ -53,7 +53,7 @@ const tabs = [
   { id: "analytics", label: "Analytics", icon: BarChart3, group: "mas", minPlan: "professional" as PlanTier },
   { id: "coupons", label: "Cupones", icon: Tag, group: "mas", minPlan: "professional" as PlanTier },
   { id: "refunds", label: "Reembolsos", icon: RotateCcw, group: "mas", minPlan: "basic" as PlanTier },
-  { id: "my-stores", label: "Mis Tiendas", icon: LayoutGrid, group: "mas", minPlan: "basic" as PlanTier },
+  { id: "my-stores", label: "Tiendas y dominios", icon: LayoutGrid, group: "mi-tienda", minPlan: "basic" as PlanTier },
   { id: "settings", label: "Configuración", icon: Settings, group: "mas", minPlan: "basic" as PlanTier },
   { id: "payment-proofs", label: "Comprobantes", icon: FileCheck, group: "mas", minPlan: "basic" as PlanTier },
 ];
