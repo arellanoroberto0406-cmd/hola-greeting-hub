@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -266,7 +266,7 @@ const MyStoresPanel = ({ userId }: { userId: string | undefined }) => {
 
 const Summary = ({ label, value, icon: Icon }: { label: string; value: number; icon: typeof StoreIcon }) => <Card className="dashboard-panel"><CardContent className="flex items-center gap-3 p-4"><div className="dashboard-metric-icon hidden sm:flex"><Icon className="h-5 w-5" /></div><div><p className="text-2xl font-bold">{value}</p><p className="text-xs text-muted-foreground">{label}</p></div></CardContent></Card>;
 
-const Field = ({ label, icon: Icon, children }: { label: string; icon?: typeof Phone; children: React.ReactNode }) => <div className="space-y-2"><Label className="flex items-center gap-1.5">{Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground" />}{label}</Label>{children}</div>;
+const Field = ({ label, icon: Icon, children }: { label: string; icon?: typeof Phone; children: ReactNode }) => <div className="space-y-2"><Label className="flex items-center gap-1.5">{Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground" />}{label}</Label>{children}</div>;
 
 const CopyButton = ({ url }: { url: string }) => {
   const { toast } = useToast();
