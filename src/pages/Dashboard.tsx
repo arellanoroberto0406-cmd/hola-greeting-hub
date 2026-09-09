@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Store, Package, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, Info, Link2, Wallet, PieChart, RotateCcw, MessagesSquare } from "lucide-react";
+import { Loader2, Store, Package, Plus, Trash2, Edit2, Save, Upload, ImageIcon, Image, ShoppingBag, BarChart3, Tag, MessageCircle, Info, Link2, Wallet, PieChart, RotateCcw, MessagesSquare, Search, AlertTriangle, Eye } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -377,12 +377,15 @@ const Dashboard = () => {
   const renderProductsPanel = () => {
     if (!store) return null;
     return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <SectionHeader title="Productos" tip="Agrega productos con múltiples imágenes, precios, colecciones y marca como Nuevo o En oferta." />
+      <div className="space-y-5">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <SectionHeader title="Gestiona tus productos" tip="Agrega productos con múltiples imágenes, precios, colecciones y marca como Nuevo o En oferta." />
+            <p className="mt-1 text-sm text-muted-foreground">Agrega, edita y organiza tu catálogo para mantenerlo listo para vender.</p>
+          </div>
           <Dialog open={isProductDialogOpen} onOpenChange={(open) => { setIsProductDialogOpen(open); if (!open) resetProductForm(); }}>
             <DialogTrigger asChild>
-              <Button className="gap-2" style={{ backgroundColor: store.primary_color }}>
+              <Button className="gap-2 dashboard-primary-action">
                 <Plus className="h-4 w-4" />
                 Nuevo Producto
               </Button>
@@ -459,34 +462,48 @@ const Dashboard = () => {
           </Dialog>
         </div>
 
+        {!productsLoading && products && products.length > 0 && (
+          <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+            <ProductMetric icon={Package} label="Total de productos" value={products.length} tone="violet" />
+            <ProductMetric icon={Eye} label="Productos activos" value={products.filter((product: any) => product.stock > 0).length} tone="green" />
+            <ProductMetric icon={AlertTriangle} label="Stock bajo" value={products.filter((product: any) => product.stock > 0 && product.stock <= 5).length} tone="amber" />
+            <ProductMetric icon={ShoppingBag} label="Sin existencias" value={products.filter((product: any) => product.stock <= 0).length} tone="blue" />
+          </div>
+        )}
+
         {productsLoading ? (
           <div className="flex justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
         ) : products && products.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          <Card className="dashboard-panel overflow-hidden">
+            <div className="flex flex-col gap-3 border-b border-border/70 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                <Button size="sm">Todos ({products.length})</Button>
+                <Button size="sm" variant="outline">Activos ({products.filter((product: any) => product.stock > 0).length})</Button>
+                <Button size="sm" variant="outline">Sin stock ({products.filter((product: any) => product.stock <= 0).length})</Button>
+              </div>
+              <div className="relative sm:w-72">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input className="pl-9" placeholder="Buscar productos..." aria-label="Buscar productos" />
+              </div>
+            </div>
+            <div className="divide-y divide-border/60">
             {products.map((product: any) => (
-              <Card key={product.id} className="overflow-hidden border-border/50 hover:shadow-md transition-shadow">
-                <div className="aspect-square relative">
-                  <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
-                  {product.is_new && <span className="absolute top-2 left-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">Nuevo</span>}
-                  {product.is_on_sale && <span className="absolute top-2 right-2 bg-destructive text-destructive-foreground text-xs px-2 py-0.5 rounded-full">Oferta</span>}
+              <div key={product.id} className="grid grid-cols-[52px_1fr_auto] items-center gap-3 p-3 transition-colors hover:bg-muted/30 sm:grid-cols-[58px_minmax(180px,1.6fr)_minmax(100px,.7fr)_100px_90px_130px]">
+                <div className="relative h-12 w-12 overflow-hidden rounded-md border border-border/70 bg-muted sm:h-14 sm:w-14">
+                  <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
                 </div>
-                <CardContent className="p-4">
-                  <h3 className="font-medium truncate">{product.name}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="text-primary font-bold">${product.price}</p>
-                    {product.original_price && <p className="text-sm text-muted-foreground line-through">${product.original_price}</p>}
-                  </div>
-                  <p className="text-sm text-muted-foreground">Stock: {product.stock}</p>
-                  <div className="flex gap-2 mt-3">
-                    <Button variant="outline" size="sm" className="flex-1" onClick={() => openEditProduct(product)}>
-                      <Edit2 className="h-4 w-4 mr-1" />Editar
-                    </Button>
-                    <Button variant="destructive" size="sm" onClick={() => handleDeleteProduct(product.id)}><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-                </CardContent>
-              </Card>
+                <div className="min-w-0"><h3 className="truncate font-semibold">{product.name}</h3><p className="truncate text-xs text-muted-foreground">{product.description || "Producto de tu catálogo"}</p></div>
+                <span className="hidden truncate text-sm text-muted-foreground sm:block">{product.collection || "General"}</span>
+                <div className="hidden sm:block"><p className="font-bold">${Number(product.price).toLocaleString("es-MX")}</p>{product.original_price && <p className="text-xs text-muted-foreground line-through">${product.original_price}</p>}</div>
+                <span className={`hidden text-sm font-semibold sm:block ${product.stock <= 5 ? "text-amber-400" : "text-emerald-400"}`}>{product.stock}</span>
+                <div className="flex justify-end gap-1">
+                  <Button variant="outline" size="icon" className="h-9 w-9" onClick={() => openEditProduct(product)} aria-label={`Editar ${product.name}`}><Edit2 className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" className="h-9 w-9 text-destructive" onClick={() => handleDeleteProduct(product.id)} aria-label={`Eliminar ${product.name}`}><Trash2 className="h-4 w-4" /></Button>
+                </div>
+              </div>
             ))}
-          </div>
+            </div>
+          </Card>
         ) : (
           <Card className="p-12 text-center border-border/50">
             <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
@@ -632,7 +649,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="dashboard-canvas min-h-screen bg-background">
       {store && <SubscriptionExpiryBanner storeId={store.id} primaryColor={store.primary_color} onUpgrade={handleNavigateToSubscription} />}
       
       {store ? (
@@ -683,7 +700,7 @@ const Dashboard = () => {
           </TooltipProvider>
 
           <main className="flex-1 min-w-0 overflow-x-hidden">
-            <div className="p-4 md:p-6 lg:p-8 max-w-6xl">
+            <div className="mx-auto w-full max-w-[1500px] p-4 md:p-6 lg:p-7">
               {/* Stats */}
               {activeTab !== "home" && (
               <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }} className="mb-6">
@@ -725,6 +742,15 @@ const SectionHeader = ({ title, tip }: { title: string; tip: string }) => (
       </TooltipContent>
     </Tooltip>
   </div>
+);
+
+const ProductMetric = ({ icon: Icon, label, value, tone }: { icon: typeof Package; label: string; value: number; tone: string }) => (
+  <Card className={`dashboard-metric dashboard-metric-${tone}`}>
+    <CardContent className="flex items-center gap-3 p-4">
+      <div className="dashboard-metric-icon"><Icon className="h-5 w-5" /></div>
+      <div><p className="text-xs text-muted-foreground">{label}</p><p className="text-2xl font-bold">{value}</p></div>
+    </CardContent>
+  </Card>
 );
 
 export default Dashboard;
