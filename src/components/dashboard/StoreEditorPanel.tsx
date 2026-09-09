@@ -474,7 +474,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
 
 
         <TabsContent value="all-in-one" className="space-y-4">
-          <div className="grid gap-6 lg:grid-cols-[1fr_420px]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(340px,.82fr)_minmax(520px,1.35fr)]">
             <div className="space-y-4 min-w-0">
               {(() => {
                 const studioSections = [
@@ -561,12 +561,12 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                         <AccordionItem
                           key={s.id}
                           value={s.id}
-                          className="border rounded-2xl px-5 bg-card shadow-sm hover:shadow-md transition-shadow data-[state=open]:shadow-md data-[state=open]:border-primary/30"
+                           className="dashboard-panel border px-4 transition-shadow data-[state=open]:border-primary/50"
                         >
                           <AccordionTrigger className="hover:no-underline py-4">
                             <div className="flex items-center gap-4 text-left">
                               <div
-                                className="h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                                 className="h-10 w-10 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm"
                                 style={{
                                   background: `linear-gradient(135deg, ${s.tint}, ${s.tint}cc)`,
                                 }}
@@ -592,9 +592,9 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
               })()}
             </div>
 
-            <div className="lg:sticky lg:top-4 h-fit space-y-3">
+            <div className="xl:sticky xl:top-20 h-fit space-y-3">
               <Card
-                className="overflow-hidden border-primary/20 shadow-xl"
+                className="dashboard-panel overflow-hidden border-primary/30 shadow-xl"
                 style={{
                   background: `linear-gradient(180deg, ${store.primary_color}0d, transparent)`,
                 }}
