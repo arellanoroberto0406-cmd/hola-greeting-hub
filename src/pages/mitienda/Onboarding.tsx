@@ -115,7 +115,7 @@ const Onboarding = () => {
                 <label className="mt-label" htmlFor="mt-store-name">Nombre de tu tienda</label>
                 <div className="relative">
                   <input
-                    id="mt-store-name" className="mt-input pr-16 text-lg font-semibold" maxLength={50}
+                    id="mt-store-name" className="mt-input !pr-16 text-lg font-semibold" maxLength={50}
                     placeholder="Urban Style" value={draft.name}
                     onChange={(event) => patch({ name: event.target.value, slug: slugify(event.target.value) })}
                   />

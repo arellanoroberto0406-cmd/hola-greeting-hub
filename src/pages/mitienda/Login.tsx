@@ -72,7 +72,7 @@ const Login = () => {
               <div className="relative">
                 <Mail className="mt-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                 <input
-                  id="mt-login-email" type="email" autoComplete="email" className="mt-input pl-10"
+                  id="mt-login-email" type="email" autoComplete="email" className="mt-input !pl-10"
                   placeholder="tu@correo.com" value={email} onChange={(event) => setEmail(event.target.value)}
                 />
               </div>
@@ -84,7 +84,7 @@ const Login = () => {
                 <Lock className="mt-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
                 <input
                   id="mt-login-pass" type={show ? "text" : "password"} autoComplete="current-password"
-                  className="mt-input px-10" placeholder="Ingresa tu contraseña"
+                  className="mt-input !px-10" placeholder="Ingresa tu contraseña"
                   value={password} onChange={(event) => setPassword(event.target.value)}
                 />
                 <button
@@ -142,7 +142,7 @@ const Login = () => {
               </div>
               <StoreMock draft={demo} device="desktop" />
             </div>
-            <div className="mt-phone-frame mt-float absolute -bottom-6 -left-3 w-[120px]">
+            <div className="mt-phone-frame mt-float absolute -bottom-6 -right-4 w-[120px]">
               <StoreMock draft={demo} device="mobile" />
             </div>
           </div>

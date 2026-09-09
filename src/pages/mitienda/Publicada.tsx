@@ -103,7 +103,7 @@ const Publicada = () => {
 
           <div className="relative">
             <div className="mt-device-frame"><StoreMock draft={draft} device="desktop" /></div>
-            <div className="mt-phone-frame mt-float absolute -bottom-6 -left-3 w-[120px]">
+            <div className="mt-phone-frame mt-float absolute -bottom-6 -right-4 w-[120px]">
               <StoreMock draft={draft} device="mobile" />
             </div>
           </div>

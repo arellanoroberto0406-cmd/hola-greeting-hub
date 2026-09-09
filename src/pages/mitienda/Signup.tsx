@@ -66,7 +66,7 @@ const Signup = () => {
               <label className="mt-label" htmlFor="mt-name">Nombre completo</label>
               <div className="relative">
                 <User className="mt-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <input id="mt-name" className="mt-input pl-10" placeholder="Tu nombre y apellido"
+                <input id="mt-name" className="mt-input !pl-10" placeholder="Tu nombre y apellido"
                   value={form.name} onChange={(event) => set("name", event.target.value)} autoComplete="name" />
               </div>
             </div>
@@ -75,7 +75,7 @@ const Signup = () => {
               <label className="mt-label" htmlFor="mt-email">Correo electrónico</label>
               <div className="relative">
                 <Mail className="mt-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <input id="mt-email" type="email" className="mt-input pl-10" placeholder="tucorreo@ejemplo.com"
+                <input id="mt-email" type="email" className="mt-input !pl-10" placeholder="tucorreo@ejemplo.com"
                   value={form.email} onChange={(event) => set("email", event.target.value)} autoComplete="email" />
               </div>
             </div>
@@ -84,7 +84,7 @@ const Signup = () => {
               <label className="mt-label" htmlFor="mt-pass">Contraseña</label>
               <div className="relative">
                 <Lock className="mt-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <input id="mt-pass" type={show ? "text" : "password"} className="mt-input px-10"
+                <input id="mt-pass" type={show ? "text" : "password"} className="mt-input !px-10"
                   placeholder="Crea una contraseña segura" value={form.password}
                   onChange={(event) => set("password", event.target.value)} autoComplete="new-password" />
                 <button type="button" onClick={() => setShow((value) => !value)}
@@ -100,7 +100,7 @@ const Signup = () => {
               <label className="mt-label" htmlFor="mt-phone">Teléfono <span className="mt-muted font-normal">(opcional)</span></label>
               <div className="relative">
                 <Phone className="mt-muted absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <input id="mt-phone" className="mt-input pl-10" placeholder="+52 55 1234 5678"
+                <input id="mt-phone" className="mt-input !pl-10" placeholder="+52 55 1234 5678"
                   value={form.phone} onChange={(event) => set("phone", event.target.value)} autoComplete="tel" />
               </div>
             </div>
