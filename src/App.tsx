@@ -26,6 +26,15 @@ const StoreCheckout = lazy(() => import("./pages/StoreCheckout"));
 const CustomerAccount = lazy(() => import("./pages/CustomerAccount"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 
+// MiTienda — nuevo recorrido completo
+const MtLanding = lazy(() => import("./pages/mitienda/Landing"));
+const MtLogin = lazy(() => import("./pages/mitienda/Login"));
+const MtSignup = lazy(() => import("./pages/mitienda/Signup"));
+const MtOnboarding = lazy(() => import("./pages/mitienda/Onboarding"));
+const MtPanel = lazy(() => import("./pages/mitienda/Panel"));
+const MtPublicada = lazy(() => import("./pages/mitienda/Publicada"));
+const MtEjemplo = lazy(() => import("./pages/mitienda/Ejemplo"));
+
 const queryClient = new QueryClient();
 
 const RouteFallback = () => (
@@ -51,6 +60,13 @@ const App = () => (
                     <Route path="/auth" element={<Auth />} />
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/inicio" element={<Index />} />
+                    <Route path="/mitienda" element={<MtLanding />} />
+                    <Route path="/mitienda/login" element={<MtLogin />} />
+                    <Route path="/mitienda/registro" element={<MtSignup />} />
+                    <Route path="/mitienda/crear" element={<MtOnboarding />} />
+                    <Route path="/mitienda/panel" element={<MtPanel />} />
+                    <Route path="/mitienda/publicada" element={<MtPublicada />} />
+                    <Route path="/mitienda/ejemplo" element={<MtEjemplo />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/tienda/:slug" element={<StoreFront />} />
                     <Route path="/tienda/:slug/checkout" element={<StoreCheckout />} />
