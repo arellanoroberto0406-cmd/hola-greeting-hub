@@ -336,7 +336,7 @@ const Dashboard = () => {
       case "my-stores":
         return (
           <div className="space-y-4">
-            <SectionHeader title="Mis Tiendas" tip="Revisa el tema, el acento y las secciones de cada tienda, y cámbialos desde aquí." />
+            <SectionHeader title="Tiendas, dominios y contacto" tip="Administra el enlace, dominio, información y datos de contacto de cada tienda desde un solo lugar." />
             <MyStoresPanel userId={user?.id} />
           </div>
         );

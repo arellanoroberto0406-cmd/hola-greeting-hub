@@ -6,3 +6,4 @@
 - [x] Rediseñar la estructura general del panel según las referencias.
 - [x] Mejorar Inicio, Productos, Diseño, Pedidos y Pagos por secciones.
 - [ ] Validar visualmente el panel autenticado en escritorio y móvil (bloqueado hasta que el usuario inicie sesión en la vista previa).
+- [x] Crear la administración central de tiendas, dominios y datos de contacto.
