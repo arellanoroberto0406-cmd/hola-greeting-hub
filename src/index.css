@@ -956,6 +956,67 @@ All colors MUST be HSL.
   box-shadow: 0 22px 54px -30px hsl(var(--primary) / 0.38);
 }
 
+/* Seller dashboard — deep navy workspace */
+.dashboard-canvas {
+  --background: 221 48% 7%;
+  --foreground: 220 25% 96%;
+  --card: 220 43% 10%;
+  --card-foreground: 220 25% 96%;
+  --popover: 220 43% 10%;
+  --popover-foreground: 220 25% 96%;
+  --primary: 239 88% 61%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 220 35% 14%;
+  --secondary-foreground: 220 25% 96%;
+  --muted: 220 31% 16%;
+  --muted-foreground: 218 16% 68%;
+  --accent: 220 31% 16%;
+  --accent-foreground: 220 25% 96%;
+  --border: 217 31% 20%;
+  --input: 217 31% 22%;
+  --ring: 239 88% 61%;
+  color-scheme: dark;
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(900px 420px at 70% -20%, hsl(228 75% 34% / .2), transparent 65%),
+    linear-gradient(135deg, hsl(222 52% 6%), hsl(219 47% 8%));
+}
+
+.dashboard-canvas .font-heading,
+.dashboard-canvas h1,
+.dashboard-canvas h2,
+.dashboard-canvas h3 { font-family: "Hind", ui-sans-serif, system-ui, sans-serif; letter-spacing: 0; }
+.dashboard-header { box-shadow: 0 8px 28px hsl(222 60% 3% / .25); }
+.dashboard-sidebar { box-shadow: 16px 0 36px hsl(222 60% 3% / .16); }
+.dashboard-panel {
+  border-color: hsl(var(--border) / .8);
+  background: linear-gradient(145deg, hsl(var(--card) / .98), hsl(222 42% 9% / .96));
+  box-shadow: 0 14px 32px -24px hsl(228 100% 3% / .9);
+}
+.dashboard-progress {
+  border-color: hsl(var(--primary) / .65);
+  background: linear-gradient(105deg, hsl(248 67% 24% / .95), hsl(222 58% 13% / .98));
+  box-shadow: 0 18px 46px -28px hsl(var(--primary) / .85);
+}
+.dashboard-step { border-color: hsl(var(--border)); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.dashboard-step:hover { transform: translateY(-3px); border-color: hsl(var(--primary) / .7); box-shadow: 0 16px 36px -22px hsl(var(--primary) / .7); }
+.dashboard-step-1 { background: linear-gradient(145deg, hsl(164 65% 15%), hsl(var(--card))); }
+.dashboard-step-2 { background: linear-gradient(145deg, hsl(254 55% 20%), hsl(var(--card))); }
+.dashboard-step-3 { background: linear-gradient(145deg, hsl(35 65% 18%), hsl(var(--card))); }
+.dashboard-step-4 { background: linear-gradient(145deg, hsl(198 64% 17%), hsl(var(--card))); }
+.dashboard-primary-action { background: linear-gradient(135deg, hsl(228 100% 60%), hsl(var(--primary))); box-shadow: 0 10px 24px -12px hsl(var(--primary) / .9); }
+.dashboard-metric { overflow: hidden; border-color: hsl(var(--border)); }
+.dashboard-metric-icon { display:flex; height:2.5rem; width:2.5rem; align-items:center; justify-content:center; border-radius:.5rem; color:hsl(var(--primary-foreground)); background:linear-gradient(135deg,hsl(var(--primary)),hsl(258 87% 58%)); box-shadow:0 8px 20px -10px hsl(var(--primary)); }
+.dashboard-metric-violet { background: linear-gradient(145deg, hsl(252 55% 18%), hsl(var(--card))); }
+.dashboard-metric-green { background: linear-gradient(145deg, hsl(163 60% 15%), hsl(var(--card))); }
+.dashboard-metric-amber { background: linear-gradient(145deg, hsl(35 65% 17%), hsl(var(--card))); }
+.dashboard-metric-blue { background: linear-gradient(145deg, hsl(208 65% 17%), hsl(var(--card))); }
+
+@media (max-width: 640px) {
+  .dashboard-canvas main { padding-bottom: 5rem; }
+  .dashboard-progress h2 { font-size: 1.05rem; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .landing-canvas *,
   .landing-canvas *::before,

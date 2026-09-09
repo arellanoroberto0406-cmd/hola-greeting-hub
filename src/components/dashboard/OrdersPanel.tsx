@@ -135,14 +135,14 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-3">
+        <Card className="dashboard-panel overflow-hidden"><div className="divide-y divide-border/60">
           {filteredOrders.map((order) => {
             const statusInfo = getStatusInfo(order.status);
             const StatusIcon = statusInfo.icon;
 
             return (
-              <Card key={order.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
+              <div key={order.id} className="transition-colors hover:bg-muted/30">
+                <div className="p-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -190,11 +190,11 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
                       </Button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             );
           })}
-        </div>
+        </div></Card>
       )}
 
       {/* Order Details Modal */}

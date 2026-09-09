@@ -12,7 +12,7 @@ import {
   Tag, 
   Package, 
   Layers, 
-  CreditCard, 
+  CreditCard,
   Settings,
   MessagesSquare,
   ChevronLeft,
@@ -23,6 +23,7 @@ import {
   LayoutGrid,
   FileCheck,
   Home,
+  Users,
   ChevronDown
 } from "lucide-react";
 import { useState } from "react";
@@ -46,7 +47,7 @@ const tabs = [
   { id: "url", label: "Compartir enlace", icon: Link2, group: "mi-tienda", minPlan: "basic" as PlanTier },
   { id: "orders", label: "Pedidos", icon: ShoppingBag, group: "ventas", minPlan: "basic" as PlanTier },
   { id: "payments", label: "Cómo te pagan", icon: Wallet, group: "ventas", minPlan: "basic" as PlanTier },
-  { id: "chat", label: "Chat en Vivo", icon: MessagesSquare, group: "ventas", minPlan: "professional" as PlanTier },
+  { id: "chat", label: "Clientes y chat", icon: Users, group: "ventas", minPlan: "professional" as PlanTier },
   { id: "subscription", label: "Mi Plan", icon: CreditCard, group: "ventas", minPlan: "basic" as PlanTier },
   { id: "payment-stats", label: "Ventas", icon: PieChart, group: "mas", minPlan: "basic" as PlanTier },
   { id: "analytics", label: "Analytics", icon: BarChart3, group: "mas", minPlan: "professional" as PlanTier },
@@ -93,7 +94,11 @@ const DashboardSidebar = ({
   const sidebarContent = (
     <>
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-5">
+      <div className="flex h-16 items-center gap-3 border-b border-border/70 px-4">
+        <div className="flex h-10 w-10 items-center justify-center rounded-md bg-primary shadow-lg shadow-primary/20"><ShoppingBag className="h-5 w-5 text-primary-foreground" /></div>
+        {!isCollapsed && <div><p className="text-lg font-bold leading-none">APP TIENDA</p><p className="mt-1 text-[10px] text-muted-foreground">Panel de vendedor</p></div>}
+      </div>
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
         {groups.map((group) => {
           const groupTabs = tabs.filter(t => t.group === group.id);
           if (groupTabs.length === 0) return null;
@@ -131,22 +136,19 @@ const DashboardSidebar = ({
                       key={tab.id}
                       onClick={() => handleTabClick(tab.id, tab.minPlan)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 group relative",
+                        "w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-all duration-200 group relative",
                         isActive 
-                          ? "text-white shadow-sm" 
+                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
                           : locked
                           ? "text-muted-foreground/50 cursor-pointer"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       )}
-                      style={{
-                        backgroundColor: isActive ? primaryColor : undefined
-                      }}
                       whileHover={{ x: isActive ? 0 : 2 }}
                       whileTap={{ scale: 0.98 }}
                     >
                       <tab.icon className={cn(
                         "h-4 w-4 flex-shrink-0",
-                        isActive ? "text-white" : locked ? "text-muted-foreground/40" : "text-muted-foreground group-hover:text-foreground"
+                         isActive ? "text-primary-foreground" : locked ? "text-muted-foreground/40" : "text-muted-foreground group-hover:text-foreground"
                       )} />
                       
                       {!isCollapsed && (
@@ -227,7 +229,7 @@ const DashboardSidebar = ({
         initial={{ width: 240 }}
         animate={{ width: isCollapsed ? 64 : 240 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="hidden lg:flex flex-col h-[calc(100vh-4rem)] sticky top-16 border-r border-border/50 bg-card/30 flex-shrink-0"
+        className="dashboard-sidebar hidden lg:flex flex-col h-screen sticky top-0 border-r border-border/70 bg-card flex-shrink-0"
       >
         {/* Toggle Button */}
         <Button

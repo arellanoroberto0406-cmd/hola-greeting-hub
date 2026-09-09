@@ -10,7 +10,8 @@ import {
   Crown,
   Building2,
   Zap,
-  Menu
+  Menu,
+  Search
 } from "lucide-react";
 import { PlanTier } from "@/hooks/useStorePlanTier";
 
@@ -54,10 +55,10 @@ const DashboardHeader = ({
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl"
+      className="dashboard-header sticky top-0 z-50 border-b border-border/70 bg-background/90 backdrop-blur-xl"
     >
       <div className="px-4 md:px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex h-16 items-center justify-between gap-4">
           {/* Left: Mobile menu + Logo & Store Name */}
           <div className="flex items-center gap-3">
             {onToggleMobileSidebar && (
@@ -70,7 +71,7 @@ const DashboardHeader = ({
                 <Menu className="h-5 w-5" />
               </Button>
             )}
-            <motion.div 
+            <motion.div
               className="flex items-center gap-3"
               whileHover={{ scale: 1.01 }}
             >
@@ -83,7 +84,7 @@ const DashboardHeader = ({
                   className="relative h-9 w-9 rounded-xl flex items-center justify-center shadow-sm"
                   style={{ backgroundColor: primaryColor }}
                 >
-                  <Store className="h-4.5 w-4.5 text-white" />
+                  <Store className="h-5 w-5 text-primary-foreground" />
                 </div>
               </div>
               <div className="hidden sm:block">
@@ -99,15 +100,9 @@ const DashboardHeader = ({
             </motion.div>
           </div>
 
-          {/* Center: Quick Status */}
-          <div className="hidden xl:flex items-center gap-3">
-            <Badge 
-              variant="outline" 
-              className="gap-1.5 px-3 py-1 rounded-full bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400"
-            >
-              <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-              Tienda Activa
-            </Badge>
+          <div className="relative hidden max-w-xl flex-1 md:block">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input className="h-10 w-full rounded-md border border-border/70 bg-secondary/50 pl-10 pr-4 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary" placeholder="Buscar productos, pedidos, clientes..." aria-label="Buscar en el panel" />
           </div>
 
           {/* Right: Actions */}
@@ -146,6 +141,8 @@ const DashboardHeader = ({
               <ExternalLink className="h-3.5 w-3.5" />
               Ver tienda
             </Button>
+
+            <Badge variant="outline" className="hidden gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-400 xl:flex"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />En línea</Badge>
 
             <Button 
               variant="ghost" 

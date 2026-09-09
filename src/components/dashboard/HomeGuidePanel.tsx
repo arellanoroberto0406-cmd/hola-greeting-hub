@@ -13,6 +13,10 @@ import {
   ShoppingBag,
   Wallet,
   Sparkles,
+  CreditCard,
+  TrendingUp,
+  Users,
+  CircleCheck,
 } from "lucide-react";
 
 interface HomeGuidePanelProps {
@@ -46,6 +50,14 @@ const HomeGuidePanel = ({
       done: hasCustomDesign,
     },
     {
+      id: "payments",
+      icon: CreditCard,
+      title: "Configura tus pagos",
+      description: "Elige cómo quieres recibir el dinero de tus ventas.",
+      action: "Configurar pagos",
+      done: hasPaymentMethod,
+    },
+    {
       id: "products",
       icon: Package,
       title: "Sube tus productos",
@@ -73,24 +85,18 @@ const HomeGuidePanel = ({
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div><h1 className="text-2xl font-bold md:text-3xl">¡Hola, {storeName}! <span aria-hidden="true">👋</span></h1><p className="text-sm text-muted-foreground">Aquí tienes un resumen de tu tienda. Sigue configurando para recibir más clientes.</p></div>
+        <p className="text-xs text-muted-foreground">Tu negocio, todo en un solo lugar.</p>
+      </div>
       {/* Welcome + progress */}
-      <Card className="overflow-hidden border-border/60">
-        <div
-          className="p-6 md:p-8"
-          style={{
-            background: `linear-gradient(135deg, ${primaryColor}1f, ${primaryColor}05)`,
-          }}
-        >
+      <Card className="dashboard-progress overflow-hidden">
+        <div className="p-5 md:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
-              <Badge variant="secondary" className="mb-3">Tu tienda en 3 pasos</Badge>
-              <h2 className="font-heading text-2xl md:text-3xl font-bold truncate">
-                Hola, {storeName}
-              </h2>
-              <p className="text-muted-foreground mt-1 text-sm md:text-base">
-                Sigue estos pasos y tu tienda queda lista para recibir clientes.
-              </p>
+              <Badge variant="secondary" className="mb-2">Tu tienda en 4 pasos</Badge>
+              <h2 className="font-heading text-xl font-bold">Completa la configuración y empieza a vender</h2>
             </div>
             <Button
               variant="outline"
@@ -102,7 +108,7 @@ const HomeGuidePanel = ({
             </Button>
           </div>
 
-          <div className="mt-6 max-w-md">
+          <div className="mt-5 max-w-2xl">
             <div className="flex items-center justify-between text-xs font-medium mb-2">
               <span>{completed} de {steps.length} pasos listos</span>
               <span>{progress}%</span>
@@ -113,7 +119,7 @@ const HomeGuidePanel = ({
       </Card>
 
       {/* Steps */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {steps.map((step, i) => (
           <motion.div
             key={step.id}
@@ -122,7 +128,7 @@ const HomeGuidePanel = ({
             transition={{ delay: i * 0.06 }}
           >
             <Card
-              className="h-full border-border/60 hover:shadow-lg transition-shadow cursor-pointer"
+              className={`dashboard-step dashboard-step-${i + 1} h-full cursor-pointer`}
               onClick={() => onGo(step.id)}
             >
               <CardContent className="p-5 flex flex-col h-full">
@@ -159,24 +165,23 @@ const HomeGuidePanel = ({
         ))}
       </div>
 
-      {/* Shortcuts */}
-      <div className="grid gap-3 sm:grid-cols-3">
-        {shortcuts.map((s) => (
-          <button
-            key={s.id}
-            onClick={() => onGo(s.id)}
-            className="flex items-center gap-3 rounded-xl border border-border/60 bg-card p-4 text-left transition-colors hover:bg-muted/50"
-          >
-            <s.icon className="h-5 w-5 flex-shrink-0" style={{ color: primaryColor }} />
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{s.label}</p>
-              <p className="text-xs text-muted-foreground truncate">{s.hint}</p>
-            </div>
-          </button>
-        ))}
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <DashboardSnapshot icon={Wallet} label="Ingresos" value="$0.00" note="Este mes" />
+        <DashboardSnapshot icon={ShoppingBag} label="Pedidos" value={String(orderCount)} note="Este mes" />
+        <DashboardSnapshot icon={Package} label="Productos" value={String(productCount)} note="En catálogo" />
+        <DashboardSnapshot icon={Users} label="Clientes" value="—" note="Próximamente" />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-[1.55fr_.8fr]">
+        <Card className="dashboard-panel"><CardContent className="p-5"><div className="mb-4 flex items-center justify-between"><div><h3 className="font-bold">Acciones rápidas</h3><p className="text-xs text-muted-foreground">Continúa trabajando en tu negocio</p></div><TrendingUp className="h-5 w-5 text-primary" /></div><div className="grid gap-3 sm:grid-cols-3">{shortcuts.map((s) => <Button key={s.id} variant="outline" className="h-auto justify-start gap-3 p-4" onClick={() => onGo(s.id)}><s.icon className="h-5 w-5 text-primary" /><span className="text-left"><span className="block font-semibold">{s.label}</span><span className="block text-xs text-muted-foreground">{s.hint}</span></span></Button>)}</div></CardContent></Card>
+        <Card className="dashboard-panel"><CardContent className="p-5"><div className="mb-4 flex items-center gap-3"><div className="dashboard-metric-icon"><CircleCheck className="h-5 w-5" /></div><div><h3 className="font-bold">Tienda en línea</h3><p className="text-xs text-emerald-400">Publicada y disponible</p></div></div><Button className="w-full" onClick={() => window.open(`/tienda/${storeSlug}`, "_blank")}>Abrir tienda <ExternalLink className="h-4 w-4" /></Button></CardContent></Card>
       </div>
     </div>
   );
 };
+
+const DashboardSnapshot = ({ icon: Icon, label, value, note }: { icon: typeof Wallet; label: string; value: string; note: string }) => (
+  <Card className="dashboard-panel"><CardContent className="flex items-center justify-between p-4"><div><p className="text-xs text-muted-foreground">{label}</p><p className="mt-1 text-2xl font-bold">{value}</p><p className="text-[11px] text-emerald-400">{note}</p></div><div className="dashboard-metric-icon"><Icon className="h-5 w-5" /></div></CardContent></Card>
+);
 
 export default HomeGuidePanel;
