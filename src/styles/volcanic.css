@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Hind:wght@400;500;600;700&display=swap');
+
+/* ============================================================
+   VOLCANIC FIRE & GOLD — tema de storefront
+   Revista urbana de alto impacto: negro profundo, rojo volcán,
+   naranja fuego y oro. Tipografía Archivo Black + Hind.
+   ============================================================ */
+
+.volcanic {
+  --vc-bg: #080808;
+  --vc-panel: #111111;
+  --vc-panel-2: #1a1a1a;
+  --vc-line: #333333;
+  --vc-red: #ec1c24;
+  --vc-fire: #ff3c00;
+  --vc-orange: #ff8c00;
+  --vc-gold: #d4af37;
+  --vc-white: #ffffff;
+  --vc-muted: #9ca3af;
+
+  background-color: var(--vc-bg);
+  color: var(--vc-white);
+  font-family: 'Hind', sans-serif;
+}
+
+.volcanic .vc-heading {
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.9;
+}
+
+.volcanic .vc-card {
+  background: var(--vc-panel);
+  border: 1px solid var(--vc-line);
+  transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.volcanic .vc-card:hover {
+  border-color: var(--vc-fire);
+  transform: translateY(-4px);
+  box-shadow: 0 0 24px rgba(236, 28, 36, 0.25);
+}
+
+.volcanic .vc-btn-fire {
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  background: var(--vc-red);
+  color: #fff;
+  transition: box-shadow 0.3s ease, transform 0.2s ease, background 0.3s ease;
+}
+
+.volcanic .vc-btn-fire:hover {
+  box-shadow: 0 0 20px rgba(236, 28, 36, 0.5);
+  transform: translateY(-2px);
+}
+
+.volcanic .vc-btn-dark {
+  font-family: 'Archivo Black', sans-serif;
+  text-transform: uppercase;
+  background: #000;
+  color: var(--vc-orange);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.volcanic .vc-btn-dark:hover {
+  background: #fff;
+  color: #000;
+}
+
+.volcanic .vc-gold-text { color: var(--vc-gold); }
+.volcanic .vc-fire-text { color: var(--vc-fire); }
+.volcanic .vc-orange-text { color: var(--vc-orange); }
+
+.volcanic .vc-img-zoom img {
+  transition: transform 0.7s ease, filter 0.7s ease;
+}
+
+.volcanic .vc-img-zoom:hover img {
+  transform: scale(1.08);
+}
+
+/* Ticker / marquesina promocional */
+@keyframes vc-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.volcanic .vc-marquee {
+  display: flex;
+  width: max-content;
+  animation: vc-marquee 22s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .volcanic .vc-marquee { animation: none; }
+  .volcanic .vc-img-zoom:hover img { transform: none; }
+}
