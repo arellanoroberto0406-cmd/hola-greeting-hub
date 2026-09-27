@@ -3,7 +3,7 @@ import { StoreSection } from "@/types/storeLayout";
 import { Product } from "@/types/product";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, Filter, SlidersHorizontal, Grid3X3, LayoutGrid, Sparkles } from "lucide-react";
+import { Search, Filter, SlidersHorizontal, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ProductFilters, { FilterState } from "@/components/ProductFilters";
 import { PremiumProductCard } from "@/components/store/PremiumProductCard";
@@ -78,7 +78,7 @@ export const PremiumProductsGridSection = ({
 
   return (
     <section className={cn(
-      "py-12",
+      "vc-products py-12",
       isEnterprise && "py-16"
     )}>
       {/* Section Header */}
@@ -87,7 +87,7 @@ export const PremiumProductsGridSection = ({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="mb-8"
+        className="mb-8 vc-products-head"
       >
         {/* Title with decoration based on plan */}
         <div className={cn(
@@ -95,22 +95,15 @@ export const PremiumProductsGridSection = ({
           isEnterprise && "mb-8"
         )}>
           <div className="flex items-center gap-3">
-            {isEnterprise && (
-              <motion.div
-                animate={{ rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-              >
-                <Sparkles className="h-8 w-8" style={{ color: store.primary_color }} />
-              </motion.div>
-            )}
+            <span className="vc-section-number">02</span>
+            <Flame className="vc-fire-text h-7 w-7" />
             <h2
               className={cn(
-                "font-bold font-heading",
+                "vc-heading font-bold",
                 isEnterprise && "text-3xl md:text-4xl",
                 isProfessional && "text-2xl md:text-3xl",
                 isBasic && "text-2xl md:text-3xl"
               )}
-              style={{ color: store.primary_color }}
             >
               {section.title}
             </h2>
@@ -129,7 +122,7 @@ export const PremiumProductsGridSection = ({
                 <span className="text-muted-foreground">×</span>
               </Badge>
             )}
-            <span className="text-sm text-muted-foreground">
+            <span className="vc-results-count text-sm">
               {products.length} de {allProducts.length} productos
             </span>
           </div>
@@ -158,7 +151,7 @@ export const PremiumProductsGridSection = ({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             className={cn(
-              "text-center py-16 space-y-6 rounded-2xl border-2 border-dashed",
+              "vc-empty text-center py-16 space-y-6 border-2 border-dashed",
               isEnterprise && "py-20 bg-muted/20"
             )}
           >
