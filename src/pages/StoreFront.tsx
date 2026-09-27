@@ -369,7 +369,7 @@ const StoreFront = () => {
   return (
     <div 
       data-store-accent={accentPalette}
-      className={`min-h-screen bg-background transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
+      className={`volcanic min-h-screen transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
       data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 
         fontFamily: 'var(--store-body-font, inherit)',
@@ -412,11 +412,7 @@ const StoreFront = () => {
 
       {/* Dynamic Sections */}
       <div className="relative">
-        {/* Subtle background texture */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.02]" style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)',
-          backgroundSize: '32px 32px',
-        }} />
+        <div className="vc-texture absolute inset-0 pointer-events-none" />
         
         <div className="container mx-auto px-4 py-8 relative">
           {productsLoading ? (
@@ -668,7 +664,7 @@ const StoreFront = () => {
             {/* Show products grid if no sections have it */}
             {!sections.some(s => s.type === 'products_grid') && allProducts.length > 0 && (
               <div id="products-section">
-                <ProductsGridSection
+                <PremiumProductsGridSection
                   section={{
                     id: 'default-products',
                     type: 'products_grid',
@@ -687,6 +683,7 @@ const StoreFront = () => {
                   onAddToCart={handleAddToCart}
                   onToggleWishlist={toggleWishlist}
                   isInWishlist={isInWishlist}
+                  planTier={planTier}
                 />
               </div>
             )}
