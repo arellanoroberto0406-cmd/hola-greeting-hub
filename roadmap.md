@@ -17,3 +17,7 @@
 - [x] Ver como cliente /mitienda/ejemplo
 - [ ] Conectar productos, pagos y envíos reales del panel actual al nuevo flujo
 - [ ] MiTienda IA real (nombres, identidad y productos) vía Lovable AI
+
+## Tienda pública — Volcanic Fire & Gold
+- [ ] Aplicar el tema a portada, categorías, productos y barra de confianza
+- [ ] Verificar la tienda real en escritorio y móvil
