@@ -19,7 +19,7 @@ export function StoreCardCheckout({ orderId, returnUrl }: StoreCardCheckoutProps
   };
 
   return (
-    <div id="store-checkout" className="rounded-2xl overflow-hidden">
+    <div id="store-checkout" className="vc-stripe-frame overflow-hidden">
       <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
         <EmbeddedCheckout />
       </EmbeddedCheckoutProvider>

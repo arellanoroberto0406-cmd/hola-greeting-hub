@@ -19,5 +19,6 @@
 - [ ] MiTienda IA real (nombres, identidad y productos) vía Lovable AI
 
 ## Tienda pública — Volcanic Fire & Gold
-- [ ] Aplicar el tema a portada, categorías, productos y barra de confianza
+- [x] Aplicar el tema a portada, categorías, productos y barra de confianza
+- [ ] Adaptar carrito, checkout, pago y confirmación al tema Volcanic
 - [ ] Verificar la tienda real en escritorio y móvil

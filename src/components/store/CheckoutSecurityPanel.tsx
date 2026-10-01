@@ -35,12 +35,12 @@ const CheckoutSecurityPanel = ({ store, primaryColor }: CheckoutSecurityPanelPro
   }, [store]);
 
   return (
-    <div className="space-y-4">
+    <div className="vc-security-panel space-y-4">
       {/* Verified seller card */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative rounded-2xl border-2 overflow-hidden"
+        className="vc-security-seller relative border-2 overflow-hidden"
         style={{
           borderColor: `${primaryColor}40`,
           background: `linear-gradient(135deg, ${primaryColor}10, transparent 60%)`,
@@ -118,7 +118,7 @@ const CheckoutSecurityPanel = ({ store, primaryColor }: CheckoutSecurityPanelPro
         ].map(({ icon: Icon, title, sub }, i) => (
           <div
             key={i}
-            className="rounded-xl border p-3 bg-card/60 backdrop-blur-sm flex items-start gap-2"
+            className="vc-security-item border p-3 flex items-start gap-2"
             style={{ borderColor: `${primaryColor}25` }}
           >
             <div
@@ -139,7 +139,7 @@ const CheckoutSecurityPanel = ({ store, primaryColor }: CheckoutSecurityPanelPro
 
       {/* Anti-scam warning */}
       <div
-        className="rounded-xl p-3 md:p-4 border-2 flex items-start gap-3"
+        className="vc-security-warning p-3 md:p-4 border-2 flex items-start gap-3"
         style={{
           borderColor: "hsl(38 92% 50% / 0.4)",
           background: "hsl(38 92% 50% / 0.08)",

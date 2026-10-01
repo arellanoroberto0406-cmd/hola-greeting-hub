@@ -2,6 +2,7 @@ import { ShoppingCart, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 interface MobileCartBarProps {
   slug: string;
@@ -30,7 +31,7 @@ const MobileCartBar = ({ slug, primaryColor, freeShippingThreshold = 999 }: Mobi
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-border/60 shadow-[0_-8px_24px_rgba(0,0,0,0.08)]"
+          className="vc-mobile-cart md:hidden fixed bottom-0 left-0 right-0 z-40"
           style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         >
           {/* Free shipping progress */}
@@ -47,8 +48,7 @@ const MobileCartBar = ({ slug, primaryColor, freeShippingThreshold = 999 }: Mobi
               </div>
               <div className="h-1 bg-muted rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full rounded-full"
-                  style={{ background: primaryColor }}
+                  className="vc-mobile-cart-progress h-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
                   transition={{ duration: 0.5 }}
@@ -59,23 +59,20 @@ const MobileCartBar = ({ slug, primaryColor, freeShippingThreshold = 999 }: Mobi
 
           {qualifiesForFreeShipping && (
             <div className="px-4 pt-2">
-              <p className="text-[11px] font-semibold text-emerald-600 text-center">
+              <p className="vc-shipping-success text-[11px] font-semibold text-center">
                 ✓ ¡Tienes envío gratis!
               </p>
             </div>
           )}
 
-          <button
+          <Button
             onClick={() => navigate(`/tienda/${slug}/checkout`)}
-            className="w-full flex items-center justify-between px-4 py-3 text-white font-semibold active:scale-[0.98] transition-transform"
-            style={{
-              background: `linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd)`,
-            }}
+            className="vc-mobile-cart-cta w-full h-auto flex items-center justify-between px-4 py-3 font-semibold"
           >
             <div className="flex items-center gap-3">
               <div className="relative">
                 <ShoppingCart className="h-5 w-5" />
-                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-white text-[10px] font-bold flex items-center justify-center" style={{ color: primaryColor }}>
+                <span className="vc-mobile-cart-count absolute -top-2 -right-2 h-5 w-5 text-[10px] font-bold flex items-center justify-center">
                   {totalItems}
                 </span>
               </div>
@@ -87,7 +84,7 @@ const MobileCartBar = ({ slug, primaryColor, freeShippingThreshold = 999 }: Mobi
               <span>Finalizar compra</span>
               <ArrowRight className="h-4 w-4" />
             </div>
-          </button>
+          </Button>
         </motion.div>
       )}
     </AnimatePresence>
