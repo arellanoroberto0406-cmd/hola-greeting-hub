@@ -510,7 +510,7 @@ const StoreCheckout = () => {
 
   if (storeLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="volcanic vc-checkout min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -518,7 +518,7 @@ const StoreCheckout = () => {
 
   if (!store) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="volcanic vc-checkout min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold">Tienda no encontrada</h1>
           <Button onClick={() => navigate("/")}>Ir al inicio</Button>
@@ -532,8 +532,8 @@ const StoreCheckout = () => {
   // Pantalla de pago con tarjeta (cobro real)
   if (cardOrderId && !orderComplete) {
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b py-4" style={{ backgroundColor: `${primaryColor}10` }}>
+      <div className="volcanic vc-checkout min-h-screen">
+        <header className="vc-checkout-header border-b py-4">
           <div className="container mx-auto px-4 flex items-center gap-3">
             {store.logo_url ? (
               <img src={store.logo_url} alt={store.name} className="h-8 w-auto" />
@@ -545,8 +545,9 @@ const StoreCheckout = () => {
         </header>
         <div className="container mx-auto px-4 py-10">
           <div className="max-w-2xl mx-auto space-y-6">
-            <div className="text-center space-y-2">
-              <h1 className="text-3xl font-heading">Pago seguro con tarjeta</h1>
+            <div className="vc-checkout-intro text-center space-y-2">
+              <span>Último paso / Pago protegido</span>
+              <h1 className="vc-heading text-3xl">Pago seguro con tarjeta</h1>
               <p className="text-muted-foreground text-sm flex items-center justify-center gap-2">
                 <Shield className="h-4 w-4" /> Total a pagar: ${finalTotal.toLocaleString('es-MX')} {(store as any).currency || 'MXN'}
               </p>
@@ -569,9 +570,9 @@ const StoreCheckout = () => {
   // Handle payment failure from MercadoPago
   if (paymentStatus === 'failure') {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="volcanic vc-checkout min-h-screen">
         <header 
-          className="border-b py-4"
+          className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
         >
           <div className="container mx-auto px-4 flex items-center gap-3">
@@ -588,7 +589,7 @@ const StoreCheckout = () => {
             <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-red-100">
               <AlertCircle className="w-10 h-10 text-red-500" />
             </div>
-            <h1 className="text-4xl font-heading mb-4">Pago no completado</h1>
+            <h1 className="vc-heading text-4xl mb-4">Pago no completado</h1>
             <p className="text-muted-foreground mb-8">
               Hubo un problema con tu pago. Por favor intenta de nuevo o elige otro método de pago.
             </p>
@@ -606,9 +607,9 @@ const StoreCheckout = () => {
   // Handle pending payment from MercadoPago (e.g., OXXO)
   if (paymentStatus === 'pending') {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="volcanic vc-checkout min-h-screen">
         <header 
-          className="border-b py-4"
+          className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
         >
           <div className="container mx-auto px-4 flex items-center gap-3">
@@ -625,7 +626,7 @@ const StoreCheckout = () => {
             <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 bg-yellow-100">
               <Clock className="w-10 h-10 text-yellow-600" />
             </div>
-            <h1 className="text-4xl font-heading mb-4">Pago pendiente</h1>
+            <h1 className="vc-heading text-4xl mb-4">Pago pendiente</h1>
             <p className="text-muted-foreground mb-4">
               Tu pago está siendo procesado. Si elegiste pagar en OXXO u otro punto de pago, 
               recuerda completar el pago antes de la fecha límite.
@@ -646,9 +647,9 @@ const StoreCheckout = () => {
 
   if (items.length === 0 && !orderComplete) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="volcanic vc-checkout min-h-screen">
         <header 
-          className="border-b py-4"
+          className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
         >
           <div className="container mx-auto px-4 flex items-center gap-3">
@@ -661,7 +662,7 @@ const StoreCheckout = () => {
           </div>
         </header>
         <div className="container mx-auto px-4 py-20 text-center">
-          <h1 className="text-3xl font-heading mb-4">Tu carrito está vacío</h1>
+          <h1 className="vc-heading text-3xl mb-4">Tu carrito está vacío</h1>
           <p className="text-muted-foreground mb-8">Agrega productos antes de continuar al checkout</p>
           <Link to={`/tienda/${slug}`}>
             <Button style={{ backgroundColor: primaryColor }}>Volver a la tienda</Button>
@@ -675,9 +676,9 @@ const StoreCheckout = () => {
     const bankInfo = (paymentConfig?.bank_info ?? null) as BankInfo | null;
     
     return (
-      <div className="min-h-screen bg-background">
+      <div className="volcanic vc-checkout min-h-screen">
         <header 
-          className="border-b py-4"
+          className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
         >
           <div className="container mx-auto px-4 flex items-center gap-3">
@@ -698,7 +699,8 @@ const StoreCheckout = () => {
               >
                 <CheckCircle2 className="w-10 h-10" style={{ color: primaryColor }} />
               </div>
-              <h1 className="text-4xl font-heading mb-4">¡Gracias por tu compra!</h1>
+              <span className="vc-status-kicker">Pedido confirmado</span>
+              <h1 className="vc-heading text-4xl mb-4">¡Gracias por tu compra!</h1>
               <p className="text-muted-foreground">
                 Tu pedido ha sido registrado correctamente.
               </p>
@@ -711,7 +713,7 @@ const StoreCheckout = () => {
 
             {/* Order details */}
             {completedOrder && (
-              <div className="bg-card rounded-xl p-6 border border-border/50 mb-6">
+              <div className="vc-checkout-card p-6 mb-6">
                 <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
                   <Truck className="w-5 h-5" style={{ color: primaryColor }} />
                   Detalles de tu pedido
@@ -776,7 +778,7 @@ const StoreCheckout = () => {
 
             {/* Payment Instructions based on method */}
             {completedOrder && (
-              <div className="bg-card rounded-xl p-6 border border-border/50 mb-8">
+              <div className="vc-checkout-card p-6 mb-8">
                 {completedOrder.paymentMethod === 'transfer' && (
                   <>
                     <h2 className="text-xl font-heading mb-4 flex items-center gap-2">
@@ -939,10 +941,10 @@ const StoreCheckout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="volcanic vc-checkout min-h-screen">
       {/* Store Header */}
       <header 
-        className="border-b py-4 sticky top-0 z-50 backdrop-blur-xl"
+        className="vc-checkout-header border-b py-4 sticky top-0 z-50"
         style={{ backgroundColor: `${primaryColor}10`, borderColor: `${primaryColor}30` }}
       >
         <div className="container mx-auto px-4 flex items-center justify-between">
@@ -1011,9 +1013,12 @@ const StoreCheckout = () => {
           </div>
         )}
 
-        <h1 className="text-2xl lg:text-4xl font-heading mb-6 lg:mb-8" style={{ color: primaryColor }}>
+        <div className="vc-checkout-title mb-6 lg:mb-8">
+          <span>Checkout / Compra protegida</span>
+          <h1 className="vc-heading text-2xl lg:text-4xl">
           {isMobile ? wizardSteps[wizardStep].label : 'Finalizar Compra'}
-        </h1>
+          </h1>
+        </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Form */}
@@ -1026,7 +1031,7 @@ const StoreCheckout = () => {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 lg:space-y-8">
                 {/* Step 1: Datos personales */}
                 {(!isMobile || wizardStep === 0) && (
-                  <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50">
+                  <div className="vc-checkout-card p-5 lg:p-6">
                     <h2 className="text-lg lg:text-xl font-heading mb-5 flex items-center gap-2">
                       <User className="w-5 h-5" style={{ color: primaryColor }} />
                       Datos Personales
@@ -1090,7 +1095,7 @@ const StoreCheckout = () => {
 
                 {/* Step 2: Envío */}
                 {(!isMobile || wizardStep === 1) && (
-                  <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50">
+                  <div className="vc-checkout-card p-5 lg:p-6">
                     <h2 className="text-lg lg:text-xl font-heading mb-5 flex items-center gap-2">
                       <Truck className="w-5 h-5" style={{ color: primaryColor }} />
                       Información de Envío
@@ -1176,7 +1181,7 @@ const StoreCheckout = () => {
 
                 {/* Step 3: Pago */}
                 {(!isMobile || wizardStep === 2) && (
-                  <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50">
+                  <div className="vc-checkout-card p-5 lg:p-6">
                     <h2 className="text-lg lg:text-xl font-heading mb-5 flex items-center gap-2">
                       <CreditCard className="w-5 h-5" style={{ color: primaryColor }} />
                       Método de Pago
@@ -1194,7 +1199,7 @@ const StoreCheckout = () => {
                             >
                               {availablePaymentMethods.includes("card") && (
                                 <div 
-                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  className="vc-payment-option flex items-center space-x-3 border p-4 transition-colors cursor-pointer"
                                   style={{ borderColor: field.value === "card" ? primaryColor : undefined }}
                                 >
                                   <RadioGroupItem value="card" id="card" />
@@ -1207,7 +1212,7 @@ const StoreCheckout = () => {
                               )}
                               {availablePaymentMethods.includes("transfer") && (
                                 <div 
-                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  className="vc-payment-option flex items-center space-x-3 border p-4 transition-colors cursor-pointer"
                                   style={{ borderColor: field.value === "transfer" ? primaryColor : undefined }}
                                 >
                                   <RadioGroupItem value="transfer" id="transfer" />
@@ -1220,7 +1225,7 @@ const StoreCheckout = () => {
                               )}
                               {availablePaymentMethods.includes("cash") && (
                                 <div 
-                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  className="vc-payment-option flex items-center space-x-3 border p-4 transition-colors cursor-pointer"
                                   style={{ borderColor: field.value === "cash" ? primaryColor : undefined }}
                                 >
                                   <RadioGroupItem value="cash" id="cash" />
@@ -1233,7 +1238,7 @@ const StoreCheckout = () => {
                               )}
                               {availablePaymentMethods.includes("paypal") && (
                                 <div 
-                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  className="vc-payment-option flex items-center space-x-3 border p-4 transition-colors cursor-pointer"
                                   style={{ borderColor: field.value === "paypal" ? primaryColor : undefined }}
                                 >
                                   <RadioGroupItem value="paypal" id="paypal" />
@@ -1246,7 +1251,7 @@ const StoreCheckout = () => {
                               )}
                               {availablePaymentMethods.includes("mercadopago") && (
                                 <div 
-                                  className="flex items-center space-x-3 rounded-lg border p-4 hover:border-opacity-50 transition-colors cursor-pointer"
+                                  className="vc-payment-option flex items-center space-x-3 border p-4 transition-colors cursor-pointer"
                                   style={{ borderColor: field.value === "mercadopago" ? primaryColor : undefined }}
                                 >
                                   <RadioGroupItem value="mercadopago" id="mercadopago" />
@@ -1291,7 +1296,7 @@ const StoreCheckout = () => {
                       <Button
                         type="button"
                         size="lg"
-                        className="flex-1 h-14 text-base font-semibold"
+                        className="vc-btn-fire flex-1 h-14 text-base font-semibold"
                         style={{ backgroundColor: primaryColor }}
                         onClick={handleNextStep}
                       >
@@ -1336,7 +1341,7 @@ const StoreCheckout = () => {
               <div className="hidden lg:block">
                 <CheckoutSecurityPanel store={store} primaryColor={primaryColor} />
               </div>
-              <div className="bg-card rounded-xl p-5 lg:p-6 border border-border/50 lg:sticky lg:top-24">
+                <div className="vc-checkout-card vc-order-summary p-5 lg:p-6 lg:sticky lg:top-24">
                 <h2 className="text-lg lg:text-xl font-heading mb-4 lg:mb-6">Resumen del Pedido</h2>
                 
                 
@@ -1395,7 +1400,7 @@ const StoreCheckout = () => {
                     <Button 
                       type="submit" 
                       size="lg" 
-                      className="w-full"
+                      className="vc-btn-fire w-full"
                       style={{ backgroundColor: primaryColor }}
                       disabled={isSubmitting || isMPProcessing || isPayPalProcessing}
                       onClick={form.handleSubmit(onSubmit)}
@@ -1431,7 +1436,7 @@ const StoreCheckout = () => {
 
         {/* Mobile mini-summary on steps 0 and 1 */}
         {isMobile && wizardStep < 2 && (
-          <div className="mt-4 p-4 bg-card rounded-xl border border-border/50 flex items-center justify-between">
+          <div className="vc-checkout-card mt-4 p-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-muted-foreground">{items.length} producto{items.length > 1 ? 's' : ''}</p>
               <p className="font-bold" style={{ color: primaryColor }}>${finalTotal.toLocaleString()}</p>
