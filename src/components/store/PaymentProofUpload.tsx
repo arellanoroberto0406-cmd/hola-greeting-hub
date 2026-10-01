@@ -72,7 +72,7 @@ const PaymentProofUpload = ({ orderId, primaryColor, onUploaded }: PaymentProofU
 
   if (uploaded) {
     return (
-      <div className="mt-4 p-4 rounded-lg border-2 border-dashed" style={{ borderColor: `${primaryColor}50` }}>
+      <div className="vc-proof-upload is-complete mt-4 p-4 border-2 border-dashed">
         <div className="flex items-center gap-3">
           <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
           <div className="flex-1">
@@ -88,7 +88,7 @@ const PaymentProofUpload = ({ orderId, primaryColor, onUploaded }: PaymentProofU
   }
 
   return (
-    <div className="mt-4 p-4 rounded-lg border-2 border-dashed" style={{ borderColor: `${primaryColor}30` }}>
+    <div className="vc-proof-upload mt-4 p-4 border-2 border-dashed">
       <div className="text-center">
         <ImageIcon className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
         <p className="font-medium text-sm mb-1">Sube tu comprobante de pago</p>
