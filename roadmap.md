@@ -18,6 +18,7 @@
 - [ ] Conectar productos, pagos y envíos reales del panel actual al nuevo flujo
 - [ ] MiTienda IA real (nombres, identidad y productos) vía Lovable AI
 - [x] Vista previa editable de la descripción antes de guardar productos
+- [ ] Rediseñar la personalización de cada tienda para que sea atractiva, clara y fácil de usar
 
 ## Tienda pública — Volcanic Fire & Gold
 - [x] Aplicar el tema a portada, categorías, productos y barra de confianza
