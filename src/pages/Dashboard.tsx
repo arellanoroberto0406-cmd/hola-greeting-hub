@@ -390,14 +390,16 @@ const Dashboard = () => {
                 Nuevo Producto
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
               <DialogHeader><DialogTitle>{editingProduct ? "Editar Producto" : "Nuevo Producto"}</DialogTitle></DialogHeader>
               <div className="space-y-4 py-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+                  <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="space-y-2"><Label>Nombre *</Label><Input value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="Nombre del producto" /></div>
                   <div className="space-y-2"><Label>Colección</Label><Input value={productCollection} onChange={(e) => setProductCollection(e.target.value)} placeholder="General" /></div>
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                   <div className="space-y-2"><Label>Precio *</Label><Input type="number" value={productPrice} onChange={(e) => setProductPrice(e.target.value)} placeholder="0" /></div>
                   <div className="space-y-2"><Label>Precio original</Label><Input type="number" value={productOriginalPrice} onChange={(e) => setProductOriginalPrice(e.target.value)} placeholder="Opcional" /></div>
                   <div className="space-y-2"><Label>Stock</Label><Input type="number" value={productStock} onChange={(e) => setProductStock(e.target.value)} placeholder="10" /></div>
@@ -447,10 +449,68 @@ const Dashboard = () => {
                   </div>
                   <p className="text-xs text-muted-foreground">Sube hasta 8 imágenes. La primera será la imagen principal.</p>
                 </div>
-                <div className="space-y-2"><Label>Descripción</Label><Textarea value={productDescription} onChange={(e) => setProductDescription(e.target.value)} placeholder="Descripción del producto..." /></div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <Label htmlFor="product-description">Descripción</Label>
+                    <span className="text-xs text-muted-foreground">{productDescription.length} caracteres</span>
+                  </div>
+                  <Textarea id="product-description" value={productDescription} onChange={(e) => setProductDescription(e.target.value)} placeholder="Describe qué hace especial a este producto..." className="min-h-32 resize-y" />
+                </div>
                 <div className="flex gap-6">
                   <div className="flex items-center gap-2"><Switch checked={productIsNew} onCheckedChange={setProductIsNew} /><Label>Nuevo</Label></div>
                   <div className="flex items-center gap-2"><Switch checked={productIsOnSale} onCheckedChange={setProductIsOnSale} /><Label>En oferta</Label></div>
+                </div>
+                  </div>
+
+                  <aside className="lg:sticky lg:top-0 lg:self-start">
+                    <div className="overflow-hidden rounded-lg border border-border bg-card shadow-sm">
+                      <div className="flex items-center justify-between border-b border-border bg-muted/40 px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Eye className="h-4 w-4 text-primary" />
+                          <p className="text-sm font-semibold">Vista previa en tu tienda</p>
+                        </div>
+                        <span className="text-[10px] font-semibold uppercase text-muted-foreground">En vivo</span>
+                      </div>
+                      <div className="aspect-[4/3] bg-muted">
+                        {productImage ? (
+                          <img src={productImage} alt={productName || "Vista previa del producto"} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                            <ImageIcon className="h-8 w-8" />
+                            <span className="text-xs">Agrega una imagen para verla aquí</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-3 p-4">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[10px] font-semibold uppercase text-primary">{productCollection.trim() || "General"}</span>
+                          {productIsNew && <span className="rounded-sm bg-primary px-2 py-0.5 text-[10px] font-semibold text-primary-foreground">Nuevo</span>}
+                          {productIsOnSale && <span className="rounded-sm bg-destructive px-2 py-0.5 text-[10px] font-semibold text-destructive-foreground">Oferta</span>}
+                        </div>
+                        <h3 className="text-xl font-bold leading-tight">{productName.trim() || "Nombre del producto"}</h3>
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xl font-bold text-primary">${Number(productPrice || 0).toLocaleString("es-MX")}</span>
+                          {Number(productOriginalPrice) > Number(productPrice || 0) && (
+                            <span className="text-sm text-muted-foreground line-through">${Number(productOriginalPrice).toLocaleString("es-MX")}</span>
+                          )}
+                        </div>
+                        <div className="border-t border-border pt-3">
+                          <Label htmlFor="product-description-preview" className="mb-2 block text-xs">Descripción visible para tus clientes</Label>
+                          <Textarea
+                            id="product-description-preview"
+                            value={productDescription}
+                            onChange={(event) => setProductDescription(event.target.value)}
+                            placeholder="Escribe o pega aquí la descripción que quieres mostrar en tu tienda."
+                            className="min-h-32 resize-y bg-background"
+                          />
+                          <p className="mt-2 text-[11px] text-muted-foreground">Puedes corregir este texto aquí. Se guardará únicamente al confirmar los cambios.</p>
+                        </div>
+                        <Button type="button" className="w-full" disabled>
+                          Agregar al carrito
+                        </Button>
+                      </div>
+                    </div>
+                  </aside>
                 </div>
                 <Button onClick={handleSaveProduct} className="w-full" disabled={isSavingProduct}>
                   {isSavingProduct && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
