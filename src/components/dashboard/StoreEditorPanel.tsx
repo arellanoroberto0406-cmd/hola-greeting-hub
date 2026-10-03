@@ -31,7 +31,6 @@ import { useStoreAccentSync } from "@/hooks/useStoreAccentSync";
 import StoreDarkModeToggle from "@/components/store/StoreDarkModeToggle";
 
 import { useUpdateStore } from "@/hooks/useStores";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Wand2, Layout } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -59,6 +58,10 @@ import {
   Check,
   Lock,
   Crown
+  ,Type
+  ,ImageIcon
+  ,Grid2X2
+  ,ArrowRight
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -118,6 +121,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
   const [hasChanges, setHasChanges] = useState(false);
   const [editorTab, setEditorTab] = useState("all-in-one");
+  const [studioPanel, setStudioPanel] = useState<"identity" | "styles" | "pro" | "sections" | null>(null);
   const [advancedMode, setAdvancedMode] = useState(() => localStorage.getItem("editor_advanced_mode") === "1");
 
   
@@ -339,53 +343,74 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
   const enabledCount = sections.filter(s => s.enabled).length;
   const publishedStoreUrl = `https://apptienda.lovable.app/tienda/${store.slug}`;
   const planLabel = planTier === 'enterprise' ? 'Enterprise' : planTier === 'professional' ? 'Professional' : 'Basic';
+  const studioPanelContent = {
+    identity: {
+      title: "Identidad visual",
+      description: "Edita el nombre, contacto, redes y elementos que reconocen tus clientes.",
+      content: <HeaderFooterPanel store={store} values={headerFooter} onChange={handleHeaderFooterChange} />,
+    },
+    styles: {
+      title: "Colores y tipografías",
+      description: "Elige el estilo general, las letras, espacios, botones y tarjetas.",
+      content: <GlobalStylesPanel styles={globalStyles} onChange={handleGlobalStylesChange} primaryColor={store.primary_color} />,
+    },
+    pro: {
+      title: "Portada y detalles",
+      description: "Ajusta imágenes de marca, botones animados y acabados especiales.",
+      content: <ProDesignPanel store={store} styles={globalStyles} onChange={handleGlobalStylesChange} />,
+    },
+    sections: {
+      title: "Orden de secciones",
+      description: "Activa, edita y ordena cada bloque de tu tienda.",
+      content: (
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={sections.map((section) => section.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              <AnimatePresence>
+                {sections.map((section, index) => (
+                  <SortableSection
+                    key={section.id}
+                    section={section}
+                    onToggle={handleToggleSection}
+                    onEdit={handleEditSection}
+                    onDuplicate={handleDuplicateSection}
+                    onDelete={handleDeleteSection}
+                    onMoveUp={(id) => handleMoveSection(id, -1)}
+                    onMoveDown={(id) => handleMoveSection(id, 1)}
+                    canMoveUp={index > 0}
+                    canMoveDown={index < sections.length - 1}
+                    primaryColor={store.primary_color}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          </SortableContext>
+        </DndContext>
+      ),
+    },
+  };
 
   return (
     <div
       data-store-accent={accentPalette}
-      className={`space-y-6 rounded-2xl transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}
+      className={`store-editor-bento space-y-6 transition-colors duration-500 ${isEditorDark ? 'store-dark p-4 sm:p-6' : ''}`}
     >
 
-      {/* Hero header */}
-      <div
-        className="relative overflow-hidden rounded-2xl border p-6 sm:p-8"
-        style={{
-          background: `linear-gradient(135deg, ${store.primary_color}18, transparent 55%), radial-gradient(1200px 300px at 100% 0%, ${store.primary_color}22, transparent 60%)`,
-        }}
-      >
-        <div
-          className="absolute -top-24 -right-24 h-64 w-64 rounded-full blur-3xl opacity-30"
-          style={{ background: store.primary_color }}
-        />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-3">
+      <div className="editor-bento-header">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="space-y-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="secondary" className="gap-1.5 rounded-full px-3 py-1">
-                <Crown className="h-3 w-3" style={{ color: store.primary_color }} />
+              <Badge variant="secondary" className="gap-1.5 px-3 py-1">
+                <Crown className="h-3 w-3 text-primary" />
                 Plan {planLabel}
               </Badge>
-              <Badge
-                variant="outline"
-                className="gap-1.5 rounded-full px-3 py-1 border-2 transition-colors"
-                style={{
-                  borderColor: hasChanges ? '#f59e0b' : `${store.primary_color}66`,
-                  color: hasChanges ? '#b45309' : store.primary_color,
-                }}
-              >
-                <span className={`h-2 w-2 rounded-full ${hasChanges ? 'bg-amber-500 animate-pulse' : 'bg-emerald-500'}`} />
+              <Badge variant="outline" className="gap-1.5 px-3 py-1">
+                <span className={`h-2 w-2 rounded-full ${hasChanges ? 'bg-editor-warning animate-pulse' : 'bg-editor-success'}`} />
                 {hasChanges ? 'Cambios sin guardar' : 'Todo guardado'}
               </Badge>
-              <Badge variant="secondary" className="gap-1.5 rounded-full px-3 py-1">
-                <Layers className="h-3 w-3" />
-                {enabledCount} secciones activas
-              </Badge>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-heading tracking-tight">
-              Estudio de diseño
-            </h2>
-            <p className="text-muted-foreground max-w-xl">
-              Personaliza cada detalle de tu tienda: colores, tipografía, secciones y animaciones. Todo se refleja al instante en la vista previa.
-            </p>
+            <h2 className="editor-bento-title">Haz que tu tienda se vea increíble</h2>
+            <p className="max-w-2xl text-muted-foreground">Elige un bloque, cambia lo que necesites y mira el resultado al instante.</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -410,8 +435,7 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
               size="sm"
               onClick={handleSaveLayout}
               disabled={saveLayout.isPending || !hasChanges}
-              className="shadow-lg transition-transform hover:scale-105"
-              style={{ backgroundColor: store.primary_color, color: 'white' }}
+              className="editor-publish-button"
             >
               {saveLayout.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
@@ -473,188 +497,74 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
         </div>
 
 
-        <TabsContent value="all-in-one" className="space-y-4">
-          <div className="grid gap-4 xl:grid-cols-[minmax(340px,.82fr)_minmax(520px,1.35fr)]">
-            <div className="space-y-4 min-w-0">
-              {(() => {
-                const studioSections = [
-                  {
-                    id: 'header-footer',
-                    icon: Layout,
-                    title: 'Encabezado y pie de página',
-                    description: 'Nombre, contacto y redes sociales visibles en tu tienda',
-                    tint: '#0ea5e9',
-                    content: <HeaderFooterPanel store={store} values={headerFooter} onChange={handleHeaderFooterChange} />,
-                  },
-                  {
-                    id: 'styles',
-                    icon: Palette,
-                    title: 'Estilos globales',
-                    description: 'Tipografías, espaciados, bordes y sombras',
-                    tint: '#f43f5e',
-                    content: (
-                      <GlobalStylesPanel
-                        styles={globalStyles}
-                        onChange={handleGlobalStylesChange}
-                        primaryColor={store.primary_color}
-                      />
-                    ),
-                  },
-                  {
-                    id: 'pro',
-                    icon: Sparkles,
-                    title: 'Diseño Pro',
-                    description: 'Colores, botones con animación e imágenes de marca',
-                    tint: '#a855f7',
-                    content: (
-                      <ProDesignPanel
-                        store={store}
-                        styles={globalStyles}
-                        onChange={handleGlobalStylesChange}
-                      />
-                    ),
-                  },
-                  {
-                    id: 'sections',
-                    icon: Layers,
-                    title: `Secciones (${enabledCount}/${sections.length})`,
-                    description: 'Arrastra para reordenar, activa o edita cada bloque',
-                    tint: '#10b981',
-                    content: (
-                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                        <SortableContext items={sections.map((s) => s.id)} strategy={verticalListSortingStrategy}>
-                          <div className="space-y-2">
-                            <AnimatePresence>
-                              {sections.map((section, idx) => (
-                                <SortableSection
-                                  key={section.id}
-                                  section={section}
-                                  onToggle={handleToggleSection}
-                                  onEdit={handleEditSection}
-                                  onDuplicate={handleDuplicateSection}
-                                  onDelete={handleDeleteSection}
-                                  onMoveUp={(id) => handleMoveSection(id, -1)}
-                                  onMoveDown={(id) => handleMoveSection(id, 1)}
-                                  canMoveUp={idx > 0}
-                                  canMoveDown={idx < sections.length - 1}
-                                  primaryColor={store.primary_color}
-                                />
-                              ))}
-                            </AnimatePresence>
-                          </div>
-                        </SortableContext>
-                      </DndContext>
-                    ),
-                  },
-                ];
+        <TabsContent value="all-in-one" className="space-y-5">
+          <div className="editor-bento-grid">
+            <section className="editor-bento-preview">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <Badge className="editor-live-badge">Vista en vivo</Badge>
+                  <h3 className="mt-3 text-2xl font-bold">Así se ve tu tienda</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Los cambios aparecen aquí antes de publicarlos.</p>
+                </div>
+                <Button variant="ghost" size="icon" asChild aria-label="Abrir tienda publicada">
+                  <a href={publishedStoreUrl} target="_blank" rel="noreferrer"><Eye className="h-5 w-5" /></a>
+                </Button>
+              </div>
+              <div className="editor-preview-canvas">
+                <LivePreviewPanel sections={sections} store={store} globalStyles={globalStyles} device={previewDevice} onDeviceChange={setPreviewDevice} />
+              </div>
+            </section>
 
-                return (
-                  <Accordion
-                    type="single"
-                    collapsible
-                    defaultValue="header-footer"
-                    className="space-y-3"
-                  >
-                    {studioSections.map((s) => {
-                      const Icon = s.icon;
-                      return (
-                        <AccordionItem
-                          key={s.id}
-                          value={s.id}
-                           className="dashboard-panel border px-4 transition-shadow data-[state=open]:border-primary/50"
-                        >
-                          <AccordionTrigger className="hover:no-underline py-4">
-                            <div className="flex items-center gap-4 text-left">
-                              <div
-                                 className="h-10 w-10 rounded-md flex items-center justify-center flex-shrink-0 shadow-sm"
-                                style={{
-                                  background: `linear-gradient(135deg, ${s.tint}, ${s.tint}cc)`,
-                                }}
-                              >
-                                <Icon className="h-5 w-5 text-white" />
-                              </div>
-                              <div className="min-w-0">
-                                <div className="font-semibold">{s.title}</div>
-                                <div className="text-xs text-muted-foreground font-normal line-clamp-1">
-                                  {s.description}
-                                </div>
-                              </div>
-                            </div>
-                          </AccordionTrigger>
-                          <AccordionContent className="pt-2 pb-5">
-                            {s.content}
-                          </AccordionContent>
-                        </AccordionItem>
-                      );
-                    })}
-                  </Accordion>
-                );
-              })()}
-            </div>
+            <button type="button" className="editor-bento-tile editor-bento-brand" onClick={() => setStudioPanel("identity")}>
+              <span className="editor-tile-icon"><Palette className="h-6 w-6" /></span>
+              <span><strong>Identidad visual</strong><small>Logo, nombre, contacto y redes</small></span>
+              <ArrowRight className="h-5 w-5" />
+            </button>
 
-            <div className="xl:sticky xl:top-20 h-fit space-y-3">
-              <Card
-                className="dashboard-panel overflow-hidden border-primary/30 shadow-xl"
-                style={{
-                  background: `linear-gradient(180deg, ${store.primary_color}0d, transparent)`,
-                }}
-              >
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                        </span>
-                        Vista previa en vivo
-                      </CardTitle>
-                      <CardDescription className="text-xs mt-1">
-                        Reflejo exacto de tu tienda publicada
-                      </CardDescription>
-                    </div>
-                    <Button variant="ghost" size="icon" asChild className="h-8 w-8">
-                      <a href={publishedStoreUrl} target="_blank" rel="noreferrer" title="Abrir tienda">
-                        <Eye className="h-4 w-4" />
-                      </a>
-                    </Button>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <LivePreviewPanel
-                    sections={sections}
-                    store={store}
-                    globalStyles={globalStyles}
-                    device={previewDevice}
-                    onDeviceChange={setPreviewDevice}
-                    showDeviceControls={true}
-                  />
-                </CardContent>
-              </Card>
+            <button type="button" className="editor-bento-tile editor-bento-type" onClick={() => setStudioPanel("styles")}>
+              <span className="editor-type-sample">Aa</span>
+              <span><strong>Colores y letras</strong><small>Haz reconocible tu marca</small></span>
+              <Type className="h-5 w-5" />
+            </button>
 
-              {hasChanges && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="rounded-xl border border-amber-300/60 bg-amber-50 dark:bg-amber-950/30 p-3 flex items-center gap-3"
-                >
-                  <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse flex-shrink-0" />
-                  <p className="text-xs text-amber-900 dark:text-amber-200 flex-1">
-                    Tienes cambios pendientes. Publica para que tus clientes los vean.
-                  </p>
-                  <Button
-                    size="sm"
-                    className="h-7 text-xs"
-                    onClick={handleSaveLayout}
-                    disabled={saveLayout.isPending}
-                    style={{ backgroundColor: store.primary_color, color: 'white' }}
-                  >
-                    Publicar
-                  </Button>
-                </motion.div>
-              )}
-            </div>
+            <button type="button" className="editor-bento-tile editor-bento-mobile" onClick={() => setPreviewDevice(previewDevice === "mobile" ? "desktop" : "mobile")}>
+              <Smartphone className="h-9 w-9" />
+              <span><strong>Vista móvil</strong><small>{previewDevice === "mobile" ? "Cambiar a escritorio" : "Revisar en teléfono"}</small></span>
+              <ArrowRight className="h-5 w-5" />
+            </button>
+
+            <button type="button" className="editor-bento-tile editor-bento-catalog" onClick={() => setStudioPanel("pro")}>
+              <ImageIcon className="h-8 w-8" />
+              <span><strong>Portada y catálogo</strong><small>Fotos, botones y productos</small></span>
+              <ArrowRight className="h-5 w-5" />
+            </button>
+
+            <button type="button" className="editor-bento-tile editor-bento-sections" onClick={() => setStudioPanel("sections")}>
+              <span><strong>Estructura de bloques</strong><small>Ordena las {enabledCount} secciones visibles de tu tienda</small></span>
+              <span className="editor-section-stack" aria-hidden="true"><i>H</i><i>P</i><i>F</i></span>
+              <Grid2X2 className="h-6 w-6" />
+            </button>
           </div>
+
+          <AnimatePresence mode="wait">
+            {studioPanel && (
+              <motion.section key={studioPanel} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="editor-settings-drawer">
+                <div className="flex items-start justify-between gap-4 border-b p-5 sm:p-6">
+                  <div><h3 className="text-xl font-bold">{studioPanelContent[studioPanel].title}</h3><p className="mt-1 text-sm text-muted-foreground">{studioPanelContent[studioPanel].description}</p></div>
+                  <Button variant="ghost" size="icon" onClick={() => setStudioPanel(null)} aria-label="Cerrar opciones"><X className="h-5 w-5" /></Button>
+                </div>
+                <div className="p-5 sm:p-6">{studioPanelContent[studioPanel].content}</div>
+              </motion.section>
+            )}
+          </AnimatePresence>
+
+          {hasChanges && (
+            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="editor-save-reminder">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-editor-warning animate-pulse" />
+              <p className="flex-1 text-sm">Tus cambios están listos para publicarse.</p>
+              <Button size="sm" onClick={handleSaveLayout} disabled={saveLayout.isPending}>Publicar ahora</Button>
+            </motion.div>
+          )}
         </TabsContent>
 
 
