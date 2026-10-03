@@ -20,6 +20,7 @@
 - [x] Vista previa editable de la descripción antes de guardar productos
 - [ ] Rediseñar la personalización de cada tienda para que sea atractiva, clara y fácil de usar
 - [ ] Preparar una nueva dirección visual distinta a las primeras opciones rechazadas
+- [ ] Explorar una paleta y estructura completamente diferentes para el editor
 
 ## Tienda pública — Volcanic Fire & Gold
 - [x] Aplicar el tema a portada, categorías, productos y barra de confianza
