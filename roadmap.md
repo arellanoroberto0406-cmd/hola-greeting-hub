@@ -19,6 +19,7 @@
 - [ ] MiTienda IA real (nombres, identidad y productos) vía Lovable AI
 - [x] Vista previa editable de la descripción antes de guardar productos
 - [ ] Rediseñar la personalización de cada tienda para que sea atractiva, clara y fácil de usar
+- [ ] Agregar recetas rápidas para personalizar tarjetas de producto y aplicarlas a la tienda publicada
 - [ ] Preparar una nueva dirección visual distinta a las primeras opciones rechazadas
 - [ ] Explorar una paleta y estructura completamente diferentes para el editor
 
