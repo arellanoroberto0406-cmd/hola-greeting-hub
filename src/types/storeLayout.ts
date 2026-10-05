@@ -149,6 +149,17 @@ export interface GlobalStyles {
   buttonAnimation?: ButtonAnimation;
 }
 
+export interface StoreDesignProposal {
+  name: string;
+  rationale: string;
+  primaryColor: string;
+  secondaryColor: string;
+  accentColor: string;
+  headingFont: FontFamily;
+  bodyFont: FontFamily;
+  sections: SectionType[];
+}
+
 export const DEFAULT_GLOBAL_STYLES: GlobalStyles = {
   headingFont: 'archivo-black',
   bodyFont: 'hind',
