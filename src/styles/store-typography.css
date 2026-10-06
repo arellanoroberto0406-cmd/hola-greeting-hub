@@ -1,0 +1,25 @@
+/* Store-specific typography must never affect editor controls or dashboards. */
+.store-typography,
+.store-typography :is(p, span, li, a, label, input, textarea, button, strong, small, summary) {
+  font-family: var(--store-body-font) !important;
+}
+.store-typography :is(h1, h2, h3, h4, h5, h6, .vc-heading) {
+  font-family: var(--store-heading-font) !important;
+  overflow-wrap: anywhere;
+  letter-spacing: 0;
+}
+.store-typography[data-heading-weight] :is(h1, h2, h3, h4, h5, h6, .vc-heading) {
+  font-weight: var(--store-heading-weight) !important;
+}
+.store-typography[data-body-weight] :is(p, li, label, input, textarea, button, summary),
+.store-typography[data-body-weight] {
+  font-weight: var(--store-body-weight) !important;
+}
+.store-typography[data-heading-size] h1 { font-size: calc(var(--store-heading-size) * 1.5) !important; line-height: 1.15; }
+.store-typography[data-heading-size] h2 { font-size: var(--store-heading-size) !important; line-height: 1.2; }
+.store-typography[data-heading-size] :is(h3, h4, h5, h6) { font-size: calc(var(--store-heading-size) * .75) !important; line-height: 1.3; }
+.store-typography[data-body-size] :is(p, li, label, input, textarea, summary) {
+  font-size: var(--store-body-size) !important;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
