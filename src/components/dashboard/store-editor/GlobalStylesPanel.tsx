@@ -10,12 +10,10 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { 
   GlobalStyles, 
-  FontFamily, 
-  FONT_OPTIONS,
   DEFAULT_GLOBAL_STYLES,
   ACCENT_PALETTES
 } from "@/types/storeLayout";
-import { Type, Radius, Layers, MousePointer, Square, Palette } from "lucide-react";
+import { Radius, Layers, MousePointer, Square, Palette } from "lucide-react";
 import { TypographyPanel } from './TypographyPanel';
 
 interface GlobalStylesPanelProps {
