@@ -16,6 +16,7 @@ import {
   ACCENT_PALETTES
 } from "@/types/storeLayout";
 import { Type, Radius, Layers, MousePointer, Square, Palette } from "lucide-react";
+import { TypographyPanel } from './TypographyPanel';
 
 interface GlobalStylesPanelProps {
   styles: GlobalStyles;
@@ -112,75 +113,7 @@ export const GlobalStylesPanel = ({
         </CardContent>
       </Card>
 
-      {/* Typography */}
-      <Card>
-        <CardHeader className="pb-4">
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Type className="h-5 w-5" style={{ color: primaryColor }} />
-            Tipografía
-          </CardTitle>
-          <CardDescription>
-            Personaliza las fuentes de tu tienda
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label>Fuente de títulos</Label>
-              <Select
-                value={styles.headingFont}
-                onValueChange={(value) => updateStyle('headingFont', value as FontFamily)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar fuente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_OPTIONS.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      <span style={{ fontFamily: `'${font.label}', sans-serif` }}>
-                        {font.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p 
-                className="text-2xl font-bold mt-2" 
-                style={{ fontFamily: `'${FONT_OPTIONS.find(f => f.value === styles.headingFont)?.label}', sans-serif` }}
-              >
-                Vista previa de título
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Fuente del cuerpo</Label>
-              <Select
-                value={styles.bodyFont}
-                onValueChange={(value) => updateStyle('bodyFont', value as FontFamily)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar fuente" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_OPTIONS.map((font) => (
-                    <SelectItem key={font.value} value={font.value}>
-                      <span style={{ fontFamily: `'${font.label}', sans-serif` }}>
-                        {font.label}
-                      </span>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p 
-                className="text-sm text-muted-foreground mt-2"
-                style={{ fontFamily: `'${FONT_OPTIONS.find(f => f.value === styles.bodyFont)?.label}', sans-serif` }}
-              >
-                Vista previa del texto del cuerpo. Este es un ejemplo de cómo se verá el texto en tu tienda.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <TypographyPanel styles={styles} onChange={onChange} />
 
       {/* Border Radius */}
       <Card>
