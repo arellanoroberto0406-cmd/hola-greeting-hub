@@ -70,6 +70,7 @@ import TrustBar from "@/components/store/TrustBar";
 import SafePurchaseSection from "@/components/store/SafePurchaseSection";
 import PurchaseFAQSection from "@/components/store/PurchaseFAQSection";
 import MobileCartBar from "@/components/store/MobileCartBar";
+import { typographyVariables, typographyAttributes, useStoreFonts } from '@/lib/storeTypography';
 
 const mapDbProduct = (dbProduct: any): Product => ({
   id: dbProduct.id,
@@ -145,6 +146,7 @@ const StoreFront = () => {
   const globalStyles = useMemo(() => {
     return layout?.globalStyles || DEFAULT_GLOBAL_STYLES;
   }, [layout]);
+  useStoreFonts(globalStyles);
 
   // Paleta de acentos sincronizada entre pestañas (evento `storage`)
   const accentPalette = useStoreAccentSync(globalStyles.accentPalette, storeThemeScope);
@@ -369,9 +371,11 @@ const StoreFront = () => {
   return (
     <div 
       data-store-accent={accentPalette}
-      className={`volcanic min-h-screen transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
+      className={`volcanic store-typography min-h-screen transition-colors duration-500 ${isStoreDark ? 'store-dark' : ''}`}
+      {...typographyAttributes(globalStyles)}
       data-btn-anim={globalStyles.buttonAnimation || 'lift'}
       style={{ 
+        ...typographyVariables(globalStyles),
         fontFamily: 'var(--store-body-font, inherit)',
       }}
     >

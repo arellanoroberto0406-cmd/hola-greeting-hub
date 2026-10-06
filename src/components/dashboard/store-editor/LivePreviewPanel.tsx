@@ -19,6 +19,7 @@ import {
   Tablet
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { typographyVariables, typographyAttributes, useStoreFonts } from '@/lib/storeTypography';
 
 interface LivePreviewPanelProps {
   sections: StoreSection[];
@@ -58,6 +59,7 @@ const getStyleVariables = (styles: GlobalStyles, primaryColor: string) => {
   };
 
   return {
+    ...typographyVariables(styles),
     '--preview-heading-font': `'${headingFont}', sans-serif`,
     '--preview-body-font': `'${bodyFont}', sans-serif`,
     '--preview-radius': borderRadiusMap[styles.borderRadius] || '12px',
@@ -75,6 +77,7 @@ export const LivePreviewPanel = ({
   onDeviceChange,
   showDeviceControls = true
 }: LivePreviewPanelProps) => {
+  useStoreFonts(globalStyles);
   const enabledSections = sections.filter(s => s.enabled);
   
   const styleVars = useMemo(() => 
@@ -401,7 +404,8 @@ export const LivePreviewPanel = ({
 
       <div className={`mx-auto transition-all duration-300 ${deviceWidth}`}>
         <motion.div 
-          className="bg-background rounded-xl border shadow-sm overflow-hidden"
+          className="store-typography bg-background rounded-xl border shadow-sm overflow-hidden"
+          {...typographyAttributes(globalStyles)}
           style={styleVars}
           layout
         >

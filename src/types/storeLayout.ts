@@ -45,7 +45,9 @@ export type FontFamily =
   | 'crimson-pro'
   | 'outfit'
   | 'archivo-black'
-  | 'hind';
+  | 'hind'
+  | 'syne'
+  | 'plus-jakarta';
 
 export type AnimationType = 
   | 'none'
@@ -139,6 +141,10 @@ export const ACCENT_PALETTES: {
 export interface GlobalStyles {
   headingFont: FontFamily;
   bodyFont: FontFamily;
+  headingSize?: number;
+  bodySize?: number;
+  headingWeight?: number;
+  bodyWeight?: number;
   borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
   sectionSpacing: 'compact' | 'normal' | 'relaxed' | 'spacious';
   buttonStyle: 'solid' | 'outline' | 'ghost' | 'gradient' | '3d';
@@ -191,6 +197,8 @@ export const FONT_OPTIONS: { value: FontFamily; label: string; googleFont: strin
   { value: 'outfit', label: 'Outfit', googleFont: 'Outfit:wght@400;500;600;700' },
   { value: 'archivo-black', label: 'Archivo Black', googleFont: 'Archivo+Black' },
   { value: 'hind', label: 'Hind', googleFont: 'Hind:wght@300;400;500;600;700' },
+  { value: 'syne', label: 'Syne', googleFont: 'Syne:wght@400;500;600;700;800' },
+  { value: 'plus-jakarta', label: 'Plus Jakarta Sans', googleFont: 'Plus+Jakarta+Sans:wght@400;500;600;700;800' },
 ];
 
 // Section availability by plan

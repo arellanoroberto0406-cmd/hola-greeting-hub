@@ -17,6 +17,9 @@ import { useCart } from "@/context/CartContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useToast } from "@/hooks/use-toast";
 import { useStore } from "@/hooks/useStores";
+import { useStoreLayout } from "@/hooks/useStoreLayout";
+import { DEFAULT_GLOBAL_STYLES } from "@/types/storeLayout";
+import { typographyVariables, typographyAttributes, useStoreFonts } from "@/lib/storeTypography";
 import { supabase } from "@/integrations/supabase/client";
 import { useMercadoPagoPayment } from "@/hooks/useMercadoPagoPayment";
 import { usePayPalStorePayment } from "@/hooks/usePayPalStorePayment";
@@ -99,6 +102,10 @@ const StoreCheckout = () => {
   } | null>(null);
   
   const { data: store, isLoading: storeLoading } = useStore(slug || "");
+  const { data: layout } = useStoreLayout(store?.id);
+  const typography = layout?.globalStyles || DEFAULT_GLOBAL_STYLES;
+  useStoreFonts(typography);
+  const typographyProps = { ...typographyAttributes(typography), style: typographyVariables(typography) };
 
   // Datos de cobro sensibles: se obtienen mediante una funcion segura del backend
   const [paymentConfig, setPaymentConfig] = useState<{
@@ -510,7 +517,7 @@ const StoreCheckout = () => {
 
   if (storeLoading) {
     return (
-      <div className="volcanic vc-checkout min-h-screen flex items-center justify-center">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -518,7 +525,7 @@ const StoreCheckout = () => {
 
   if (!store) {
     return (
-      <div className="volcanic vc-checkout min-h-screen flex items-center justify-center">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold">Tienda no encontrada</h1>
           <Button onClick={() => navigate("/")}>Ir al inicio</Button>
@@ -532,7 +539,7 @@ const StoreCheckout = () => {
   // Pantalla de pago con tarjeta (cobro real)
   if (cardOrderId && !orderComplete) {
     return (
-      <div className="volcanic vc-checkout min-h-screen">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen">
         <header className="vc-checkout-header border-b py-4">
           <div className="container mx-auto px-4 flex items-center gap-3">
             {store.logo_url ? (
@@ -570,7 +577,7 @@ const StoreCheckout = () => {
   // Handle payment failure from MercadoPago
   if (paymentStatus === 'failure') {
     return (
-      <div className="volcanic vc-checkout min-h-screen">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen">
         <header 
           className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
@@ -607,7 +614,7 @@ const StoreCheckout = () => {
   // Handle pending payment from MercadoPago (e.g., OXXO)
   if (paymentStatus === 'pending') {
     return (
-      <div className="volcanic vc-checkout min-h-screen">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen">
         <header 
           className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
@@ -647,7 +654,7 @@ const StoreCheckout = () => {
 
   if (items.length === 0 && !orderComplete) {
     return (
-      <div className="volcanic vc-checkout min-h-screen">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen">
         <header 
           className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
@@ -676,7 +683,7 @@ const StoreCheckout = () => {
     const bankInfo = (paymentConfig?.bank_info ?? null) as BankInfo | null;
     
     return (
-      <div className="volcanic vc-checkout min-h-screen">
+      <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen">
         <header 
           className="vc-checkout-header border-b py-4"
           style={{ backgroundColor: `${primaryColor}10` }}
@@ -941,7 +948,7 @@ const StoreCheckout = () => {
   }
 
   return (
-    <div className="volcanic vc-checkout min-h-screen">
+    <div {...typographyProps} className="volcanic store-typography vc-checkout min-h-screen">
       {/* Store Header */}
       <header 
         className="vc-checkout-header border-b py-4 sticky top-0 z-50"
