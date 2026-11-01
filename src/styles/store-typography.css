@@ -1,4 +1,40 @@
 /* Store-specific typography must never affect editor controls or dashboards. */
+.store-typography { container-type: inline-size; container-name: store-screen; }
+.store-typography[data-typography-device='mobile'] > *,
+.store-typography:not([data-typography-device]) > * {
+  --store-heading-size: var(--store-mobile-heading-size);
+  --store-body-size: var(--store-mobile-body-size);
+  --store-heading-weight: var(--store-mobile-heading-weight);
+  --store-body-weight: var(--store-mobile-body-weight);
+}
+.store-typography[data-typography-device='tablet'] > * {
+  --store-heading-size: var(--store-tablet-heading-size);
+  --store-body-size: var(--store-tablet-body-size);
+  --store-heading-weight: var(--store-tablet-heading-weight);
+  --store-body-weight: var(--store-tablet-body-weight);
+}
+.store-typography[data-typography-device='desktop'] > * {
+  --store-heading-size: var(--store-desktop-heading-size);
+  --store-body-size: var(--store-desktop-body-size);
+  --store-heading-weight: var(--store-desktop-heading-weight);
+  --store-body-weight: var(--store-desktop-body-weight);
+}
+@container store-screen (min-width: 640px) {
+  .store-typography:not([data-typography-device]) > * {
+    --store-heading-size: var(--store-tablet-heading-size);
+    --store-body-size: var(--store-tablet-body-size);
+    --store-heading-weight: var(--store-tablet-heading-weight);
+    --store-body-weight: var(--store-tablet-body-weight);
+  }
+}
+@container store-screen (min-width: 1024px) {
+  .store-typography:not([data-typography-device]) > * {
+    --store-heading-size: var(--store-desktop-heading-size);
+    --store-body-size: var(--store-desktop-body-size);
+    --store-heading-weight: var(--store-desktop-heading-weight);
+    --store-body-weight: var(--store-desktop-body-weight);
+  }
+}
 .store-typography,
 .store-typography :is(p, span, li, a, label, input, textarea, button, strong, small, summary) {
   font-family: var(--store-body-font) !important;

@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { Monitor, Smartphone, Tablet, Scan } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { typographyVariables } from '@/lib/storeTypography';
-import type { GlobalStyles } from '@/types/storeLayout';
+import type { GlobalStyles, TypographyDevice } from '@/types/storeLayout';
 import '@/styles/typography-preview.css';
 
 const DEVICES = [
@@ -11,8 +11,9 @@ const DEVICES = [
   { id: 'desktop', label: 'Escritorio', width: 1280, icon: Monitor },
 ] as const;
 
-export function TypographyDevicePreview({ styles }: { styles: GlobalStyles }) {
-  const [device, setDevice] = useState<(typeof DEVICES)[number]>(DEVICES[0]);
+export function TypographyDevicePreview({ styles, device: selectedDevice, onDeviceChange }: { styles: GlobalStyles; device?: TypographyDevice; onDeviceChange?: (device: TypographyDevice) => void }) {
+  const [localDevice, setLocalDevice] = useState<TypographyDevice>('mobile');
+  const device = DEVICES.find(option => option.id === (selectedDevice ?? localDevice)) ?? DEVICES[0];
   const [actualSize, setActualSize] = useState(false);
   const [availableWidth, setAvailableWidth] = useState(390);
   const [contentHeight, setContentHeight] = useState(420);
@@ -41,7 +42,7 @@ export function TypographyDevicePreview({ styles }: { styles: GlobalStyles }) {
         <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Tamaño de pantalla">
           {DEVICES.map(option => (
             <Button key={option.id} size="sm" variant={device.id === option.id ? 'default' : 'ghost'}
-              aria-pressed={device.id === option.id} onClick={() => setDevice(option)}>
+              aria-pressed={device.id === option.id} onClick={() => { setLocalDevice(option.id); onDeviceChange?.(option.id); }}>
               <option.icon className="mr-2 h-4 w-4" />{option.label}
             </Button>
           ))}
@@ -59,7 +60,7 @@ export function TypographyDevicePreview({ styles }: { styles: GlobalStyles }) {
         <div className="relative mx-auto" style={{ width: device.width * scale, height: contentHeight * scale }}>
           <div ref={contentRef} className="typography-device-sample bg-background text-foreground"
             data-preview-device={device.id}
-            style={{ ...typographyVariables(styles), width: device.width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
+            style={{ ...typographyVariables(styles, device.id), width: device.width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
             <header className="border-b"><span>Mi tienda</span></header>
             <div className="typography-device-content">
               <span className="text-muted-foreground">Nueva colección</span>
