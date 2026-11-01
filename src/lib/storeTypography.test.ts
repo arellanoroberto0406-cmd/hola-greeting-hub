@@ -1,4 +1,5 @@
-import { describe, expect, test } from 'bun:test';
+import { describe, test } from 'node:test';
+import assert from 'node:assert/strict';
 import { DEFAULT_GLOBAL_STYLES } from '../types/storeLayout';
 import { deviceTypography, updateDeviceTypography } from './storeTypography';
 
@@ -8,13 +9,13 @@ describe('Independent typography per store and screen', () => {
       test(`${device} ${key} changes only the selected screen`, () => {
         const original = { ...DEFAULT_GLOBAL_STYLES, headingSize: 32, bodySize: 16, headingWeight: 700, bodyWeight: 400 };
         const changed = updateDeviceTypography(original, device, key, value);
-        expect(deviceTypography(changed, device)[key]).toBe(value);
+        assert.equal(deviceTypography(changed, device)[key], value);
         for (const other of ['mobile', 'tablet', 'desktop'] as const) {
-          if (other !== device) expect(deviceTypography(changed, other)[key]).toBe(original[key]);
+          if (other !== device) assert.equal(deviceTypography(changed, other)[key], original[key]);
         }
-        expect(original.responsiveTypography).toBeUndefined();
+        assert.equal(original.responsiveTypography, undefined);
         const saved = JSON.parse(JSON.stringify(changed));
-        expect(deviceTypography(saved, device)[key]).toBe(value);
+        assert.equal(deviceTypography(saved, device)[key], value);
       });
     }
   }
