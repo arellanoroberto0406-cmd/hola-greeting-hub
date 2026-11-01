@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Solicitud actual
+- [ ] Vistas de móvil y tablet para comprobar tipografías antes de publicar
 - [x] Controles por tienda de fuente, tamaño y grosor para títulos y textos, con vista previa y guardado
 
 - [x] Proteger los correos de carritos abandonados del acceso público.

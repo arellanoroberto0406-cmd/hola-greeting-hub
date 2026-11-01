@@ -1,0 +1,23 @@
+/* Fixed CSS-pixel canvases preserve line wrapping when fitted into the editor. */
+.typography-device-sample {
+  font-family: var(--store-body-font);
+  font-size: var(--store-body-size);
+  font-weight: var(--store-body-weight);
+  line-height: 1.55;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+.typography-device-sample header { padding: 20px 24px; }
+.typography-device-content { padding: 32px 24px; }
+.typography-device-content > * + * { margin-top: 16px; }
+.typography-device-sample :is(h2, h3) {
+  font-family: var(--store-heading-font);
+  font-weight: var(--store-heading-weight);
+  font-size: var(--store-heading-size);
+  line-height: 1.2;
+}
+.typography-device-sample h3 { font-size: calc(var(--store-heading-size) * .75); line-height: 1.3; }
+.typography-device-details { padding-top: 24px; }
+.typography-device-details p { margin-top: 12px; }
+.typography-device-sample[data-preview-device='tablet'] .typography-device-content { padding: 40px 48px; }
+.typography-device-sample[data-preview-device='desktop'] .typography-device-content { padding: 48px 80px; }

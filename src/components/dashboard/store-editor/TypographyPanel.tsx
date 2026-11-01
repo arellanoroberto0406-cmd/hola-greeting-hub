@@ -5,7 +5,8 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Type, RotateCcw } from 'lucide-react';
 import { DEFAULT_GLOBAL_STYLES, FONT_OPTIONS, type GlobalStyles, type FontFamily } from '@/types/storeLayout';
-import { fontName, fontWeights, resolvedWeight, typographyVariables, useStoreFonts } from '@/lib/storeTypography';
+import { fontName, fontWeights, resolvedWeight, useStoreFonts } from '@/lib/storeTypography';
+import { TypographyDevicePreview } from './TypographyDevicePreview';
 
 const WEIGHT_LABELS: Record<number, string> = { 300: 'Ligero', 400: 'Normal', 500: 'Medio', 600: 'Seminegrita', 700: 'Negrita', 800: 'Extra negrita' };
 
@@ -59,10 +60,7 @@ export function TypographyPanel({ styles, onChange }: { styles: GlobalStyles; on
             </div>;
           })}
         </div>
-        <div className="space-y-3 overflow-hidden rounded-md border bg-muted/30 p-5" style={typographyVariables(styles)} aria-label="Vista previa de tipografías">
-          <h2 className="break-words" style={{ fontFamily: 'var(--store-heading-font)', fontSize: 'var(--store-heading-size)', fontWeight: 'var(--store-heading-weight)', lineHeight: 1.2 }}>Encuentra tu próximo favorito</h2>
-          <p className="break-words" style={{ fontFamily: 'var(--store-body-font)', fontSize: 'var(--store-body-size)', fontWeight: 'var(--store-body-weight)', lineHeight: 1.55 }}>Productos elegidos con cuidado para acompañarte todos los días.</p>
-        </div>
+        <TypographyDevicePreview styles={styles} />
       </CardContent>
     </Card>
   );
