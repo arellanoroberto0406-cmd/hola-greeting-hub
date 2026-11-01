@@ -406,6 +406,7 @@ export const LivePreviewPanel = ({
         <motion.div 
           className="store-typography bg-background rounded-xl border shadow-sm overflow-hidden"
           {...typographyAttributes(globalStyles)}
+          data-typography-device={device}
           style={styleVars}
           layout
         >

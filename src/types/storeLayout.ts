@@ -138,6 +138,14 @@ export const ACCENT_PALETTES: {
   { value: 'lavanda', label: 'Lavanda', description: 'Creativo y elegante', light: '#7A5AC8', dark: '#B79BF5' },
 ];
 
+export type TypographyDevice = 'mobile' | 'tablet' | 'desktop';
+export interface TypographySettings {
+  headingSize?: number;
+  bodySize?: number;
+  headingWeight?: number;
+  bodyWeight?: number;
+}
+
 export interface GlobalStyles {
   headingFont: FontFamily;
   bodyFont: FontFamily;
@@ -145,6 +153,7 @@ export interface GlobalStyles {
   bodySize?: number;
   headingWeight?: number;
   bodyWeight?: number;
+  responsiveTypography?: Partial<Record<TypographyDevice, TypographySettings>>;
   borderRadius: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
   sectionSpacing: 'compact' | 'normal' | 'relaxed' | 'spacious';
   buttonStyle: 'solid' | 'outline' | 'ghost' | 'gradient' | '3d';
