@@ -945,7 +945,7 @@ All colors MUST be HSL.
 }
 
 .landing-canvas .landing-section {
-  padding-block: clamp(4.5rem, 8vw, 8rem);
+  padding-block: clamp(3.25rem, 5.5vw, 5.5rem);
 }
 
 .landing-canvas .landing-panel {

@@ -672,7 +672,12 @@ const Index = () => {
       </section>
 
       {/* ==================== CTA ==================== */}
-      <section className="landing-section relative overflow-hidden bg-primary text-primary-foreground">
+      <section className="landing-section relative overflow-hidden text-primary-foreground" style={{ background: "linear-gradient(135deg, hsl(357 85% 45%), hsl(var(--primary)) 45%, hsl(33 100% 48%) 80%, hsl(var(--gold)))" }}>
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,hsl(0_0%_100%/0.18),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_60%_at_100%_100%,hsl(0_0%_0%/0.25),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(hsl(0_0%_100%/0.05)_1px,transparent_1px),linear-gradient(90deg,hsl(0_0%_100%/0.05)_1px,transparent_1px)] bg-[size:56px_56px]" />
+        </div>
         <div className="container mx-auto px-4 md:px-8 relative">
           <motion.div 
             className="max-w-3xl mx-auto"
