@@ -216,7 +216,7 @@ const Index = () => {
       </motion.header>
 
       {/* ==================== HERO ==================== */}
-      <motion.section ref={heroRef} className="relative min-h-[92svh] flex items-center pt-28 pb-14 md:pt-32 md:pb-20" style={{ opacity: heroOpacity }}>
+      <motion.section ref={heroRef} className="relative flex items-center pt-28 pb-14 md:pt-36 md:pb-20" style={{ opacity: heroOpacity }}>
         {/* Background */}
         <div className="absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,hsl(var(--primary)/0.12),transparent_60%)]" />
