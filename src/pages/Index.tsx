@@ -94,31 +94,41 @@ const Index = () => {
 
   const demoStores = [
     {
-      name: "TechWorld", tagline: "Lo último en tecnología", icon: "🚀",
-      gradient: "from-blue-500/20 via-cyan-400/10 to-violet-500/20",
-      logoGradient: "from-blue-500 to-violet-500",
+      name: "TechWorld",
+      tagline: "Lo último en tecnología",
+      icon: "🚀",
+      accent: "46 65% 52%",
+      accentInk: "0 0% 5%",
+      rating: "4.9",
+      buyers: "2,400",
+      promise: "Envío en 24 h",
       categories: [{ name: "Smartphones", icon: "📱" }, { name: "Audio", icon: "🎧" }, { name: "Wearables", icon: "⌚" }, { name: "Gaming", icon: "🎮" }],
       products: [
-        { name: "iPhone 16 Pro", price: "$1,199", originalPrice: "$1,399", badge: "Oferta", image: "📱" },
-        { name: "AirPods Max", price: "$549", badge: "Popular", image: "🎧" },
-        { name: "Apple Watch Ultra", price: "$799", badge: "Nuevo", image: "⌚" },
-        { name: "Steam Deck OLED", price: "$649", originalPrice: "$799", badge: "Oferta", image: "🎮" },
-        { name: "MacBook Air M3", price: "$1,099", badge: "Trending", image: "💻" },
-        { name: "iPad Pro M4", price: "$999", badge: "Exclusivo", image: "📲" },
+        { name: "iPhone 16 Pro", price: "$1,199", originalPrice: "$1,399", badge: "Oferta", image: "📱", blurb: "Titanio, cámara de 48 MP y batería para todo el día.", rating: 4.9, reviews: 214, stock: 3 },
+        { name: "AirPods Max", price: "$549", badge: "Popular", image: "🎧", blurb: "Audio envolvente con cancelación activa de ruido.", rating: 4.7, reviews: 96, stock: 12 },
+        { name: "Apple Watch Ultra", price: "$799", badge: "Nuevo", image: "⌚", blurb: "Diseñado para aventura, deporte y buceo.", rating: 4.8, reviews: 58, stock: 7 },
+        { name: "Steam Deck OLED", price: "$649", originalPrice: "$799", badge: "Oferta", image: "🎮", blurb: "Tu biblioteca de PC completa, en la mano.", rating: 4.6, reviews: 143, stock: 4 },
+        { name: "MacBook Air M3", price: "$1,099", badge: "Trending", image: "💻", blurb: "Ligero, silencioso y con 18 h de batería.", rating: 4.9, reviews: 77, stock: 2 },
+        { name: "iPad Pro M4", price: "$999", badge: "Exclusivo", image: "📲", blurb: "La pantalla más delgada que hemos hecho.", rating: 4.8, reviews: 41, stock: 9 },
       ]
     },
     {
-      name: "Moda Urbana", tagline: "Tu estilo, tu identidad", icon: "✨",
-      gradient: "from-pink-500/20 via-rose-400/10 to-orange-500/20",
-      logoGradient: "from-pink-500 to-orange-500",
+      name: "Moda Urbana",
+      tagline: "Tu estilo, tu identidad",
+      icon: "✨",
+      accent: "357 85% 55%",
+      accentInk: "0 0% 100%",
+      rating: "4.8",
+      buyers: "5,100",
+      promise: "Devoluciones gratis",
       categories: [{ name: "Ropa", icon: "👕" }, { name: "Calzado", icon: "👟" }, { name: "Accesorios", icon: "💎" }, { name: "Bolsos", icon: "👜" }],
       products: [
-        { name: "Hoodie Premium", price: "$89", originalPrice: "$120", badge: "Oferta", image: "🧥" },
-        { name: "Sneakers Limited", price: "$199", badge: "Exclusivo", image: "👟" },
-        { name: "Gafas Aviador", price: "$159", badge: "Trending", image: "🕶️" },
-        { name: "Bolso Cuero", price: "$249", badge: "Popular", image: "👜" },
-        { name: "Vestido Elegante", price: "$129", originalPrice: "$179", badge: "Oferta", image: "👗" },
-        { name: "Jeans Slim Fit", price: "$75", badge: "Nuevo", image: "👖" },
+        { name: "Hoodie Premium", price: "$89", originalPrice: "$120", badge: "Oferta", image: "🧥", blurb: "Algodón peinado 480 g con interior afelpado.", rating: 4.8, reviews: 187, stock: 5 },
+        { name: "Sneakers Limited", price: "$199", badge: "Exclusivo", image: "👟", blurb: "Edición de 300 pares, suela de goma reciclada.", rating: 4.9, reviews: 112, stock: 2 },
+        { name: "Gafas Aviador", price: "$159", badge: "Trending", image: "🕶️", blurb: "Montura de titanio con filtro polarizado.", rating: 4.6, reviews: 64, stock: 14 },
+        { name: "Bolso Cuero", price: "$249", badge: "Popular", image: "👜", blurb: "Piel curtida a mano, cosido a doble hilo.", rating: 4.9, reviews: 93, stock: 6 },
+        { name: "Vestido Elegante", price: "$129", originalPrice: "$179", badge: "Oferta", image: "👗", blurb: "Corte fluido que se adapta a tu movimiento.", rating: 4.7, reviews: 151, stock: 8 },
+        { name: "Jeans Slim Fit", price: "$75", badge: "Nuevo", image: "👖", blurb: "Denim elástico de tiro alto y costura reforzada.", rating: 4.5, reviews: 78, stock: 20 },
       ]
     }
   ];
@@ -466,7 +476,7 @@ const Index = () => {
       {/* ==================== STORE PREVIEW ==================== */}
       <section id="tiendas" className="landing-section relative" ref={storesRef}>
         <div className="container mx-auto px-4 md:px-8">
-          <motion.div className="text-center mb-16" initial="hidden" animate={storesInView ? "visible" : "hidden"} variants={stagger}>
+          <motion.div className="text-center mb-12" initial="hidden" animate={storesInView ? "visible" : "hidden"} variants={stagger}>
             <motion.div variants={fadeUp} custom={0}>
               <Badge variant="outline" className="mb-6 px-4 py-1.5 rounded-full"><Palette className="h-3.5 w-3.5 mr-2" />Vista Previa</Badge>
             </motion.div>
@@ -474,29 +484,28 @@ const Index = () => {
               Así lucirá tu tienda
             </motion.h2>
             <motion.p variants={fadeUp} custom={2} className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-              Explora dos estilos completamente diferentes — cada una 100% personalizable
+              Dos tiendas reales, dos estilos distintos — cada una 100% personalizable
             </motion.p>
 
             {/* Store Switcher */}
-            <motion.div variants={fadeUp} custom={3} className="flex justify-center gap-3">
+            <motion.div variants={fadeUp} custom={3} className="flex flex-wrap justify-center gap-3">
               {demoStores.map((s, i) => (
                 <Button
                   key={i}
                   onClick={() => setActiveStore(i)}
                   variant="outline"
-                  className={`flex items-center gap-2.5 px-6 py-3 rounded-xl border-2 transition-all duration-300 ${
-                    activeStore === i 
-                      ? "border-primary bg-primary/10 shadow-lg shadow-primary/10" 
-                      : "border-border/40 bg-card/30 hover:border-primary/30"
+                  style={{ "--demo-accent": s.accent, "--demo-accent-ink": s.accentInk } as CSSProperties}
+                  className={`demo-switch flex items-center gap-2.5 rounded-xl border px-6 py-3 transition-all duration-300 ${
+                    activeStore === i ? "demo-switch--active" : ""
                   }`}
                 >
                   <span className="text-xl">{s.icon}</span>
-                  <span className={`font-heading font-semibold text-sm ${activeStore === i ? "text-primary" : "text-muted-foreground"}`}>{s.name}</span>
+                  <span className={`font-heading font-semibold text-sm ${activeStore === i ? "" : "text-muted-foreground"}`}>{s.name}</span>
                 </Button>
               ))}
             </motion.div>
           </motion.div>
-          
+
           {/* Store Preview */}
           <AnimatePresence mode="wait">
             <motion.div
@@ -505,65 +514,161 @@ const Index = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.98 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="max-w-5xl mx-auto"
+              style={{ "--demo-accent": store.accent, "--demo-accent-ink": store.accentInk } as CSSProperties}
+              className="demo-store mx-auto max-w-6xl"
             >
-              {/* Store Header */}
-              <Card className="overflow-hidden border-border/30 bg-card/40 backdrop-blur-sm mb-6">
-                <div className={`relative h-40 md:h-56 bg-gradient-to-br ${store.gradient}`}>
-                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px]" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent" />
-                  <div className="absolute bottom-4 left-6 flex items-end gap-4">
-                    <motion.div 
-                      className={`h-16 w-16 md:h-20 md:w-20 rounded-2xl bg-gradient-to-br ${store.logoGradient} flex items-center justify-center border-4 border-card shadow-xl text-2xl md:text-3xl`}
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+              {/* Store banner */}
+              <div className="demo-store-banner relative overflow-hidden px-5 py-6 md:px-8 md:py-8">
+                <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                  <div className="flex items-center gap-4">
+                    <motion.div
+                      className="demo-store-logo grid h-16 w-16 place-items-center text-2xl md:h-20 md:w-20 md:text-3xl"
+                      initial={{ scale: 0, rotate: -12 }}
+                      animate={{ scale: 1, rotate: 0 }}
                       transition={{ type: "spring", stiffness: 200, delay: 0.1 }}
                     >
                       {store.icon}
                     </motion.div>
-                    <div className="pb-1">
-                      <h3 className="text-xl md:text-2xl font-heading font-bold">{store.name}</h3>
-                      <p className="text-sm text-muted-foreground">{store.tagline}</p>
+                    <div>
+                      <h3 className="font-heading text-xl font-bold md:text-3xl">{store.name}</h3>
+                      <p className="mt-1 text-sm text-muted-foreground md:text-base">{store.tagline}</p>
                     </div>
                   </div>
+                  <div className="demo-store-proof flex flex-wrap items-center gap-x-5 gap-y-2">
+                    <span className="flex items-center gap-1.5">
+                      <Star className="demo-star--on h-4 w-4" />
+                      <strong className="font-heading text-sm">{store.rating}</strong>
+                    </span>
+                    <span className="hidden h-4 w-px bg-border md:block" />
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground md:text-sm">
+                      <Users className="h-3.5 w-3.5 text-gold" />
+                      {store.buyers} clientes
+                    </span>
+                    <span className="hidden h-4 w-px bg-border md:block" />
+                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground md:text-sm">
+                      <Truck className="h-3.5 w-3.5 text-gold" />
+                      {store.promise}
+                    </span>
+                  </div>
                 </div>
-              </Card>
+              </div>
 
               {/* Categories */}
-              <div className="flex flex-wrap justify-center gap-2 mb-8">
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
                 {store.categories.map((cat, i) => (
-                  <motion.div key={cat.name} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 + i * 0.05 }}>
-                    <Badge variant={i === 0 ? "default" : "outline"} className="px-4 py-2 rounded-full cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors">
-                      <span className="mr-1.5">{cat.icon}</span>{cat.name}
-                    </Badge>
-                  </motion.div>
+                  <motion.button
+                    key={cat.name}
+                    type="button"
+                    onClick={() => setActiveCategory(i)}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 + i * 0.05 }}
+                    className="demo-chip"
+                    data-active={i === activeCategory}
+                  >
+                    <span aria-hidden>{cat.icon}</span>
+                    {cat.name}
+                  </motion.button>
                 ))}
               </div>
 
-              {/* Products Grid */}
-              <motion.div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-5" initial="hidden" animate="visible" variants={stagger}>
-                {store.products.map((product, i) => (
-                  <motion.div key={`${activeStore}-${i}`} variants={fadeUp} custom={i} whileHover={{ y: -6 }} transition={{ type: "spring", stiffness: 300 }}>
-                    <Card className="group h-full overflow-hidden border-border/30 bg-card/40 hover:border-primary/20 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300">
-                      <div className="relative aspect-square bg-gradient-to-br from-muted/30 to-muted/10 flex items-center justify-center">
-                        <span className="text-4xl md:text-5xl group-hover:scale-110 transition-transform duration-300">{product.image}</span>
-                        <Badge className="absolute top-2 left-2 rounded-full text-[10px]" variant="secondary">{product.badge}</Badge>
+              {/* Products bento */}
+              <motion.div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4" initial="hidden" animate="visible" variants={stagger}>
+                {store.products.map((product, i) => {
+                  const featured = i === 0;
+                  const off = product.originalPrice
+                    ? Math.round((1 - Number(product.price.replace(/[^0-9.]/g, "")) / Number(product.originalPrice.replace(/[^0-9.]/g, ""))) * 100)
+                    : 0;
+                  const stars = Math.round(product.rating);
+                  const low = product.stock <= 4;
+                  const fill = Math.min(100, Math.round((product.stock / 20) * 100));
+
+                  if (featured) {
+                    return (
+                      <motion.article
+                        key={`${activeStore}-${i}`}
+                        variants={fadeUp}
+                        custom={0}
+                        className="demo-product demo-product--featured group col-span-2 md:col-span-2 md:row-span-2"
+                      >
+                        <div className="demo-product-media demo-product-media--featured">
+                          <span className="demo-product-emoji">{product.image}</span>
+                          <span className="demo-badge">{product.badge}</span>
+                          {off > 0 && <span className="demo-badge demo-badge--off">-{off}%</span>}
+                        </div>
+                        <div className="demo-product-body">
+                          <p className="demo-product-kicker">Producto destacado</p>
+                          <h4 className="demo-product-name demo-product-name--lg">{product.name}</h4>
+                          <p className="demo-product-blurb">{product.blurb}</p>
+                          <div className="demo-product-price-row">
+                            <span className="demo-price demo-price--lg">{product.price}</span>
+                            {product.originalPrice && <span className="demo-price-old">{product.originalPrice}</span>}
+                          </div>
+                          <div className="demo-product-meta">
+                            <span className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, j) => (
+                                <Star key={j} className={`demo-star h-3.5 w-3.5 ${j < stars ? "demo-star--on" : "demo-star--off"}`} />
+                              ))}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{product.rating} · {product.reviews} reseñas</span>
+                          </div>
+                          <div className="demo-stock" role="presentation">
+                            <span style={{ width: `${fill}%` }} />
+                          </div>
+                          <p className={`mt-1.5 text-[11px] font-medium ${low ? "text-primary" : "text-muted-foreground"}`}>
+                            {low ? `Solo quedan ${product.stock}` : `${product.stock} disponibles`}
+                          </p>
+                          <button type="button" className="demo-add demo-add--wide mt-3">
+                            <Plus className="h-4 w-4" />Añadir al carrito
+                          </button>
+                        </div>
+                      </motion.article>
+                    );
+                  }
+
+                  return (
+                    <motion.article
+                      key={`${activeStore}-${i}`}
+                      variants={fadeUp}
+                      custom={i}
+                      className={`demo-product group ${i === store.products.length - 1 ? "col-span-2 md:col-span-1" : ""}`}
+                    >
+                      <div className="demo-product-media">
+                        <span className="demo-product-emoji">{product.image}</span>
+                        <span className="demo-badge">{product.badge}</span>
+                        {off > 0 && <span className="demo-badge demo-badge--off">-{off}%</span>}
+                        <button type="button" className="demo-add" aria-label={`Añadir ${product.name} al carrito`}>
+                          <Plus className="h-4 w-4" />
+                        </button>
                       </div>
-                      <CardContent className="p-4">
-                        <h4 className="font-medium text-sm line-clamp-1 group-hover:text-primary transition-colors">{product.name}</h4>
-                        <div className="flex items-center gap-2 mt-1.5">
-                          <span className="text-base font-bold text-primary">{product.price}</span>
-                          {product.originalPrice && <span className="text-xs text-muted-foreground line-through">{product.originalPrice}</span>}
+                      <div className="demo-product-body">
+                        <h4 className="demo-product-name">{product.name}</h4>
+                        <div className="demo-product-price-row">
+                          <span className="demo-price">{product.price}</span>
+                          {product.originalPrice && <span className="demo-price-old">{product.originalPrice}</span>}
                         </div>
-                        <div className="flex items-center gap-0.5 mt-1.5">
-                          {[...Array(5)].map((_, j) => (
-                            <Star key={j} className={`h-3 w-3 ${j < 4 + (i % 2) ? 'fill-yellow-400 text-yellow-400' : 'fill-muted text-muted'}`} />
-                          ))}
+                        <div className="demo-product-meta">
+                          <span className="flex items-center gap-0.5">
+                            {[...Array(5)].map((_, j) => (
+                              <Star key={j} className={`demo-star h-3 w-3 ${j < stars ? "demo-star--on" : "demo-star--off"}`} />
+                            ))}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground">({product.reviews})</span>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
+                      </div>
+                    </motion.article>
+                  );
+                })}
+
+                <motion.div variants={fadeUp} custom={store.products.length} className="col-span-2 md:col-span-3">
+                  <div className="demo-catalog h-full">
+                    <div>
+                      <p className="font-heading text-sm font-bold md:text-base">Ver catálogo completo</p>
+                      <p className="text-xs text-muted-foreground">{store.products.length * 7} productos en {store.categories[activeCategory].name}</p>
+                    </div>
+                    <span className="demo-catalog-arrow"><ArrowRight className="h-5 w-5" /></span>
+                  </div>
+                </motion.div>
               </motion.div>
 
               {/* CTA below store */}
@@ -571,7 +676,7 @@ const Index = () => {
                 <div className="flex flex-wrap justify-center gap-2">
                   {["Personaliza colores", "Agrega productos", "Recibe pagos", "Conecta WhatsApp"].map((item, i) => (
                     <Badge key={i} variant="outline" className="px-3 py-1.5 rounded-full gap-1.5 text-xs">
-                      <CheckCircle2 className="h-3 w-3 text-green-500" />{item}
+                      <CheckCircle2 className="h-3 w-3 text-gold" />{item}
                     </Badge>
                   ))}
                 </div>
