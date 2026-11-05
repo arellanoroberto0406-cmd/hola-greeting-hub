@@ -1262,12 +1262,34 @@ All colors MUST be HSL.
   flex: 1;
   min-height: 210px;
 }
-.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 7rem; }
+.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 8rem; }
 .landing-canvas .demo-product--featured .demo-product-media::after { width: 46%; box-shadow: 0 0 0 26px hsl(var(--demo-accent) / .07); }
 @media (min-width: 768px) {
   .landing-canvas .demo-product--featured .demo-product-media { min-height: 300px; }
-  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 10.5rem; }
+  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 13rem; }
 }
+.landing-canvas .demo-featured-thumbs {
+  position: absolute;
+  z-index: 2;
+  bottom: 1rem;
+  left: 50%;
+  display: flex;
+  transform: translateX(-50%);
+}
+.landing-canvas .demo-featured-thumb {
+  display: grid;
+  place-items: center;
+  height: 2.9rem;
+  width: 2.9rem;
+  margin-left: -.7rem;
+  border: 1px solid hsl(var(--demo-accent) / .42);
+  border-radius: .8rem;
+  background: hsl(0 0% 8% / .85);
+  font-size: 1.45rem;
+  line-height: 1;
+  backdrop-filter: blur(4px);
+}
+.landing-canvas .demo-featured-thumb:first-child { margin-left: 0; }
 
 .landing-canvas .demo-badge {
   position: absolute;
@@ -1419,8 +1441,8 @@ All colors MUST be HSL.
 }
 .landing-canvas .demo-catalog-title {
   font-family: 'Archivo Black', sans-serif;
-  font-size: clamp(1.35rem, 2.4vw, 2rem);
-  line-height: 1.1;
+  font-size: clamp(1.6rem, 3vw, 2.5rem);
+  line-height: 1.05;
   color: hsl(var(--demo-accent));
 }
 .landing-canvas .demo-catalog-link {
@@ -1448,13 +1470,13 @@ All colors MUST be HSL.
 .landing-canvas .demo-catalog-thumb {
   display: grid;
   place-items: center;
-  height: 3.1rem;
-  width: 3.1rem;
-  margin-left: -.8rem;
+  height: 3.8rem;
+  width: 3.8rem;
+  margin-left: -.95rem;
   border: 1px solid hsl(var(--demo-accent) / .38);
-  border-radius: .8rem;
+  border-radius: .9rem;
   background: radial-gradient(circle at 50% 38%, hsl(var(--demo-accent) / .3), hsl(0 0% 8%));
-  font-size: 1.5rem;
+  font-size: 1.85rem;
   line-height: 1;
 }
 .landing-canvas .demo-catalog-thumb:first-child { margin-left: 0; }

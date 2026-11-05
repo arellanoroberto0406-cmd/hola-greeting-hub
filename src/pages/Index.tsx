@@ -597,6 +597,11 @@ const Index = () => {
                       >
                         <div className="demo-product-media demo-product-media--featured">
                           <span className="demo-product-emoji">{product.image}</span>
+                          <div className="demo-featured-thumbs" aria-hidden>
+                            {store.products.slice(1, 4).map((pr) => (
+                              <span key={pr.name} className="demo-featured-thumb">{pr.image}</span>
+                            ))}
+                          </div>
                           <span className="demo-badge">{product.badge}</span>
                           {off > 0 && <span className="demo-badge demo-badge--off">-{off}%</span>}
                         </div>
@@ -635,7 +640,7 @@ const Index = () => {
                       key={`${activeStore}-${i}`}
                       variants={fadeUp}
                       custom={i}
-                      className={`demo-product group ${i === store.products.length - 1 ? "col-span-2 demo-product--wide" : ""}`}
+                      className={`demo-product group ${i === store.products.length - 1 ? "col-span-2 demo-product--wide md:col-span-1" : ""}`}
                     >
                       <div className="demo-product-media">
                         <span className="demo-product-emoji">{product.image}</span>
@@ -676,6 +681,7 @@ const Index = () => {
                     <div className="min-w-0">
                       <p className="demo-product-kicker">Categoría destacada</p>
                       <p className="demo-catalog-title">{store.categories[activeCategory].name}</p>
+                      <p className="demo-product-blurb">Todo lo de {store.name} en {store.categories[activeCategory].name.toLowerCase()}, listo para vender hoy mismo.</p>
                     </div>
                     <div className="demo-catalog-thumbs" aria-hidden>
                       {store.products.map((pr) => (
