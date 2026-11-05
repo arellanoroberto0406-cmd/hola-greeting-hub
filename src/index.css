@@ -1230,7 +1230,7 @@ All colors MUST be HSL.
   width: 62%;
   aspect-ratio: 1;
   border-radius: 9999px;
-  background: radial-gradient(circle, hsl(var(--demo-accent) / .55), transparent 66%);
+  background: radial-gradient(circle, hsl(var(--demo-accent) / .6), hsl(var(--primary) / .3) 46%, transparent 68%);
   filter: blur(18px);
   opacity: .7;
   transition: transform .45s ease, opacity .45s ease;
@@ -1239,7 +1239,7 @@ All colors MUST be HSL.
 .landing-canvas .demo-product-emoji {
   position: relative;
   z-index: 1;
-  font-size: 2.7rem;
+  font-size: 3.5rem;
   line-height: 1;
   filter: drop-shadow(0 14px 20px hsl(0 0% 0% / .65));
   transition: transform .4s cubic-bezier(.22, 1, .36, 1);
@@ -1251,10 +1251,10 @@ All colors MUST be HSL.
   flex: 1;
   min-height: 190px;
 }
-.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 5rem; }
+.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 6rem; }
 @media (min-width: 768px) {
   .landing-canvas .demo-product--featured .demo-product-media { min-height: 260px; }
-  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 6.5rem; }
+  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 7.5rem; }
 }
 
 .landing-canvas .demo-badge {
@@ -1415,3 +1415,17 @@ All colors MUST be HSL.
   transition: transform .3s ease;
 }
 .landing-canvas .demo-catalog:hover .demo-catalog-arrow { transform: translateX(4px); }
+.landing-canvas .demo-catalog-thumbs { display: flex; flex-shrink: 0; }
+.landing-canvas .demo-catalog-thumb {
+  display: grid;
+  place-items: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  margin-left: -.65rem;
+  border: 1px solid hsl(var(--demo-accent) / .38);
+  border-radius: .7rem;
+  background: radial-gradient(circle at 50% 38%, hsl(var(--demo-accent) / .3), hsl(0 0% 8%));
+  font-size: 1.15rem;
+  line-height: 1;
+}
+.landing-canvas .demo-catalog-thumb:first-child { margin-left: 0; }

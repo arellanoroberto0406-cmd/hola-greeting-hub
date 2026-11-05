@@ -666,9 +666,16 @@ const Index = () => {
 
                 <motion.div variants={fadeUp} custom={store.products.length} className="col-span-2 md:col-span-3">
                   <div className="demo-catalog h-full">
-                    <div>
-                      <p className="font-heading text-sm font-bold md:text-base">Ver catálogo completo</p>
-                      <p className="text-xs text-muted-foreground">{store.products.length * 7} productos en {store.categories[activeCategory].name}</p>
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="demo-catalog-thumbs" aria-hidden>
+                        {store.products.slice(0, 4).map((pr) => (
+                          <span key={pr.name} className="demo-catalog-thumb">{pr.image}</span>
+                        ))}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-heading text-sm font-bold md:text-base">Ver catálogo completo</p>
+                        <p className="truncate text-xs text-muted-foreground">{store.products.length * 7} productos en {store.categories[activeCategory].name}</p>
+                      </div>
                     </div>
                     <span className="demo-catalog-arrow"><ArrowRight className="h-5 w-5" /></span>
                   </div>
