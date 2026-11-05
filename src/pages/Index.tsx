@@ -659,12 +659,19 @@ const Index = () => {
                           </span>
                           <span className="text-[11px] text-muted-foreground">({product.reviews})</span>
                         </div>
+                        <p className="demo-product-blurb line-clamp-2">{product.blurb}</p>
+                        <div className="demo-stock" role="presentation">
+                          <span style={{ width: `${fill}%` }} />
+                        </div>
+                        <p className={`text-[11px] font-medium ${low ? "text-primary" : "text-muted-foreground"}`}>
+                          {low ? `Solo quedan ${product.stock}` : `${product.stock} disponibles`}
+                        </p>
                       </div>
                     </motion.article>
                   );
                 })}
 
-                <motion.div variants={fadeUp} custom={store.products.length} className="col-span-2 md:col-span-3">
+                <motion.div variants={fadeUp} custom={store.products.length} className="col-span-2 md:col-span-2">
                   <div className="demo-catalog h-full">
                     <div className="min-w-0">
                       <p className="demo-product-kicker">Categoría destacada</p>
@@ -676,8 +683,7 @@ const Index = () => {
                       ))}
                     </div>
                     <div className="demo-catalog-link">
-                      <span>Ver catálogo completo</span>
-                      <span className="text-xs text-muted-foreground">{store.products.length * 7} productos</span>
+                      <span>Ver catálogo completo <span className="text-muted-foreground">· {store.products.length * 7} productos</span></span>
                       <span className="demo-catalog-arrow"><ArrowRight className="h-5 w-5" /></span>
                     </div>
                   </div>

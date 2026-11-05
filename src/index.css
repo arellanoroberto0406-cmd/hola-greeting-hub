@@ -1239,7 +1239,7 @@ All colors MUST be HSL.
 .landing-canvas .demo-product-media::after {
   content: "";
   position: absolute;
-  width: 56%;
+  width: 50%;
   aspect-ratio: 1;
   border-radius: 9999px;
   border: 1px solid hsl(var(--demo-accent) / .3);
@@ -1250,7 +1250,7 @@ All colors MUST be HSL.
 .landing-canvas .demo-product-emoji {
   position: relative;
   z-index: 1;
-  font-size: 4rem;
+  font-size: 4.6rem;
   line-height: 1;
   filter: drop-shadow(0 14px 20px hsl(0 0% 0% / .65));
   transition: transform .4s cubic-bezier(.22, 1, .36, 1);
