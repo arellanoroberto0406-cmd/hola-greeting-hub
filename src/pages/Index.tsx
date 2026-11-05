@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 import { 
   Store, 
   ShoppingBag, 
@@ -32,7 +32,10 @@ import {
   Play,
   WandSparkles,
   Boxes,
-  CircleDollarSign
+  CircleDollarSign,
+  Users,
+  Truck,
+  Plus
 } from "lucide-react";
 
 const fadeUp = {
@@ -53,6 +56,7 @@ const Index = () => {
   const { user } = useAuth();
   const [showBanner, setShowBanner] = useState(true);
   const [activeStore, setActiveStore] = useState(0);
+  const [activeCategory, setActiveCategory] = useState(0);
   const [activeStep, setActiveStep] = useState(0);
 
   const heroRef = useRef(null);
@@ -492,7 +496,7 @@ const Index = () => {
               {demoStores.map((s, i) => (
                 <Button
                   key={i}
-                  onClick={() => setActiveStore(i)}
+                  onClick={() => { setActiveStore(i); setActiveCategory(0); }}
                   variant="outline"
                   style={{ "--demo-accent": s.accent, "--demo-accent-ink": s.accentInk } as CSSProperties}
                   className={`demo-switch flex items-center gap-2.5 rounded-xl border px-6 py-3 transition-all duration-300 ${
