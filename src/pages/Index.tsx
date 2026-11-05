@@ -113,8 +113,7 @@ const Index = () => {
         { name: "Apple Watch Ultra", price: "$799", badge: "Nuevo", image: "⌚", blurb: "Diseñado para aventura, deporte y buceo.", rating: 4.8, reviews: 58, stock: 7 },
         { name: "Steam Deck OLED", price: "$649", originalPrice: "$799", badge: "Oferta", image: "🎮", blurb: "Tu biblioteca de PC completa, en la mano.", rating: 4.6, reviews: 143, stock: 4 },
         { name: "MacBook Air M3", price: "$1,099", badge: "Trending", image: "💻", blurb: "Ligero, silencioso y con 18 h de batería.", rating: 4.9, reviews: 77, stock: 2 },
-        { name: "iPad Pro M4", price: "$999", badge: "Exclusivo", image: "📲", blurb: "La pantalla más delgada que hemos hecho.", rating: 4.8, reviews: 41, stock: 9 },
-      ]
+        { name: "iPad Pro M4", price: "$999", badge: "Exclusivo", image: "📲", blurb: "La pantalla más delgada que hemos hecho.", rating: 4.8, reviews: 41, stock: 9 },      ]
     },
     {
       name: "Moda Urbana",
@@ -635,7 +634,7 @@ const Index = () => {
                       key={`${activeStore}-${i}`}
                       variants={fadeUp}
                       custom={i}
-                      className={`demo-product group ${i === store.products.length - 1 ? "col-span-2 md:col-span-1" : ""}`}
+                      className={`demo-product group ${i === store.products.length - 1 ? "col-span-2 demo-product--wide" : ""}`}
                     >
                       <div className="demo-product-media">
                         <span className="demo-product-emoji">{product.image}</span>
