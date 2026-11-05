@@ -113,7 +113,8 @@ const Index = () => {
         { name: "Apple Watch Ultra", price: "$799", badge: "Nuevo", image: "⌚", blurb: "Diseñado para aventura, deporte y buceo.", rating: 4.8, reviews: 58, stock: 7 },
         { name: "Steam Deck OLED", price: "$649", originalPrice: "$799", badge: "Oferta", image: "🎮", blurb: "Tu biblioteca de PC completa, en la mano.", rating: 4.6, reviews: 143, stock: 4 },
         { name: "MacBook Air M3", price: "$1,099", badge: "Trending", image: "💻", blurb: "Ligero, silencioso y con 18 h de batería.", rating: 4.9, reviews: 77, stock: 2 },
-        { name: "iPad Pro M4", price: "$999", badge: "Exclusivo", image: "📲", blurb: "La pantalla más delgada que hemos hecho.", rating: 4.8, reviews: 41, stock: 9 },      ]
+        { name: "Monitor Pro 5K", price: "$999", badge: "Exclusivo", image: "🖥️", blurb: "Pantalla retina de 27 pulgadas con color perfecto.", rating: 4.8, reviews: 41, stock: 9 },
+      ]
     },
     {
       name: "Moda Urbana",
@@ -126,7 +127,7 @@ const Index = () => {
       promise: "Devoluciones gratis",
       categories: [{ name: "Ropa", icon: "👕" }, { name: "Calzado", icon: "👟" }, { name: "Accesorios", icon: "💎" }, { name: "Bolsos", icon: "👜" }],
       products: [
-        { name: "Hoodie Premium", price: "$89", originalPrice: "$120", badge: "Oferta", image: "🧥", blurb: "Algodón peinado 480 g con interior afelpado.", rating: 4.8, reviews: 187, stock: 5 },
+        { name: "Parka Premium", price: "$89", originalPrice: "$120", badge: "Oferta", image: "🧥", blurb: "Plumas recicladas con capucha cortavientos.", rating: 4.8, reviews: 187, stock: 5 },
         { name: "Sneakers Limited", price: "$199", badge: "Exclusivo", image: "👟", blurb: "Edición de 300 pares, suela de goma reciclada.", rating: 4.9, reviews: 112, stock: 2 },
         { name: "Gafas Aviador", price: "$159", badge: "Trending", image: "🕶️", blurb: "Montura de titanio con filtro polarizado.", rating: 4.6, reviews: 64, stock: 14 },
         { name: "Bolso Cuero", price: "$249", badge: "Popular", image: "👜", blurb: "Piel curtida a mano, cosido a doble hilo.", rating: 4.9, reviews: 93, stock: 6 },
