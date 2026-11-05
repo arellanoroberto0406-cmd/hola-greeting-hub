@@ -1298,8 +1298,8 @@ All colors MUST be HSL.
 }
 .landing-canvas .demo-product-kicker {
   font-family: 'Archivo Black', sans-serif;
-  font-size: .56rem;
-  letter-spacing: .14em;
+  font-size: .64rem;
+  letter-spacing: .16em;
   text-transform: uppercase;
   color: hsl(var(--demo-accent));
 }
