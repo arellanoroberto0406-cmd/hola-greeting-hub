@@ -1096,3 +1096,322 @@ All colors MUST be HSL.
 .dashboard-canvas .dashboard-metric-blue { background: linear-gradient(145deg, hsl(28 70% 13%), hsl(var(--card))); }
 .dashboard-canvas .dashboard-header { background: hsl(0 0% 4% / .92); border-bottom: 1px solid hsl(var(--gold) / .25); }
 .dashboard-canvas .dashboard-sidebar { background: hsl(0 0% 5%); }
+
+/* ==========================================================
+   Tiendas de ejemplo de la página principal
+   (bento volcánico: negro, brasa y oro con acento por tienda)
+   ========================================================== */
+.landing-canvas .demo-store,
+.landing-canvas .demo-switch {
+  --demo-accent: var(--gold);
+  --demo-accent-ink: 0 0% 5%;
+}
+
+/* Selector de tienda */
+.landing-canvas .demo-switch {
+  border-color: hsl(var(--border));
+  background: hsl(var(--card) / .6);
+}
+.landing-canvas .demo-switch:hover {
+  border-color: hsl(var(--demo-accent) / .5);
+  background: hsl(var(--demo-accent) / .07);
+}
+.landing-canvas .demo-switch--active {
+  border-color: hsl(var(--demo-accent) / .75);
+  background: linear-gradient(135deg, hsl(var(--demo-accent) / .18), hsl(var(--primary) / .12));
+  box-shadow: 0 14px 34px -22px hsl(var(--demo-accent) / .9);
+  color: hsl(var(--foreground));
+}
+.landing-canvas .demo-switch--active .font-heading { color: hsl(var(--demo-accent)); }
+
+/* Fachada de la tienda */
+.landing-canvas .demo-store-banner {
+  border: 1px solid hsl(var(--demo-accent) / .28);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(120% 150% at 10% 0%, hsl(var(--demo-accent) / .2), transparent 58%),
+    radial-gradient(90% 130% at 96% 115%, hsl(var(--primary) / .16), transparent 60%),
+    linear-gradient(150deg, hsl(0 0% 9%), hsl(0 0% 4%));
+  box-shadow: 0 34px 70px -44px hsl(0 0% 0% / .95), inset 0 1px 0 hsl(var(--demo-accent) / .16);
+}
+.landing-canvas .demo-store-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(hsl(var(--foreground) / .05) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--foreground) / .05) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(85% 95% at 18% 0%, #000, transparent 72%);
+}
+.landing-canvas .demo-store-logo {
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--demo-accent) / .55);
+  background: linear-gradient(140deg, hsl(var(--demo-accent) / .95), hsl(var(--primary) / .9));
+  color: hsl(var(--demo-accent-ink));
+  box-shadow: 0 18px 38px -18px hsl(var(--demo-accent) / .85);
+}
+.landing-canvas .demo-store-proof {
+  border-top: 1px solid hsl(var(--border) / .8);
+  padding-top: .85rem;
+}
+@media (min-width: 768px) {
+  .landing-canvas .demo-store-proof { border-top: 0; padding-top: 0; }
+}
+
+/* Categorías */
+.landing-canvas .demo-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 9999px;
+  background: hsl(var(--card) / .55);
+  padding: .45rem 1rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: hsl(var(--muted-foreground));
+  transition: color .25s, border-color .25s, background .25s, box-shadow .25s, transform .25s;
+}
+.landing-canvas .demo-chip:hover {
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--demo-accent) / .5);
+  transform: translateY(-2px);
+}
+.landing-canvas .demo-chip[data-active="true"] {
+  border-color: transparent;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--demo-accent)));
+  color: hsl(var(--demo-accent-ink));
+  box-shadow: 0 12px 26px -14px hsl(var(--demo-accent) / .95);
+}
+
+/* Tarjeta de producto */
+.landing-canvas .demo-product {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid hsl(var(--border));
+  border-radius: 1rem;
+  background: linear-gradient(160deg, hsl(0 0% 9%), hsl(0 0% 5%));
+  transition: transform .35s cubic-bezier(.22, 1, .36, 1), border-color .35s, box-shadow .35s;
+}
+.landing-canvas .demo-product:hover {
+  transform: translateY(-6px);
+  border-color: hsl(var(--demo-accent) / .6);
+  box-shadow: 0 28px 54px -30px hsl(var(--demo-accent) / .75);
+}
+.landing-canvas .demo-product::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, hsl(var(--foreground) / .09), transparent);
+  transform: skewX(-18deg);
+  transition: left .65s ease;
+  pointer-events: none;
+}
+.landing-canvas .demo-product:hover::after { left: 140%; }
+
+.landing-canvas .demo-product-media {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: radial-gradient(72% 62% at 50% 44%, hsl(var(--demo-accent) / .26), transparent 70%),
+    linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%));
+}
+.landing-canvas .demo-product-media::before {
+  content: "";
+  position: absolute;
+  width: 62%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  background: radial-gradient(circle, hsl(var(--demo-accent) / .55), transparent 66%);
+  filter: blur(18px);
+  opacity: .7;
+  transition: transform .45s ease, opacity .45s ease;
+}
+.landing-canvas .demo-product:hover .demo-product-media::before { transform: scale(1.22); opacity: 1; }
+.landing-canvas .demo-product-emoji {
+  position: relative;
+  z-index: 1;
+  font-size: 2.7rem;
+  line-height: 1;
+  filter: drop-shadow(0 14px 20px hsl(0 0% 0% / .65));
+  transition: transform .4s cubic-bezier(.22, 1, .36, 1);
+}
+.landing-canvas .demo-product:hover .demo-product-emoji { transform: scale(1.12) translateY(-4px); }
+
+.landing-canvas .demo-product--featured .demo-product-media {
+  aspect-ratio: auto;
+  flex: 1;
+  min-height: 190px;
+}
+.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 5rem; }
+@media (min-width: 768px) {
+  .landing-canvas .demo-product--featured .demo-product-media { min-height: 260px; }
+  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 6.5rem; }
+}
+
+.landing-canvas .demo-badge {
+  position: absolute;
+  z-index: 2;
+  top: .6rem;
+  left: .6rem;
+  padding: .22rem .6rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--demo-accent)));
+  color: hsl(var(--demo-accent-ink));
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .56rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  box-shadow: 0 10px 20px -10px hsl(var(--demo-accent) / .95);
+}
+.landing-canvas .demo-badge--off {
+  left: auto;
+  right: .6rem;
+  background: hsl(var(--demo-accent));
+}
+
+.landing-canvas .demo-product-body {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  padding: .9rem 1rem 1.05rem;
+}
+.landing-canvas .demo-product-kicker {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: .56rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: hsl(var(--demo-accent));
+}
+.landing-canvas .demo-product-name {
+  font-family: 'Hind', sans-serif;
+  font-weight: 700;
+  font-size: .92rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.landing-canvas .demo-product-name--lg {
+  font-size: 1.35rem;
+  white-space: normal;
+  letter-spacing: -0.01em;
+}
+@media (min-width: 768px) {
+  .landing-canvas .demo-product-name--lg { font-size: 1.75rem; }
+}
+.landing-canvas .demo-product-blurb {
+  max-width: 46ch;
+  font-size: .84rem;
+  line-height: 1.45;
+  color: hsl(var(--muted-foreground));
+}
+.landing-canvas .demo-product-price-row { display: flex; align-items: baseline; gap: .5rem; margin-top: .15rem; }
+.landing-canvas .demo-price {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.02rem;
+  color: hsl(var(--demo-accent));
+}
+.landing-canvas .demo-price--lg { font-size: 1.6rem; }
+.landing-canvas .demo-price-old {
+  font-size: .78rem;
+  color: hsl(var(--muted-foreground));
+  text-decoration: line-through;
+}
+.landing-canvas .demo-product-meta {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .1rem;
+}
+.landing-canvas .demo-star--on { fill: hsl(var(--gold)); color: hsl(var(--gold)); }
+.landing-canvas .demo-star--off { fill: hsl(var(--muted)); color: hsl(var(--muted)); }
+
+.landing-canvas .demo-stock {
+  height: 4px;
+  margin-top: .6rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: hsl(var(--muted));
+}
+.landing-canvas .demo-stock > span {
+  display: block;
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--demo-accent)));
+}
+
+.landing-canvas .demo-add {
+  position: absolute;
+  z-index: 3;
+  right: .55rem;
+  bottom: .55rem;
+  display: grid;
+  place-items: center;
+  height: 2.1rem;
+  width: 2.1rem;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--demo-accent)));
+  color: hsl(var(--demo-accent-ink));
+  opacity: 0;
+  transform: translateY(8px) scale(.92);
+  box-shadow: 0 12px 24px -12px hsl(var(--demo-accent) / .95);
+  transition: opacity .3s ease, transform .3s ease, filter .2s ease;
+}
+.landing-canvas .demo-product:hover .demo-add,
+.landing-canvas .demo-add:focus-visible { opacity: 1; transform: none; }
+.landing-canvas .demo-add:hover { filter: brightness(1.12); }
+.landing-canvas .demo-add--wide {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  width: 100%;
+  height: 2.6rem;
+  border-radius: .8rem;
+  font-family: 'Hind', sans-serif;
+  font-size: .88rem;
+  font-weight: 700;
+  opacity: 1;
+  transform: none;
+}
+@media (hover: none) {
+  .landing-canvas .demo-add { opacity: 1; transform: none; }
+}
+
+.landing-canvas .demo-catalog {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border: 1px dashed hsl(var(--demo-accent) / .45);
+  border-radius: 1rem;
+  background: linear-gradient(120deg, hsl(var(--demo-accent) / .1), hsl(0 0% 6%));
+  padding: 1rem 1.25rem;
+  transition: border-color .3s, background .3s, transform .3s;
+}
+.landing-canvas .demo-catalog:hover {
+  border-color: hsl(var(--demo-accent) / .85);
+  background: linear-gradient(120deg, hsl(var(--demo-accent) / .18), hsl(0 0% 6%));
+  transform: translateY(-4px);
+}
+.landing-canvas .demo-catalog-arrow {
+  display: grid;
+  place-items: center;
+  height: 2.35rem;
+  width: 2.35rem;
+  border-radius: 9999px;
+  border: 1px solid hsl(var(--demo-accent) / .55);
+  color: hsl(var(--demo-accent));
+  transition: transform .3s ease;
+}
+.landing-canvas .demo-catalog:hover .demo-catalog-arrow { transform: translateX(4px); }
