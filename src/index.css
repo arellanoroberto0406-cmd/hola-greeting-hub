@@ -1219,7 +1219,7 @@ All colors MUST be HSL.
   position: relative;
   display: grid;
   place-items: center;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   background: radial-gradient(72% 62% at 50% 44%, hsl(var(--demo-accent) / .26), transparent 70%),
     linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%));
@@ -1236,10 +1236,21 @@ All colors MUST be HSL.
   transition: transform .45s ease, opacity .45s ease;
 }
 .landing-canvas .demo-product:hover .demo-product-media::before { transform: scale(1.22); opacity: 1; }
+.landing-canvas .demo-product-media::after {
+  content: "";
+  position: absolute;
+  width: 56%;
+  aspect-ratio: 1;
+  border-radius: 9999px;
+  border: 1px solid hsl(var(--demo-accent) / .3);
+  box-shadow: 0 0 0 16px hsl(var(--demo-accent) / .06);
+  transition: transform .45s ease;
+}
+.landing-canvas .demo-product:hover .demo-product-media::after { transform: scale(1.12); }
 .landing-canvas .demo-product-emoji {
   position: relative;
   z-index: 1;
-  font-size: 3.5rem;
+  font-size: 4rem;
   line-height: 1;
   filter: drop-shadow(0 14px 20px hsl(0 0% 0% / .65));
   transition: transform .4s cubic-bezier(.22, 1, .36, 1);
@@ -1249,12 +1260,13 @@ All colors MUST be HSL.
 .landing-canvas .demo-product--featured .demo-product-media {
   aspect-ratio: auto;
   flex: 1;
-  min-height: 190px;
+  min-height: 210px;
 }
-.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 6rem; }
+.landing-canvas .demo-product--featured .demo-product-emoji { font-size: 7rem; }
+.landing-canvas .demo-product--featured .demo-product-media::after { width: 46%; box-shadow: 0 0 0 26px hsl(var(--demo-accent) / .07); }
 @media (min-width: 768px) {
-  .landing-canvas .demo-product--featured .demo-product-media { min-height: 260px; }
-  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 7.5rem; }
+  .landing-canvas .demo-product--featured .demo-product-media { min-height: 300px; }
+  .landing-canvas .demo-product--featured .demo-product-emoji { font-size: 10.5rem; }
 }
 
 .landing-canvas .demo-badge {
@@ -1390,19 +1402,36 @@ All colors MUST be HSL.
 
 .landing-canvas .demo-catalog {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
   border: 1px dashed hsl(var(--demo-accent) / .45);
   border-radius: 1rem;
   background: linear-gradient(120deg, hsl(var(--demo-accent) / .1), hsl(0 0% 6%));
-  padding: 1rem 1.25rem;
+  padding: 1.25rem 1.5rem;
   transition: border-color .3s, background .3s, transform .3s;
 }
 .landing-canvas .demo-catalog:hover {
   border-color: hsl(var(--demo-accent) / .85);
   background: linear-gradient(120deg, hsl(var(--demo-accent) / .18), hsl(0 0% 6%));
   transform: translateY(-4px);
+}
+.landing-canvas .demo-catalog-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: clamp(1.35rem, 2.4vw, 2rem);
+  line-height: 1.1;
+  color: hsl(var(--demo-accent));
+}
+.landing-canvas .demo-catalog-link {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: 'Hind', sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
 }
 .landing-canvas .demo-catalog-arrow {
   display: grid;
@@ -1415,17 +1444,23 @@ All colors MUST be HSL.
   transition: transform .3s ease;
 }
 .landing-canvas .demo-catalog:hover .demo-catalog-arrow { transform: translateX(4px); }
-.landing-canvas .demo-catalog-thumbs { display: flex; flex-shrink: 0; }
+.landing-canvas .demo-catalog-thumbs { display: flex; flex-wrap: wrap; flex-shrink: 0; }
 .landing-canvas .demo-catalog-thumb {
   display: grid;
   place-items: center;
-  height: 2.5rem;
-  width: 2.5rem;
-  margin-left: -.65rem;
+  height: 3.1rem;
+  width: 3.1rem;
+  margin-left: -.8rem;
   border: 1px solid hsl(var(--demo-accent) / .38);
-  border-radius: .7rem;
+  border-radius: .8rem;
   background: radial-gradient(circle at 50% 38%, hsl(var(--demo-accent) / .3), hsl(0 0% 8%));
-  font-size: 1.15rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 .landing-canvas .demo-catalog-thumb:first-child { margin-left: 0; }
+
+@media (max-width: 767px) {
+  .landing-canvas .demo-product--wide { flex-direction: row; }
+  .landing-canvas .demo-product--wide .demo-product-media { width: 44%; flex-shrink: 0; aspect-ratio: 1 / 1; }
+  .landing-canvas .demo-product--wide .demo-product-body { justify-content: center; }
+}
