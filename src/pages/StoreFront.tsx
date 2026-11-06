@@ -70,6 +70,7 @@ import TrustBar from "@/components/store/TrustBar";
 import SafePurchaseSection from "@/components/store/SafePurchaseSection";
 import PurchaseFAQSection from "@/components/store/PurchaseFAQSection";
 import MobileCartBar from "@/components/store/MobileCartBar";
+import ProductRecommendations from "@/components/store/ProductRecommendations";
 import { typographyVariables, typographyAttributes, useStoreFonts } from '@/lib/storeTypography';
 
 const mapDbProduct = (dbProduct: any): Product => ({
@@ -516,6 +517,7 @@ const StoreFront = () => {
                   return (
                     <SectionWrapper key={section.id} section={section} primaryColor={store.primary_color}>
                       <div id="products-section">
+                        <ProductRecommendations storeId={store.id} products={allProducts} onProductClick={setSelectedProduct} />
                         <PremiumProductsGridSection
                           section={section}
                           store={store}
@@ -668,6 +670,7 @@ const StoreFront = () => {
             {/* Show products grid if no sections have it */}
             {!sections.some(s => s.type === 'products_grid') && allProducts.length > 0 && (
               <div id="products-section">
+                <ProductRecommendations storeId={store.id} products={allProducts} onProductClick={setSelectedProduct} />
                 <PremiumProductsGridSection
                   section={{
                     id: 'default-products',
