@@ -1427,14 +1427,14 @@ All colors MUST be HSL.
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1.1rem 2rem;
+  gap: 1.1rem 1.5rem;
   border: 1px dashed hsl(var(--demo-accent) / .45);
   border-radius: 1rem;
   background: linear-gradient(120deg, hsl(var(--demo-accent) / .1), hsl(0 0% 6%));
   padding: 1.4rem 1.5rem;
   transition: border-color .3s, background .3s, transform .3s;
 }
-.landing-canvas .demo-catalog > div:first-child { flex: 1 1 240px; }
+.landing-canvas .demo-catalog > div:first-child { flex: 1 1 170px; }
 .landing-canvas .demo-catalog:hover {
   border-color: hsl(var(--demo-accent) / .85);
   background: linear-gradient(120deg, hsl(var(--demo-accent) / .18), hsl(0 0% 6%));
@@ -1487,4 +1487,8 @@ All colors MUST be HSL.
   .landing-canvas .demo-product--wide { flex-direction: row; }
   .landing-canvas .demo-product--wide .demo-product-media { width: 44%; flex-shrink: 0; aspect-ratio: 1 / 1; }
   .landing-canvas .demo-product--wide .demo-product-body { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 639px) {
+  .landing-canvas .demo-product:not(.demo-product--wide) .demo-product-blurb { display: none; }
 }
