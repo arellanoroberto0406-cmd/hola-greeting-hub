@@ -1,4 +1,5 @@
 # Architecture rules
+- Buyer AI recommendations read only guest-accessible active-store catalog fields server-side, validate returned IDs against that store, and persist terminal gateway pauses in a service-only table; this prevents invented or cross-store products and repeated blocked calls.
 
 - Platform surfaces (landing, auth, seller dashboard) share Volcanic tokens via their canvas scopes in index.css; the editorial storefront classes stay scoped under `.volcanic`, so per-store themes never leak into dashboards.
 - Persist optional typography size and weight in the existing layout's globalStyles JSON, and apply shared scoped typography variables in editor previews and storefronts; this keeps per-store settings consistent without altering older layouts or dashboard typography.

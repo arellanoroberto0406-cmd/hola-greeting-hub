@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Solicitud actual
+- [ ] Añadir búsqueda con IA para compradores basada únicamente en el catálogo de cada tienda.
+- [ ] Desplegar y comprobar recomendaciones reales, apertura de producto y estados de error en móvil y escritorio.
 - [x] Tamaño y grosor independientes por pantalla: controles y aplicación por ancho verificados; 12 pruebas de aislamiento aprobadas
 - [ ] Verificar guardado y recarga de los ajustes por pantalla en la tienda real (bloqueado: sesión caducada; requiere iniciar sesión en la vista previa)
 - [x] Vistas de móvil y tablet para comprobar tipografías antes de publicar (cambio de pantalla, ajustes en vivo y tamaño real verificados en el panel)

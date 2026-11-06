@@ -1,0 +1,11 @@
+.volcanic .vc-recommendations { border-block: 1px solid var(--vc-line); padding: 1.75rem 0; }
+.volcanic .vc-recommendation-icon { color: var(--vc-gold); }
+.volcanic .vc-recommendation-input { background: var(--vc-panel); border-color: var(--vc-line); color: var(--vc-white); border-radius: 6px; }
+.volcanic .vc-recommendation-input::placeholder { color: var(--vc-muted); }
+.volcanic .vc-recommendation-input:focus-visible { outline-color: var(--vc-gold); --tw-ring-color: var(--vc-gold); }
+.volcanic .vc-recommendation-note { color: var(--vc-muted); }
+.volcanic .vc-recommendation-error { color: var(--vc-orange); }
+.volcanic .vc-recommendation-result { border: 1px solid var(--vc-line); background: var(--vc-panel); border-radius: 6px; overflow: hidden; }
+.volcanic .vc-recommendation-result img { background: var(--vc-panel-2); }
+.volcanic .vc-recommendation-stop { border-color: var(--vc-gold); background: var(--vc-panel); color: var(--vc-gold); border-radius: 6px; }
+.volcanic .vc-recommendation-stop:hover { background: var(--vc-panel-2); color: var(--vc-white); }
