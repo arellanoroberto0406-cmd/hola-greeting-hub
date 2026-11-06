@@ -585,6 +585,27 @@ export type Database = {
         }
         Relationships: []
       }
+      product_recommendation_ai_state: {
+        Row: {
+          message: string
+          scope: string
+          status: number
+          updated_at: string
+        }
+        Insert: {
+          message: string
+          scope: string
+          status: number
+          updated_at?: string
+        }
+        Update: {
+          message?: string
+          scope?: string
+          status?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       product_variants: {
         Row: {
           created_at: string
