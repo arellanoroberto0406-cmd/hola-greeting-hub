@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import type { Product } from '@/types/product';
+import '@/styles/product-recommendations.css';
 
 type Result = { summary: string; recommendations: { productId: string; reason: string }[] };
 export default function ProductRecommendations({ storeId, products, onProductClick }: {
