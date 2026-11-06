@@ -1426,8 +1426,8 @@ All colors MUST be HSL.
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  justify-content: space-between;
-  gap: 1.25rem;
+  justify-content: center;
+  gap: 1.6rem;
   border: 1px dashed hsl(var(--demo-accent) / .45);
   border-radius: 1rem;
   background: linear-gradient(120deg, hsl(var(--demo-accent) / .1), hsl(0 0% 6%));
@@ -1494,4 +1494,5 @@ All colors MUST be HSL.
 
 @media (max-width: 639px) {
   .landing-canvas .demo-product:not(.demo-product--wide) .demo-product-blurb { display: none; }
+  .landing-canvas .demo-catalog-thumb { flex: 0 0 calc((100% - 1rem) / 3); width: auto; }
 }
