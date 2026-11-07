@@ -882,6 +882,41 @@ export type Database = {
         }
         Relationships: []
       }
+      store_buyer_contacts: {
+        Row: {
+          email: string
+          full_name: string
+          phone: string
+          store_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          email: string
+          full_name: string
+          phone?: string
+          store_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          email?: string
+          full_name?: string
+          phone?: string
+          store_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_buyer_contacts_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       store_categories: {
         Row: {
           created_at: string
@@ -916,6 +951,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "store_categories_store_id_fkey"
+            columns: ["store_id"]
+            isOneToOne: false
+            referencedRelation: "stores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      store_customer_faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          id: string
+          question: string
+          sort_order: number
+          store_id: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          id?: string
+          question: string
+          sort_order?: number
+          store_id: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          id?: string
+          question?: string
+          sort_order?: number
+          store_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "store_customer_faqs_store_id_fkey"
             columns: ["store_id"]
             isOneToOne: false
             referencedRelation: "stores"
