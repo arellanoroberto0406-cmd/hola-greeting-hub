@@ -1,4 +1,5 @@
 # Architecture rules
+- Store buyer contacts are per-store records with customer-only writes and customer/owner reads; public customer FAQs use a separate owner-managed table, keeping contact details out of storefront queries.
 - Buyer AI recommendations read only guest-accessible active-store catalog fields server-side, validate returned IDs against that store, and persist terminal gateway pauses in a service-only table; this prevents invented or cross-store products and repeated blocked calls.
 
 - Platform surfaces (landing, auth, seller dashboard) share Volcanic tokens via their canvas scopes in index.css; the editorial storefront classes stay scoped under `.volcanic`, so per-store themes never leak into dashboards.

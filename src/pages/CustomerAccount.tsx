@@ -35,6 +35,7 @@ import {
 import { useCart } from "@/context/CartContext";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import BuyerContactCard from '@/components/store/BuyerContactCard';
 
 const fadeInUp = {
   hidden: { opacity: 0, y: 20 },
@@ -603,6 +604,7 @@ const CustomerAccount = () => {
 
               {/* Profile Tab */}
               <TabsContent value="profile" className="space-y-4">
+                <BuyerContactCard key={`${store.id}-${user.id}`} storeId={store.id} userId={user.id} initial={{ full_name: profile?.full_name || [lastOrder?.first_name, lastOrder?.last_name].filter(Boolean).join(' ') || 'Cliente', email: user.email || '', phone: lastOrder?.phone || '' }} />
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Datos de mi cuenta</CardTitle>

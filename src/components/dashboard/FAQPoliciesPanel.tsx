@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2, Save, HelpCircle, RotateCcw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import CustomerFaqPanel from './CustomerFaqPanel';
 
 interface FAQPoliciesPanelProps {
   storeId: string;
@@ -73,6 +74,7 @@ const FAQPoliciesPanel = ({ storeId, primaryColor, initial }: FAQPoliciesPanelPr
   };
 
   return (
+    <>
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
@@ -128,6 +130,8 @@ const FAQPoliciesPanel = ({ storeId, primaryColor, initial }: FAQPoliciesPanelPr
         </Button>
       </CardContent>
     </Card>
+    <CustomerFaqPanel key={storeId} storeId={storeId} />
+    </>
   );
 };
 
