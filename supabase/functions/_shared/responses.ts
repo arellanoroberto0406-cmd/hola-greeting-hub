@@ -10,7 +10,7 @@ import {
 
 export function createResponsesCall(
   request: Request,
-  config: { baseURL: string; apiKey: string; model: string; schema: z.ZodObject; fetch?: typeof fetch },
+  config: { baseURL: string; apiKey: string; model: string; schema: z.ZodObject },
   messages: ModelMessage[],
   instructions?: string,
 ) {
@@ -19,7 +19,7 @@ export function createResponsesCall(
     baseURL: `${config.baseURL.replace(/\/+$/, "").replace(/\/v1$/, "")}/v1`,
     apiKey: config.apiKey,
     headers: { "Lovable-API-Key": config.apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
-    fetch: config.fetch ? (input, init) => config.fetch?.(input, init) as Promise<Response> : runIdFetch.fetch,
+    fetch: runIdFetch.fetch,
   });
   const reasoning = config.model !== "openai/chat-latest";
   const result = streamText({
@@ -46,6 +46,7 @@ export function createResponsesCall(
   });
   return {
     result,
+    getRunId: runIdFetch.getRunId,
     response: () =>
       withLovableAiGatewayRunIdHeader(result.toUIMessageStreamResponse({ sendReasoning: true }), runIdFetch),
   };
