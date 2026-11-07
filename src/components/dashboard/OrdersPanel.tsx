@@ -36,6 +36,7 @@ import { es } from "date-fns/locale";
 import TrackingInput from "./TrackingInput";
 import ExportOrdersButton from "./ExportOrdersButton";
 import OrderInvoice from "./OrderInvoice";
+import BuyerContactsPanel from './BuyerContactsPanel';
 
 interface OrdersPanelProps {
   storeId: string;
@@ -198,6 +199,7 @@ const OrdersPanel = ({ storeId, store }: OrdersPanelProps) => {
       )}
 
       {/* Order Details Modal */}
+      <BuyerContactsPanel key={storeId} storeId={storeId} />
       <Dialog open={!!selectedOrder} onOpenChange={() => setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>

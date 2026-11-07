@@ -69,6 +69,7 @@ import SEOHead from "@/components/SEOHead";
 import TrustBar from "@/components/store/TrustBar";
 import SafePurchaseSection from "@/components/store/SafePurchaseSection";
 import PurchaseFAQSection from "@/components/store/PurchaseFAQSection";
+import CustomerFaqSection from '@/components/store/CustomerFaqSection';
 import MobileCartBar from "@/components/store/MobileCartBar";
 import ProductRecommendations from "@/components/store/ProductRecommendations";
 import { typographyVariables, typographyAttributes, useStoreFonts } from '@/lib/storeTypography';
@@ -772,6 +773,7 @@ const StoreFront = () => {
       />
 
       {/* Premium Footer */}
+      <CustomerFaqSection storeId={store.id} />
       <PremiumFooterSection store={store} planTier={planTier} />
 
       {/* Mobile sticky cart bar - conversion booster */}
