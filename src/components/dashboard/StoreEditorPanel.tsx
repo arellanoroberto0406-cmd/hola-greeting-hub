@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import '@/styles/store-creator.css';
 import {
   DndContext,
   closestCenter,
@@ -409,8 +410,8 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                 {hasChanges ? 'Cambios sin guardar' : 'Todo guardado'}
               </Badge>
             </div>
-            <h2 className="editor-bento-title">Haz que tu tienda se vea increíble</h2>
-            <p className="max-w-2xl text-muted-foreground">Elige un bloque, cambia lo que necesites y mira el resultado al instante.</p>
+            <h2 className="editor-bento-title">Personaliza {store.name}</h2>
+            <p className="max-w-2xl text-muted-foreground">{enabledCount} secciones visibles · {store.slug}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -498,54 +499,16 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
 
 
         <TabsContent value="all-in-one" className="space-y-5">
-          <div className="editor-bento-grid">
-            <section className="editor-bento-preview">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <Badge className="editor-live-badge">Vista en vivo</Badge>
-                  <h3 className="mt-3 text-2xl font-bold">Así se ve tu tienda</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Los cambios aparecen aquí antes de publicarlos.</p>
-                </div>
-                <Button variant="ghost" size="icon" asChild aria-label="Abrir tienda publicada">
-                  <a href={publishedStoreUrl} target="_blank" rel="noreferrer"><Eye className="h-5 w-5" /></a>
-                </Button>
-              </div>
-              <div className="editor-preview-canvas">
-                <LivePreviewPanel sections={sections} store={store} globalStyles={globalStyles} device={previewDevice} onDeviceChange={setPreviewDevice} />
-              </div>
-            </section>
-
-            <button type="button" className="editor-bento-tile editor-bento-brand" onClick={() => setStudioPanel("identity")}>
-              <span className="editor-tile-icon"><Palette className="h-6 w-6" /></span>
-              <span><strong>Identidad visual</strong><small>Logo, nombre, contacto y redes</small></span>
-              <ArrowRight className="h-5 w-5" />
-            </button>
-
-            <button type="button" className="editor-bento-tile editor-bento-type" onClick={() => setStudioPanel("styles")}>
-              <span className="editor-type-sample">Aa</span>
-              <span><strong>Colores y letras</strong><small>Haz reconocible tu marca</small></span>
-              <Type className="h-5 w-5" />
-            </button>
-
-            <button type="button" className="editor-bento-tile editor-bento-mobile" onClick={() => setPreviewDevice(previewDevice === "mobile" ? "desktop" : "mobile")}>
-              <Smartphone className="h-9 w-9" />
-              <span><strong>Vista móvil</strong><small>{previewDevice === "mobile" ? "Cambiar a escritorio" : "Revisar en teléfono"}</small></span>
-              <ArrowRight className="h-5 w-5" />
-            </button>
-
-            <button type="button" className="editor-bento-tile editor-bento-catalog" onClick={() => setStudioPanel("pro")}>
-              <ImageIcon className="h-8 w-8" />
-              <span><strong>Portada y catálogo</strong><small>Fotos, botones y productos</small></span>
-              <ArrowRight className="h-5 w-5" />
-            </button>
-
-            <button type="button" className="editor-bento-tile editor-bento-sections" onClick={() => setStudioPanel("sections")}>
-              <span><strong>Estructura de bloques</strong><small>Ordena las {enabledCount} secciones visibles de tu tienda</small></span>
-              <span className="editor-section-stack" aria-hidden="true"><i>H</i><i>P</i><i>F</i></span>
-              <Grid2X2 className="h-6 w-6" />
-            </button>
-          </div>
-
+          <div className="creator-workspace">
+          <div className="creator-controls">
+            <div className="creator-tools" aria-label="Personalización de tienda">
+              <Button variant="ghost" className="creator-tool" aria-pressed={studioPanel === 'identity'} onClick={() => setStudioPanel('identity')}><Palette /><span><strong>Tu marca</strong><small>Nombre, contacto y redes</small></span></Button>
+              <Button variant="ghost" className="creator-tool" aria-pressed={studioPanel === 'styles'} onClick={() => setStudioPanel('styles')}><Type /><span><strong>Colores y letras</strong><small>Tipografía, tamaños y botones</small></span></Button>
+              <Button variant="ghost" className="creator-tool" aria-pressed={studioPanel === 'pro'} onClick={() => setStudioPanel('pro')}><ImageIcon /><span><strong>Logo y portada</strong><small>Imágenes y acabados</small></span></Button>
+              <Button variant="ghost" className="creator-tool" aria-pressed={studioPanel === 'sections'} onClick={() => setStudioPanel('sections')}><Layers /><span><strong>Secciones</strong><small>{enabledCount} bloques visibles</small></span></Button>
+              <Button variant="ghost" className="creator-tool" onClick={() => setEditorTab('templates')}><LayoutTemplate /><span><strong>Plantillas</strong><small>Diseños listos para tu tienda</small></span></Button>
+              <Button variant="ghost" className="creator-tool" onClick={() => { setPreviewDevice('mobile'); setEditorTab('preview'); }}><Smartphone /><span><strong>Revisar en móvil</strong><small>Vista de tus compradores</small></span></Button>
+            </div>
           <AnimatePresence mode="wait">
             {studioPanel && (
               <motion.section key={studioPanel} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} className="editor-settings-drawer">
@@ -553,10 +516,16 @@ const StoreEditorPanel = ({ store }: StoreEditorPanelProps) => {
                   <div><h3 className="text-xl font-bold">{studioPanelContent[studioPanel].title}</h3><p className="mt-1 text-sm text-muted-foreground">{studioPanelContent[studioPanel].description}</p></div>
                   <Button variant="ghost" size="icon" onClick={() => setStudioPanel(null)} aria-label="Cerrar opciones"><X className="h-5 w-5" /></Button>
                 </div>
-                <div className="p-5 sm:p-6">{studioPanelContent[studioPanel].content}</div>
+                <div className="py-5">{studioPanelContent[studioPanel].content}</div>
               </motion.section>
             )}
           </AnimatePresence>
+          </div>
+          <section className="creator-preview">
+            <div className="flex items-center justify-between gap-3"><div><Badge className="editor-live-badge">Vista previa</Badge><h3 className="mt-2 text-lg font-semibold">{store.name}</h3></div><Button variant="ghost" size="icon" asChild aria-label="Abrir tienda publicada"><a href={publishedStoreUrl} target="_blank" rel="noreferrer"><Eye className="h-5 w-5" /></a></Button></div>
+            <div className="editor-preview-canvas"><LivePreviewPanel sections={sections} store={{ ...store, ...headerFooter }} globalStyles={globalStyles} device={previewDevice} onDeviceChange={setPreviewDevice} /></div>
+          </section>
+          </div>
 
           {hasChanges && (
             <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="editor-save-reminder">
