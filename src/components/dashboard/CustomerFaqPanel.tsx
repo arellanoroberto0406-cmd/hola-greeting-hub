@@ -22,7 +22,7 @@ export default function CustomerFaqPanel({ storeId }: { storeId: string }) {
     const parsed = customerFaqSchema.safeParse(draft);
     if (!parsed.success) { setError(parsed.error.issues[0]?.message ?? 'Revisa la pregunta y respuesta.'); return; }
     setSaving(true); setError('');
-    const result = draft.id ? await supabase.from('store_customer_faqs').update(parsed.data).eq('id', draft.id).eq('store_id', storeId) : await supabase.from('store_customer_faqs').insert({ ...parsed.data, store_id: storeId, sort_order: (data?.reduce((max, item) => Math.max(max, item.sort_order), -1) ?? -1) + 1 });
+    const result = draft.id ? await supabase.from('store_customer_faqs').update({ question: parsed.data.question, answer: parsed.data.answer }).eq('id', draft.id).eq('store_id', storeId) : await supabase.from('store_customer_faqs').insert({ question: parsed.data.question, answer: parsed.data.answer, store_id: storeId, sort_order: (data?.reduce((max, item) => Math.max(max, item.sort_order), -1) ?? -1) + 1 });
     setSaving(false);
     if (result.error) { setError('No se pudo guardar la pregunta.'); return; }
     await refresh(); setDraft(null); toast.success('Pregunta publicada en tu tienda');

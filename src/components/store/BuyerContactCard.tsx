@@ -38,7 +38,7 @@ export default function BuyerContactCard({ storeId, userId, initial }: { storeId
     const parsed = buyerContactSchema.safeParse(values);
     if (!parsed.success) { setMessage(parsed.error.issues[0]?.message ?? 'Revisa los datos.'); return; }
     setSaving(true); setMessage('');
-    const { error } = await supabase.from('store_buyer_contacts').upsert({ ...parsed.data, store_id: storeId, user_id: userId, updated_at: new Date().toISOString() });
+    const { error } = await supabase.from('store_buyer_contacts').upsert({ full_name: parsed.data.full_name, email: parsed.data.email, phone: parsed.data.phone, store_id: storeId, user_id: userId, updated_at: new Date().toISOString() });
     setSaving(false);
     if (error) { setMessage('No se pudieron guardar tus datos.'); return; }
     await queryClient.invalidateQueries({ queryKey: ['buyer-contact', storeId, userId] });
