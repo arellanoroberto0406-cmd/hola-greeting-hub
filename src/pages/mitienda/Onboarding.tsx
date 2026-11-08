@@ -5,6 +5,8 @@ import {
   Palette, Plus, RefreshCw, Sparkles, Store, Upload, Wand2,
 } from "lucide-react";
 import "@/mitienda/mitienda.css";
+import '@/styles/store-creator.css';
+import { Button } from '@/components/ui/button';
 import MtNav from "@/mitienda/components/MtNav";
 import DevicePreview from "@/mitienda/components/DevicePreview";
 import StoreMock from "@/mitienda/components/StoreMock";
@@ -16,7 +18,7 @@ import {
 
 const TAKEN = ["tienda", "shop", "moda", "urbanstyle"];
 
-const STEP_LABELS = ["Cuenta", "Negocio", "Identidad", "Diseño", "Publica"];
+const STEP_LABELS = ["Nombre", "Negocio", "Identidad", "Productos", "Plan"];
 
 const Stepper = ({ step }: { step: number }) => (
   <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
@@ -25,18 +27,11 @@ const Stepper = ({ step }: { step: number }) => (
       const done = value < step;
       const active = value === step;
       return (
-        <div key={label} className="flex items-center gap-2">
-          <span
-            className="grid h-8 w-8 place-items-center rounded-full text-sm font-bold transition-colors"
-            style={{
-              background: done ? "#10b981" : active ? "#3b46f1" : "#eef1f8",
-              color: done || active ? "#fff" : "#94a3b8",
-            }}
-          >
+        <div key={label} className="creator-step" data-active={active} data-done={done} aria-current={active ? 'step' : undefined}>
+          <span className="creator-step-number">
             {done ? <Check className="h-4 w-4" /> : value}
           </span>
-          <span className={`hidden text-sm sm:block ${active ? "font-bold" : "mt-muted"}`}>{label}</span>
-          {value < STEP_LABELS.length && <span className="hidden h-px w-6 bg-[#e2e8f0] sm:block" />}
+          <span className="creator-step-label text-sm">{label}</span>
         </div>
       );
     })}
@@ -90,14 +85,14 @@ const Onboarding = () => {
     : true;
 
   return (
-    <div className="mt mt-shell">
+    <div className="mt mt-shell creator-onboarding">
       <MtNav variant="minimal" />
 
       <div className="mx-auto max-w-[1200px] px-4 py-6">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <button type="button" className="mt-btn mt-btn-ghost mt-btn-sm" onClick={() => (step === 1 ? navigate("/mitienda") : go(step - 1))}>
+        <div className="creator-stepbar">
+          <Button variant="ghost" className="mt-btn mt-btn-ghost mt-btn-sm" onClick={() => (step === 1 ? navigate("/mitienda") : go(step - 1))}>
             <ArrowLeft className="h-4 w-4" /> {step === 1 ? "Volver al inicio" : "Atrás"}
-          </button>
+          </Button>
           <Stepper step={step} />
           <span className="mt-muted text-sm font-semibold">Paso {step} de 5</span>
         </div>
@@ -170,7 +165,7 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <DevicePreview draft={draft} subtitle="Así se verá tu tienda mientras escribes." />
+            <div className="creator-preview-top"><DevicePreview draft={draft} /></div>
           </div>
         )}
 
@@ -249,12 +244,8 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <div className="lg:sticky lg:top-24 lg:self-start">
+            <div className="creator-preview-top">
               <DevicePreview draft={draft} subtitle="Tu tienda se adapta a tus respuestas." />
-              <div className="mt-card mt-8 p-4 text-sm">
-                <p className="font-bold">Tu tienda se adapta a tus respuestas</p>
-                <p className="mt-muted">Colores, secciones, productos y estilo. Todo en tiempo real.</p>
-              </div>
             </div>
           </div>
         )}

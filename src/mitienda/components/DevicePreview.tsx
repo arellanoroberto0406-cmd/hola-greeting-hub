@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Monitor, Smartphone } from "lucide-react";
 import StoreMock from "./StoreMock";
 import { StoreDraft } from "../draft";
+import { Button } from '@/components/ui/button';
+import '@/styles/store-creator.css';
 
 interface Props {
   draft: StoreDraft;
@@ -15,33 +17,31 @@ const DevicePreview = ({ draft, title = "Vista previa en tiempo real", subtitle,
 
   return (
     <div className="w-full">
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <div className="creator-device-toolbar">
         <div>
           <p className="mt-chip">✨ {title}</p>
           {subtitle && <p className="mt-muted mt-1 text-sm">{subtitle}</p>}
         </div>
         {withToggle && (
-          <div className="flex rounded-xl border bg-white p-1">
-            <button
+          <div className="creator-device-toggle">
+            <Button variant="ghost" size="icon"
               type="button"
               onClick={() => setDevice("desktop")}
               aria-pressed={device === "desktop"}
               aria-label="Vista escritorio"
               className="mt-btn mt-btn-sm"
-              style={device === "desktop" ? { background: "#eaeeff", color: "#3b46f1" } : { background: "transparent", color: "#64748b" }}
             >
               <Monitor className="h-4 w-4" />
-            </button>
-            <button
+            </Button>
+            <Button variant="ghost" size="icon"
               type="button"
               onClick={() => setDevice("mobile")}
               aria-pressed={device === "mobile"}
               aria-label="Vista móvil"
               className="mt-btn mt-btn-sm"
-              style={device === "mobile" ? { background: "#eaeeff", color: "#3b46f1" } : { background: "transparent", color: "#64748b" }}
             >
               <Smartphone className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         )}
       </div>
@@ -49,18 +49,13 @@ const DevicePreview = ({ draft, title = "Vista previa en tiempo real", subtitle,
       {device === "desktop" ? (
         <div className="relative">
           <div className="mt-device-frame">
-            <div className="flex items-center gap-1.5 border-b bg-[#f6f8fc] px-3 py-2">
-              <span className="h-2 w-2 rounded-full bg-[#ff5f57]" />
-              <span className="h-2 w-2 rounded-full bg-[#febc2e]" />
-              <span className="h-2 w-2 rounded-full bg-[#28c840]" />
-              <span className="mx-auto rounded-md bg-white px-3 py-0.5 text-[9px] text-slate-400">
+            <div className="creator-browser-bar">
+              <span className="creator-browser-dot" /><span className="creator-browser-dot" /><span className="creator-browser-dot" />
+              <span className="creator-browser-address">
                 mitienda.mx/{draft.slug || "tu-tienda"}
               </span>
             </div>
             <StoreMock draft={draft} device="desktop" />
-          </div>
-          <div className="mt-phone-frame absolute -bottom-6 -right-3 hidden w-[130px] sm:block">
-            <StoreMock draft={draft} device="mobile" />
           </div>
         </div>
       ) : (

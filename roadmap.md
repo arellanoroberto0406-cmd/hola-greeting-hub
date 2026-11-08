@@ -1,6 +1,8 @@
 # Roadmap
 
 ## Solicitud actual
+- [ ] Simplificar el estudio de personalización con herramientas agrupadas y vista previa al lado.
+- [ ] Mejorar pasos de creación y vistas de escritorio y móvil sin cambiar el flujo existente.
 - [x] Tarjeta privada de contacto por comprador y tienda, editable en Mi cuenta y visible para el dueño en Pedidos.
 - [x] Preguntas y respuestas frecuentes editables desde Configuración y visibles en su tienda cuando se publican.
 - [ ] Verificar guardado y lectura con comprador y dueño autenticados (bloqueado: no hay sesión disponible; requiere iniciar sesión en la vista previa). Acceso público a contactos denegado y lectura pública de FAQ comprobados.
