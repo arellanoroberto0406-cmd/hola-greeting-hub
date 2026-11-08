@@ -1,9 +1,9 @@
 # Roadmap
 
 ## Solicitud actual
-- [ ] Tarjeta privada de contacto por comprador y tienda, editable en Mi cuenta y visible para el dueño.
-- [ ] Preguntas y respuestas frecuentes editables por el dueño y visibles en su tienda.
-- [ ] Verificar guardado, lectura privada y FAQ público.
+- [x] Tarjeta privada de contacto por comprador y tienda, editable en Mi cuenta y visible para el dueño en Pedidos.
+- [x] Preguntas y respuestas frecuentes editables desde Configuración y visibles en su tienda cuando se publican.
+- [ ] Verificar guardado y lectura con comprador y dueño autenticados (bloqueado: no hay sesión disponible; requiere iniciar sesión en la vista previa). Acceso público a contactos denegado y lectura pública de FAQ comprobados.
 - [x] Añadir búsqueda con IA para compradores basada únicamente en el catálogo de cada tienda; 2 pruebas de catálogo aprobadas.
 - [x] Desplegar y comprobar recomendaciones reales, ausencia de coincidencias y apertura de producto en móvil y escritorio.
 - [x] Tamaño y grosor independientes por pantalla: controles y aplicación por ancho verificados; 12 pruebas de aislamiento aprobadas
